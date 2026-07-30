@@ -1,19 +1,53 @@
 aid: leo
 name: LeO
-description: LeO is a company surfaced as a portfolio company of techstars and added to the API Evangelist
-  network as a stub for enrichment. This profile is a lead awaiting the enrichment pipeline.
+description: >-
+  LeO is an AI-powered sales and prospecting platform for commercial insurance
+  professionals, serving property & casualty (P&C) brokers, employee benefits
+  advisors, and nonprofit insurance specialists. The platform pairs a
+  commercial-lines prospect database with more than 150 filters -- NAICS codes,
+  revenue thresholds, workers' compensation, DOT, OSHA compliance history and IRS
+  990 nonprofit data -- with a renewal-date (X-date) database carrying key contacts
+  and AI-predicted renewal months. LeO generates AI-personalized email outreach,
+  produces pre-meeting intelligence on incumbent carriers, brokers, coverage and
+  risk gaps, and pushes qualified prospects to CRM or CSV export. Founded by CEO
+  Liri Halperin Segal, LeO is a Techstars portfolio company and has been certified
+  HIPAA compliant by an external auditing firm. It is delivered as a subscription
+  web application and publishes no public developer API, SDKs or documentation;
+  its only machine-readable surfaces are an llms.txt and a live Wix-provided site
+  MCP endpoint covering public marketing content.
+accessModel:
+  pricing: unknown
+  onboarding: unknown
+  trial: false
+  try_now: false
+  public: false
+  label: Unknown
+  confidence: low
+  source: []
+  generated: '2026-07-22'
+  method: derived
+image: https://static.wixstatic.com/media/38dea4_5b1d1b85783146d8b6cf1c6f354c9be8%7Emv2.jpg/v1/fit/w_2500,h_1330,al_c/38dea4_5b1d1b85783146d8b6cf1c6f354c9be8%7Emv2.jpg
 url: https://raw.githubusercontent.com/api-evangelist/leo/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - techstars
-x-tier: stub
-x-tier-reason: portfolio-lead
+x-tier: profiled
+x-tier-reason: enriched-no-public-api
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-19'
 tags:
 - Company
+- Insurance
+- Commercial Insurance
+- Property and Casualty
+- Employee Benefits
+- Insurtech
+- Artificial Intelligence
+- Sales
+- Lead Generation
+- Prospecting
 apis: []
 maintainers:
 - FN: Kin Lane
@@ -22,4 +56,39 @@ maintainers:
   email: info@apis.io
 common:
 - type: Website
-  url: https://meetleo.co/
+  url: https://www.meetleo.com/
+- type: Pricing
+  url: https://www.meetleo.com/pricing
+- type: SignUp
+  url: https://insights-app.meetleo.com/signup/register
+- type: Login
+  url: https://insights-app.meetleo.com/login
+- type: Support
+  url: https://www.meetleo.com/contact
+- type: FAQ
+  url: https://www.meetleo.com/faq
+- type: Blog
+  url: https://www.meetleo.com/blog
+- type: Resources
+  url: https://www.meetleo.com/resources
+- type: Press
+  url: https://www.meetleo.com/media
+- type: TermsOfService
+  url: https://www.meetleo.com/terms-and-conditions
+- type: PrivacyPolicy
+  url: https://www.meetleo.com/privacy
+- type: Compliance
+  url: https://www.meetleo.com/ai-transparency
+- type: Conformance
+  url: conformance/leo-conformance.yml
+- type: LLMsTxt
+  url: llms/leo-llms.txt
+- type: MCPServer
+  url: mcp/leo-mcp.yml
+- type: DomainSecurity
+  url: security/leo-domain-security.yml
+x-enrichment:
+  date: '2026-07-19'
+  status: backfilled
+  pass: local-v1
+  note: backfilled from .gitignore signal + verified work evidence
