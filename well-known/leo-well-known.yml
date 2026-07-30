@@ -1,0 +1,31 @@
+generated: '2026-07-19'
+method: searched
+source: live probe of https://www.meetleo.com/.well-known/*
+host: https://www.meetleo.com
+found: 0
+notes: >-
+  No /.well-known/ discovery documents are published. The host is a Wix-managed
+  site that returns HTTP 400 for every /.well-known/ path rather than 404, so the
+  path space is not served at all. Recorded as a negative probe result; no
+  WellKnown or SecurityTxt pointer is wired in apis.yml because no document
+  exists. Absence is a valid, expected result for a provider with no public API.
+documents:
+- path: /.well-known/security.txt
+  status: 400
+- path: /.well-known/openid-configuration
+  status: 400
+- path: /.well-known/oauth-authorization-server
+  status: 400
+- path: /.well-known/api-catalog
+  status: 400
+- path: /.well-known/ai-plugin.json
+  status: 400
+related:
+- path: /llms.txt
+  status: 200
+  file: ../llms/leo-llms.txt
+  note: Present and captured; advertises the site MCP endpoint.
+- path: /robots.txt
+  status: 200
+- path: /sitemap.xml
+  status: 200

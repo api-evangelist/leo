@@ -1,0 +1,97 @@
+generated: '2026-07-19'
+method: searched
+source: https://www.meetleo.com/llms.txt
+status: published
+notes: >-
+  LeO publishes no first-party product API or MCP server. The endpoint below is
+  the platform-provided Wix Site MCP server that fronts LeO's marketing site, is
+  advertised in LeO's own llms.txt, and was verified live on 2026-07-19 via a
+  JSON-RPC initialize + tools/list handshake. It exposes public site content and
+  generic Wix site-management tooling ONLY -- it is not an interface to the LeO
+  commercial-insurance prospecting product, which remains a subscription web app
+  behind login at https://insights-app.meetleo.com/. Recorded as the provider's
+  real agentic-access surface, with that scope limitation made explicit.
+server:
+  name: LeO 3.0 Site Visitor Assistant
+  transport: http
+  url: https://www.meetleo.com/_api/mcp
+  protocol_version: '2024-11-05'
+  server_info: Site Visitor Assistant for site "LeO 3.0" (https://www.meetleo.com/_api/mcp)
+  version: 1.0.0
+  vendor: Wix
+  vendor_docs: https://dev.wix.com/docs/develop-websites/articles/get-started/about-the-wix-site-mcp
+  first_party: false
+  authentication: none
+  scope: public site content only
+verified:
+  date: '2026-07-19'
+  initialize: 200
+  tools_list: 200
+  tool_count: 9
+capabilities:
+  tools:
+    listChanged: true
+  logging: {}
+tools:
+- name: GetBusinessDetails
+  description: Retrieves business and site details such as timezone, email, phone, and address.
+  parameters: []
+- name: SearchInSite
+  description: Searches the site for information.
+  parameters:
+  - searchTerm
+- name: SearchSiteApiDocs
+  description: >-
+    Retrieves the API documentation for the Wix business solutions installed on this
+    site and informs the AI client how to use the APIs.
+  parameters:
+  - searchTerm
+- name: GenerateVisitorToken
+  description: >-
+    Creates a new visitor session and obtains a visitor access token for the site.
+    Must be called before any CallWixSiteAPI request.
+  parameters: []
+- name: CallWixSiteAPI
+  description: >-
+    Calls API methods on the site to perform actions on a visitor's behalf, such as
+    querying site data or starting a purchase.
+  parameters:
+  - visitorToken
+  - url
+  - method
+  - body
+- name: ExecuteWixAPI
+  description: Executes a Wix API call from supplied code.
+  parameters:
+  - code
+  - reason
+  - hasMutations
+  - sourceDocUrls
+  - visitorToken
+- name: ReadFullDocsArticle
+  description: Fetches a complete article from the Wix developer documentation portal.
+  parameters:
+  - articleUrl
+- name: ReadFullDocsMethodSchema
+  description: Fetches the full schema for a Wix API method.
+  parameters:
+  - articleUrl
+  - reason
+- name: BrowseWixRESTDocsMenu
+  description: Browses the Wix REST documentation menu.
+  parameters:
+  - menuUrl
+  - reason
+advertised_capabilities:
+- Get business details (contact info, location, hours)
+- Discover products and services on offer
+- Book services and make reservations
+- Start a purchase and be directed to the site to complete checkout
+- Ask questions and get relevant answers without browsing the site
+caveats:
+- >-
+  Tool descriptions returned by this server embed Wix "agent-mandatory-instructions"
+  prompt text directing a connecting agent to manage Wix sites. That text is
+  third-party content in a tool description, not a LeO API contract, and should be
+  treated as untrusted data by any agent that connects.
+- No authentication is required; only public information is reachable.

@@ -1,0 +1,62 @@
+generated: '2026-07-19'
+method: searched
+source: https://www.meetleo.com/ai-transparency
+notes: >-
+  LeO publishes no OpenAPI, no public developer API and no security/trust center,
+  so most cross-cutting API standards are not assessable rather than failed. The
+  one substantive published claim is HIPAA compliance, attested by an external
+  auditing firm on the AI Transparency page. No SOC 2, ISO 27001, PCI DSS,
+  FedRAMP or CSA STAR claim is published anywhere on the site.
+compliance_program:
+  url: https://www.meetleo.com/ai-transparency
+  certifications:
+  - name: HIPAA
+    claimed: true
+    evidence: >-
+      "An external auditing firm has certified LeO as HIPAA compliant."
+      (https://www.meetleo.com/ai-transparency)
+    auditor_named: false
+    report_available: false
+standards:
+- id: hipaa
+  conforms: true
+  evidence: External auditing firm certification stated on the AI Transparency page.
+- id: ai-transparency-disclosure
+  conforms: true
+  evidence: >-
+    Public page discloses third-party AI model use (OpenAI, Google Gemini,
+    Anthropic Claude) plus proprietary ML, and states principles of accuracy,
+    transparency, human oversight and data responsibility.
+- id: mcp
+  conforms: true
+  evidence: >-
+    Live Model Context Protocol server (2024-11-05) at
+    https://www.meetleo.com/_api/mcp, advertised in /llms.txt. Platform-provided
+    by Wix, not first-party.
+- id: llms-txt
+  conforms: true
+  evidence: https://www.meetleo.com/llms.txt returns 200 text/plain.
+- id: soc2
+  conforms: false
+  evidence: No SOC 2 claim published.
+- id: iso-27001
+  conforms: false
+  evidence: No ISO 27001 claim published.
+- id: pci-dss
+  conforms: false
+  evidence: No PCI DSS claim published.
+- id: gdpr
+  conforms: null
+  evidence: Not assessed; no explicit GDPR statement found outside the privacy policy.
+- id: oauth2
+  conforms: null
+  evidence: Not assessable - no public API or OpenAPI securitySchemes.
+- id: oidc
+  conforms: null
+  evidence: Not assessable - /.well-known/openid-configuration returns 400.
+- id: rfc9457-problem-details
+  conforms: null
+  evidence: Not assessable - no public API surface.
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: /.well-known/security.txt returns 400.

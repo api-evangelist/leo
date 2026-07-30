@@ -1,0 +1,68 @@
+# LeO 3.0
+> The Leo website offers an AI-powered platform designed to help insurance sales professionals streamline prospecting and close more deals. It provides resources like whitepapers and guides, alongside its core service which features AI-driven automation, superior data accuracy, and advanced filtering for P&C and employee benefits. The platform aims to accelerate sales cycles and improve lead generation through real-time data and pre-meeting planning tools. Leo emphasizes enterprise-grade security and compliance, positioning itself as a modern solution for the evolving insurance industry.
+
+## Homepage link
+- [home](https://www.meetleo.com/)
+
+## AI Agent Access
+
+This site is powered by Wix and supports the Model Context Protocol (MCP)
+for agentic AI access. AI agents can connect directly to retrieve live,
+up-to-date site content - no scraping required.
+
+- [**Site MCP Endpoint**](https://www.meetleo.com/_api/mcp)
+- [**Wix MCP Docs**](https://dev.wix.com/docs/develop-websites/articles/get-started/about-the-wix-site-mcp)
+
+## Available MCP Tools
+
+### GetBusinessDetails
+Retrieves business and site details such as timezone, email, phone, and address.
+- No parameters required.
+
+### SearchInSite
+Searches the site for information.
+- **searchTerm** - The term to search for in the site.
+
+### SearchSiteApiDocs
+Retrieves the API documentation for the Wix business solutions installed on
+this site, and informs the AI client how to use the APIs. Use this tool for
+querying products and services (instead of SearchInSite).
+- **searchTerm** - The term to search for in the site API documentation.
+
+### GenerateVisitorToken
+Creates a new visitor session and obtains a visitor access token for the site.
+Must be called before making any CallWixSiteAPI request if no visitor token
+is already available in context.
+- No parameters required.
+
+### CallWixSiteAPI
+Calls API methods on the site to perform actions on a visitor's behalf,
+such as querying site data, booking an appointment, or starting a purchase.
+- **visitorToken** - Visitor access token. Use GenerateVisitorToken first if not available.
+- **url** - Absolute URL of the API method to call (e.g. https://www.wixapis.com/...). Retrieve using SearchSiteApiDocs.
+- **method** -  HTTP method to use for the API call.
+- **body** -  Request body as a valid JSON string.
+
+### ReadFullDocsArticle
+Fetches a complete article from the Wix developer documentation portal.
+- **articleUrl** -  URL of an article in the Wix developer documentation portal.
+
+### ReadFullDocsMethodSchema
+Fetches the full schema for a Wix API method. Should be called before
+calling the actual method via CallWixSiteAPI.
+- **articleUrl** - URL of the reference article for the Wix API method.
+
+## What Visitors Can Do via AI + MCP
+
+- Get business details (contact info, location, hours)
+- Discover products and services on offer
+- Book services and make reservations
+- Start a purchase and be directed to the site to complete checkout
+- Ask questions and get relevant answers without having to browse the site
+
+## Notes
+
+- No authentication required to connect to the MCP endpoint
+- Only public information accessible on the site is available
+- Content is always live and up to date
+- To receive tool updates, implement a tools/list call upon receipt of a tool update notification
