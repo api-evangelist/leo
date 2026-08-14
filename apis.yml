@@ -4,28 +4,40 @@ description: >-
   LeO is an AI-powered sales and prospecting platform for commercial insurance
   professionals, serving property & casualty (P&C) brokers, employee benefits
   advisors, and nonprofit insurance specialists. The platform pairs a
-  commercial-lines prospect database with more than 150 filters -- NAICS codes,
-  revenue thresholds, workers' compensation, DOT, OSHA compliance history and IRS
-  990 nonprofit data -- with a renewal-date (X-date) database carrying key contacts
+  commercial-lines prospect database of 25M+ US businesses and 200+ filters --
+  NAICS codes, revenue thresholds, workers' compensation, DOT/FMCSA records, OSHA
+  compliance history, Form 5500 benefits and pension filings, and IRS 990
+  nonprofit data -- with a renewal-date (X-date) database carrying key contacts
   and AI-predicted renewal months. LeO generates AI-personalized email outreach,
   produces pre-meeting intelligence on incumbent carriers, brokers, coverage and
   risk gaps, and pushes qualified prospects to CRM or CSV export. Founded by CEO
   Liri Halperin Segal, LeO is a Techstars portfolio company and has been certified
-  HIPAA compliant by an external auditing firm. It is delivered as a subscription
-  web application and publishes no public developer API, SDKs or documentation;
-  its only machine-readable surfaces are an llms.txt and a live Wix-provided site
-  MCP endpoint covering public marketing content.
+  HIPAA compliant by an external auditing firm. Alongside the subscription web
+  application it ships two programmatic surfaces: a REST "Leo Public API" at
+  api.meetleo.com with a published OpenAPI 3.0.0 definition covering account,
+  credits, prospect search and asynchronous contact enrichment, and a first-party,
+  OAuth-protected MCP Connector at mcp.meetleo.com marketed for Claude, ChatGPT,
+  Gemini and Copilot. Both are entitlement-gated to existing customers and metered
+  in credits.
 accessModel:
-  pricing: unknown
-  onboarding: unknown
-  trial: false
+  pricing: paid
+  onboarding: sales
+  trial: true
   try_now: false
   public: false
-  label: Unknown
-  confidence: low
-  source: []
-  generated: '2026-07-22'
-  method: derived
+  label: Customer-gated
+  confidence: medium
+  source:
+  - https://www.meetleo.com/pricing
+  - https://www.meetleo.com/mcp
+  - openapi/leo-account-api-openapi.yml
+  note: >-
+    A 14-day free trial of the web application is offered, but programmatic access
+    is gated by per-plan entitlement flags (plan.hasApiAccess, plan.hasMcpAccess)
+    and no self-service credential issuance was found. Tier prices are rendered
+    client-side and are not readable from the served pricing page.
+  generated: '2026-08-14'
+  method: searched
 image: https://static.wixstatic.com/media/38dea4_5b1d1b85783146d8b6cf1c6f354c9be8%7Emv2.jpg/v1/fit/w_2500,h_1330,al_c/38dea4_5b1d1b85783146d8b6cf1c6f354c9be8%7Emv2.jpg
 url: https://raw.githubusercontent.com/api-evangelist/leo/refs/heads/main/apis.yml
 x-type: company
@@ -33,10 +45,10 @@ x-source: vc-portfolio
 x-backed-by:
 - techstars
 x-tier: profiled
-x-tier-reason: enriched-no-public-api
+x-tier-reason: public-openapi-and-first-party-mcp
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-19'
+modified: '2026-08-14'
 tags:
 - Company
 - Insurance
@@ -48,7 +60,119 @@ tags:
 - Sales
 - Lead Generation
 - Prospecting
-apis: []
+- Data Enrichment
+- Sales Intelligence
+- Nonprofits
+- Trucking
+- MCP
+- Agent Native
+apis:
+- name: LeO Public API
+  description: >-
+    REST API for account entitlements, credit balance, commercial-insurance
+    prospect search across 134 filter properties, single-prospect retrieval, and
+    asynchronous decision-maker contact enrichment with job polling. OpenAPI 3.0.0
+    published at https://api.meetleo.com/openapi.json and rendered by a Swagger UI
+    at /docs. Bearer JWT auth; metered in credits with a 402 on exhaustion.
+  humanURL: https://api.meetleo.com/docs
+  baseURL: https://api.meetleo.com
+  tags:
+  - insurance
+  - commercial-insurance
+  - prospecting
+  - sales-intelligence
+  - data-enrichment
+  - company-data
+  - contact-data
+  - workers-compensation
+  - dot-fmcsa
+  - form-5500
+  - irs-990
+  - osha
+  properties:
+  - type: OpenAPI
+    url: openapi/leo-prospects-api-openapi.yml
+  - type: OpenAPI
+    url: openapi/leo-jobs-api-openapi.yml
+  - type: OpenAPI
+    url: openapi/leo-account-api-openapi.yml
+  - type: OpenAPI
+    url: openapi/leo-credits-api-openapi.yml
+  - type: OpenAPI
+    url: openapi/leo-system-api-openapi.yml
+  - type: OpenAPI
+    url: https://api.meetleo.com/openapi.json
+  - type: Documentation
+    url: https://api.meetleo.com/docs
+  - type: APIReference
+    url: https://api.meetleo.com/docs
+  - type: Authentication
+    url: authentication/leo-authentication.yml
+  - type: Conventions
+    url: conventions/leo-conventions.yml
+  - type: ErrorCatalog
+    url: errors/leo-problem-types.yml
+  - type: DataModel
+    url: data-model/leo-data-model.yml
+  - type: RateLimits
+    url: rate-limits/leo-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/leo-lifecycle.yml
+  - type: Overlay
+    url: overlays/leo-servers-overlay.yaml
+  - type: AgentSkill
+    url: skills/_index.yml
+- name: LeO MCP Connector
+  description: >-
+    First-party, hosted, remote MCP server exposing LeO's insurance intelligence --
+    25M+ US businesses across 200+ filters, x-dates, Form 5500 financials, benefits
+    red flags, DOT Intelligence, Trucking Triggers, IRS 990 data, OSHA violations
+    and Talking Points -- to Claude, ChatGPT, Gemini, Copilot and custom agents.
+    OAuth 2.1 (authorization_code + PKCE S256) over an AWS Cognito user pool, with
+    RFC 9728 and RFC 8414 discovery documents published anonymously. Requires a LeO
+    account and honours its entitlements and credit balance.
+  humanURL: https://www.meetleo.com/mcp
+  baseURL: https://mcp.meetleo.com
+  tags:
+  - mcp
+  - agent-native
+  - insurance
+  - prospecting
+  - sales-intelligence
+  - data-enrichment
+  properties:
+  - type: MCPServer
+    url: mcp/leo-mcp.yml
+  - type: MCPServer
+    url: https://mcp.meetleo.com/mcp
+  - type: ToolCrosswalk
+    url: mcp/leo-tool-crosswalk.yml
+  - type: OAuthScopes
+    url: scopes/leo-scopes.yml
+  - type: Authentication
+    url: authentication/leo-authentication.yml
+  - type: WellKnown
+    url: well-known/leo-well-known.yml
+  - type: Documentation
+    url: https://www.meetleo.com/mcp
+- name: LeO Site MCP (Wix-provided)
+  description: >-
+    Platform-provided Wix Site MCP server fronting LeO's marketing site, advertised
+    in LeO's llms.txt. Nine tools covering business details, site search and generic
+    Wix site tooling. Unauthenticated, public marketing content only -- NOT an
+    interface to the LeO prospecting product. Recorded for completeness and clearly
+    distinguished from the first-party MCP Connector.
+  humanURL: https://www.meetleo.com/llms.txt
+  baseURL: https://www.meetleo.com/_api/mcp
+  tags:
+  - mcp
+  - site-content
+  - wix
+  properties:
+  - type: MCPServer
+    url: mcp/leo-site-mcp.yml
+  - type: LLMsTxt
+    url: llms/leo-llms.txt
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -59,6 +183,8 @@ common:
   url: https://www.meetleo.com/
 - type: Pricing
   url: https://www.meetleo.com/pricing
+- type: Plans
+  url: plans/leo-plans-pricing.yml
 - type: SignUp
   url: https://insights-app.meetleo.com/signup/register
 - type: Login
@@ -81,14 +207,43 @@ common:
   url: https://www.meetleo.com/ai-transparency
 - type: Conformance
   url: conformance/leo-conformance.yml
+- type: Documentation
+  url: https://api.meetleo.com/docs
+- type: APIReference
+  url: https://api.meetleo.com/docs
 - type: LLMsTxt
   url: llms/leo-llms.txt
-- type: MCPServer
-  url: mcp/leo-mcp.yml
+- type: Authentication
+  url: authentication/leo-authentication.yml
+- type: OAuthScopes
+  url: scopes/leo-scopes.yml
+- type: Conventions
+  url: conventions/leo-conventions.yml
+- type: ErrorCatalog
+  url: errors/leo-problem-types.yml
+- type: DataModel
+  url: data-model/leo-data-model.yml
+- type: RateLimits
+  url: rate-limits/leo-rate-limits.yml
+- type: Lifecycle
+  url: lifecycle/leo-lifecycle.yml
+- type: Overlay
+  url: overlays/leo-servers-overlay.yaml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: ToolCrosswalk
+  url: mcp/leo-tool-crosswalk.yml
+- type: WellKnown
+  url: well-known/leo-well-known.yml
 - type: DomainSecurity
   url: security/leo-domain-security.yml
 x-enrichment:
-  date: '2026-07-19'
-  status: backfilled
+  date: '2026-08-14'
+  status: enriched
+  artifacts_added: 25
   pass: local-v1
-  note: backfilled from .gitignore signal + verified work evidence
+  note: >-
+    Round 2 overturned the round-1 "no public API" finding. Probing the API host
+    root rather than the Wix marketing host found a real OpenAPI 3.0.0 document at
+    https://api.meetleo.com/openapi.json, and a first-party OAuth-protected MCP
+    Connector at https://mcp.meetleo.com/mcp with RFC 9728 / RFC 8414 discovery.
