@@ -1,0 +1,167 @@
+openapi: 3.0.0
+info:
+  title: LeO Public API - jobs
+  description: External API for account management, credits, prospect search, and contact enrichment This
+    document carries only the `jobs` operations, split from LeO's published openapi.json.
+  version: '1.0'
+servers:
+- url: https://api.meetleo.com
+  description: 'LeO Public API production base (verified live 2026-08-14: GET /health -> 200, GET /openapi.json
+    -> 200)'
+tags:
+- name: jobs
+  description: Poll asynchronous contact-enrichment jobs queued by POST /v1/prospects/enrich.
+paths:
+  /v1/jobs/{taskId}:
+    get:
+      operationId: JobsController_getJob
+      summary: Poll enrichment job status
+      description: 'Returns the current state of an enrichment job and — once complete — the enriched
+        prospects with contact data.
+
+
+        **Polling cadence:** every 5 seconds. Typical jobs complete in ~1–2 minutes. Allow up to 5 minutes
+        before timing out.
+
+
+        **Status values:**
+
+        - `pending` / `processing` — job is queued or running, keep polling.
+
+        - `completed` — `data.prospects[]` is populated; `metadata.creditsUsed` reflects the actual charge.
+
+        - `failed` — terminal; inspect the `errors[]` array.
+
+
+        **Per-prospect `enrichmentStatus`:** `enriched` (email + title returned), `no_email` (matched
+        but no contact found — no credit consumed), `failed` (this prospect errored).'
+      parameters:
+      - name: taskId
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Job status and results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPollEnvelopeDto'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Job not found or expired
+        '429':
+          description: Too many requests (HTTP API stage throttling or upstream limits)
+      tags:
+      - jobs
+      security:
+      - bearer: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    EnrichedProspectJobItemDto:
+      type: object
+      properties:
+        prospectId:
+          type: number
+          example: 8472193
+        enrichmentStatus:
+          type: string
+          description: Outcome of contact enrichment for this prospect. Only `enriched` consumes a credit.
+          enum:
+          - enriched
+          - no_email
+          - failed
+          example: enriched
+      required:
+      - prospectId
+      - enrichmentStatus
+    JobErrorItemDto:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ENRICHMENT_FAILED
+        message:
+          type: string
+          example: Enrichment pipeline error — please retry in a few minutes
+      required:
+      - code
+      - message
+    JobPollEnvelopeDto:
+      type: object
+      properties:
+        version:
+          type: string
+          example: '1.0'
+        processTime:
+          type: number
+          example: 84
+          description: Server processing time in ms.
+        data:
+          $ref: '#/components/schemas/JobStatusDataDto'
+        errors:
+          description: Empty array on success.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/JobErrorItemDto'
+        metadata:
+          $ref: '#/components/schemas/JobPollMetadataDto'
+      required:
+      - version
+      - processTime
+      - data
+      - errors
+      - metadata
+    JobPollMetadataDto:
+      type: object
+      properties:
+        requestId:
+          type: string
+          format: uuid
+          example: a1b2c3d4-5678-90ab-cdef-1234567890ab
+        creditsUsed:
+          type: number
+          example: 18
+          description: Credits actually charged for this job. Only prospects with enrichmentStatus="enriched"
+            are billed; "no_email" and "failed" rows are free.
+        creditsRemaining:
+          type: number
+          example: 1482
+          description: Caller credits remaining after this job.
+      required:
+      - requestId
+      - creditsUsed
+      - creditsRemaining
+    JobStatusDataDto:
+      type: object
+      properties:
+        taskId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        status:
+          type: string
+          enum:
+          - pending
+          - processing
+          - completed
+          - failed
+          example: completed
+          description: Poll until this is `completed` or `failed`. Other values mean the job is still
+            running.
+        prospects:
+          description: Populated only when status is `completed`.
+          type: array
+          items:
+            $ref: '#/components/schemas/EnrichedProspectJobItemDto'
+      required:
+      - taskId
+      - status

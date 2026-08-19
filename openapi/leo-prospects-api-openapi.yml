@@ -1,0 +1,1706 @@
+openapi: 3.0.0
+info:
+  title: LeO Public API - prospects
+  description: External API for account management, credits, prospect search, and contact enrichment This
+    document carries only the `prospects` operations, split from LeO's published openapi.json.
+  version: '1.0'
+servers:
+- url: https://api.meetleo.com
+  description: 'LeO Public API production base (verified live 2026-08-14: GET /health -> 200, GET /openapi.json
+    -> 200)'
+tags:
+- name: prospects
+  description: Search, retrieve and enrich commercial-insurance prospects across LeO's insights database.
+paths:
+  /v1/prospects/search:
+    post:
+      operationId: ProspectsController_search
+      summary: Search prospects
+      description: "Synchronous search over the Leo insights database. Returns firmographics (employees,\
+        \ vertical, NAICS, website), and insurance signals (workers comp, OSHA, DOT, Form 5500, IRS 990\
+        \ for non-profits).\n\n**When to use:** building a prospecting list, exploring market segments,\
+        \ or previewing match volume before paying for enrichment.\n\n**Does NOT consume enrichment credits.**\
+        \ Contacts are always `null` here — call `POST /v1/prospects/enrich` to get contact emails.\n\n\
+        **Example — Texas trucking fleets, 25–250 employees, with WC and DOT data:**\n```json\n{\n  \"\
+        filters\": [{\n    \"state\": [\"TX\"],\n    \"naicsList\": [\"484110\", \"484121\"],\n    \"\
+        minEmployeesNumber\": 25,\n    \"maxEmployeesNumber\": 250,\n    \"hasWc\": true,\n    \"hasDot\"\
+        : true\n  }],\n  \"page\": 1,\n  \"limit\": 25\n}\n```"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchProspectsDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchProspectsResponseData'
+        '401':
+          description: Unauthorized
+        '422':
+          description: Validation error
+        '429':
+          description: Too many requests (HTTP API stage throttling or upstream limits)
+      tags:
+      - prospects
+      security:
+      - bearer: []
+  /v1/prospects/{prospectId}:
+    get:
+      operationId: ProspectsController_getById
+      summary: Get a single prospect by ID
+      description: 'Returns full firmographic and insurance data for a single prospect.
+
+
+        **Consumes 1 credit** per call (same as a 1-result search).
+
+
+        Use `POST /v1/prospects/search` first to discover matching prospect IDs, then call this endpoint
+        to fetch the full record.'
+      parameters:
+      - name: prospectId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProspectResponse'
+        '401':
+          description: Unauthorized
+        '402':
+          description: Insufficient credits
+        '404':
+          description: Prospect not found
+        '429':
+          description: Too many requests (HTTP API stage throttling or upstream limits)
+      tags:
+      - prospects
+      security:
+      - bearer: []
+  /v1/prospects/enrich:
+    post:
+      operationId: ProspectsController_enrich
+      summary: Enrich prospects with contact data
+      description: "Asynchronous. Searches for matching prospects, reserves credits up to `maxProspects`,\
+        \ and queues a contact-enrichment job that resolves decision-maker emails and titles.\n\n**Flow:**\n\
+        1. POST this endpoint → **202 Accepted** with `taskId`, `pollUrl`, `creditsReserved`, `estimatedWaitSeconds`\
+        \ (~120s typical).\n2. Poll `GET /v1/jobs/{taskId}` every 5s until `data.status` is `completed`\
+        \ or `failed` (allow up to 5 minutes).\n3. Inspect per-prospect `enrichmentStatus`: `enriched`\
+        \ (email returned, credit charged), `no_email` (no contact found, no credit charged), `failed`.\n\
+        \n**Tip:** narrow filters return higher `enriched` rates. The same filter shape as `/v1/prospects/search`\
+        \ works here — preview with search first, then enrich.\n\n**Example — enrich up to 25 Texas trucking\
+        \ fleets:**\n```json\n{\n  \"filters\": [{\n    \"state\": [\"TX\"],\n    \"naicsList\": [\"484110\"\
+        , \"484121\"],\n    \"minEmployeesNumber\": 25,\n    \"maxEmployeesNumber\": 250,\n    \"hasWc\"\
+        : true,\n    \"hasDot\": true\n  }],\n  \"maxProspects\": 25\n}\n```"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrichProspectsDto'
+      responses:
+        '202':
+          description: Accepted — poll GET /v1/jobs/{taskId} for results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrichProspectsResponseData'
+        '401':
+          description: Unauthorized
+        '402':
+          description: Insufficient credits
+        '422':
+          description: No prospects match filters
+        '429':
+          description: Too many requests (HTTP API stage throttling or upstream limits)
+      tags:
+      - prospects
+      security:
+      - bearer: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    BenefitsRedFlags:
+      type: object
+      properties:
+        benefitsRagFlagComplianceAmendmentNeeded:
+          type: boolean
+          nullable: true
+          example: null
+          description: Compliance Amendment Needed — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionComplianceAmendmentNeeded:
+          type: string
+          nullable: true
+          example: null
+          description: Compliance Amendment Needed — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagCorrectiveDistributions:
+          type: boolean
+          nullable: true
+          example: null
+          description: Corrective Distributions — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionCorrectiveDistributions:
+          type: string
+          nullable: true
+          example: null
+          description: Corrective Distributions — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagDecliningPlanAssets:
+          type: boolean
+          nullable: true
+          example: null
+          description: Declining Plan Assets — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionDecliningPlanAssets:
+          type: string
+          nullable: true
+          example: null
+          description: Declining Plan Assets — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagDelinquentContributions:
+          type: boolean
+          nullable: true
+          example: null
+          description: Delinquent Contributions — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionDelinquentContributions:
+          type: string
+          nullable: true
+          example: null
+          description: Delinquent Contributions — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagExcessiveServiceProviderFees:
+          type: boolean
+          nullable: true
+          example: null
+          description: Excessive Service Provider Fees — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionExcessiveServiceProviderFees:
+          type: string
+          nullable: true
+          example: null
+          description: Excessive Service Provider Fees — human-readable explanation when flagged; null
+            otherwise.
+        benefitsRagFlagFidelityBondTooLow:
+          type: boolean
+          nullable: true
+          example: null
+          description: Fidelity Bond Too Low — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionFidelityBondTooLow:
+          type: string
+          nullable: true
+          example: null
+          description: Fidelity Bond Too Low — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagFrozenPlan:
+          type: boolean
+          nullable: true
+          example: null
+          description: Frozen Plan — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionFrozenPlan:
+          type: string
+          nullable: true
+          example: null
+          description: Frozen Plan — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagHas5500Audit:
+          type: boolean
+          nullable: true
+          example: null
+          description: Has 5500 Audit — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionHas5500Audit:
+          type: string
+          nullable: true
+          example: null
+          description: Has 5500 Audit — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagHighAverageAccountBalance:
+          type: boolean
+          nullable: true
+          example: null
+          description: High Average Account Balance — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionHighAverageAccountBalance:
+          type: string
+          nullable: true
+          example: null
+          description: High Average Account Balance — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagHighBrokerCommissionRate:
+          type: boolean
+          nullable: true
+          example: null
+          description: High Broker Commission Rate — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionHighBrokerCommissionRate:
+          type: string
+          nullable: true
+          example: null
+          description: High Broker Commission Rate — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagHighExpenseRatio:
+          type: boolean
+          nullable: true
+          example: null
+          description: High Expense Ratio — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionHighExpenseRatio:
+          type: string
+          nullable: true
+          example: null
+          description: High Expense Ratio — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagHighFees:
+          type: boolean
+          nullable: true
+          example: null
+          description: High Fees — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionHighFees:
+          type: string
+          nullable: true
+          example: null
+          description: High Fees — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagHighParticipantTurnover:
+          type: boolean
+          nullable: true
+          example: null
+          description: High Participant Turnover — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionHighParticipantTurnover:
+          type: string
+          nullable: true
+          example: null
+          description: High Participant Turnover — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagHighPremiumPerCapita:
+          type: boolean
+          nullable: true
+          example: null
+          description: High Premium Per Capita — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionHighPremiumPerCapita:
+          type: string
+          nullable: true
+          example: null
+          description: High Premium Per Capita — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagHighRetireeAssets:
+          type: boolean
+          nullable: true
+          example: null
+          description: High Retiree Assets — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionHighRetireeAssets:
+          type: string
+          nullable: true
+          example: null
+          description: High Retiree Assets — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagHighTurnoverRatio:
+          type: boolean
+          nullable: true
+          example: null
+          description: High Turnover Ratio — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionHighTurnoverRatio:
+          type: string
+          nullable: true
+          example: null
+          description: High Turnover Ratio — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagIndirectCompensationHeavy:
+          type: boolean
+          nullable: true
+          example: null
+          description: Indirect Compensation Heavy — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionIndirectCompensationHeavy:
+          type: string
+          nullable: true
+          example: null
+          description: Indirect Compensation Heavy — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagLargeAssetDrop:
+          type: boolean
+          nullable: true
+          example: null
+          description: Large Asset Drop — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionLargeAssetDrop:
+          type: string
+          nullable: true
+          example: null
+          description: Large Asset Drop — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagLateFiling:
+          type: boolean
+          nullable: true
+          example: null
+          description: Late Filing — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionLateFiling:
+          type: string
+          nullable: true
+          example: null
+          description: Late Filing — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagLowParticipationRate:
+          type: boolean
+          nullable: true
+          example: null
+          description: Low Participation Rate — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionLowParticipationRate:
+          type: string
+          nullable: true
+          example: null
+          description: Low Participation Rate — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagMissingAudit:
+          type: boolean
+          nullable: true
+          example: null
+          description: Missing Audit — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionMissingAudit:
+          type: string
+          nullable: true
+          example: null
+          description: Missing Audit — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagMultiplePlansSingleEmployer:
+          type: boolean
+          nullable: true
+          example: null
+          description: Multiple Plans Single Employer — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionMultiplePlansSingleEmployer:
+          type: string
+          nullable: true
+          example: null
+          description: Multiple Plans Single Employer — human-readable explanation when flagged; null
+            otherwise.
+        benefitsRagFlagNegativeNetAssets:
+          type: boolean
+          nullable: true
+          example: null
+          description: Negative Net Assets — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionNegativeNetAssets:
+          type: string
+          nullable: true
+          example: null
+          description: Negative Net Assets — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagNegativeNetIncome:
+          type: boolean
+          nullable: true
+          example: null
+          description: Negative Net Income — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionNegativeNetIncome:
+          type: string
+          nullable: true
+          example: null
+          description: Negative Net Income — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagNetParticipantOutflow:
+          type: boolean
+          nullable: true
+          example: null
+          description: Net Participant Outflow — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionNetParticipantOutflow:
+          type: string
+          nullable: true
+          example: null
+          description: Net Participant Outflow — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagNewPlan:
+          type: boolean
+          nullable: true
+          example: null
+          description: New Plan — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionNewPlan:
+          type: string
+          nullable: true
+          example: null
+          description: New Plan — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagNoCurrentBroker:
+          type: boolean
+          nullable: true
+          example: null
+          description: No Current Broker — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionNoCurrentBroker:
+          type: string
+          nullable: true
+          example: null
+          description: No Current Broker — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagNoEmployerContributions:
+          type: boolean
+          nullable: true
+          example: null
+          description: No Employer Contributions — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionNoEmployerContributions:
+          type: string
+          nullable: true
+          example: null
+          description: No Employer Contributions — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagNoInsuranceOnWelfarePlan:
+          type: boolean
+          nullable: true
+          example: null
+          description: No Insurance On Welfare Plan — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionNoInsuranceOnWelfarePlan:
+          type: string
+          nullable: true
+          example: null
+          description: No Insurance On Welfare Plan — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagNoStopLoss:
+          type: boolean
+          nullable: true
+          example: null
+          description: No Stop Loss — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionNoStopLoss:
+          type: string
+          nullable: true
+          example: null
+          description: No Stop Loss — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagPlanRecentlyTerminated:
+          type: boolean
+          nullable: true
+          example: null
+          description: Plan Recently Terminated — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionPlanRecentlyTerminated:
+          type: string
+          nullable: true
+          example: null
+          description: Plan Recently Terminated — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagPolicyExpiringSoon:
+          type: boolean
+          nullable: true
+          example: null
+          description: Policy Expiring Soon — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionPolicyExpiringSoon:
+          type: string
+          nullable: true
+          example: null
+          description: Policy Expiring Soon — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagQualifiedAuditOpinion:
+          type: boolean
+          nullable: true
+          example: null
+          description: Qualified Audit Opinion — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionQualifiedAuditOpinion:
+          type: string
+          nullable: true
+          example: null
+          description: Qualified Audit Opinion — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagRelatedPartyTransactions:
+          type: boolean
+          nullable: true
+          example: null
+          description: Related Party Transactions — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionRelatedPartyTransactions:
+          type: string
+          nullable: true
+          example: null
+          description: Related Party Transactions — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagSingleCarrierDependency:
+          type: boolean
+          nullable: true
+          example: null
+          description: Single Carrier Dependency — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionSingleCarrierDependency:
+          type: string
+          nullable: true
+          example: null
+          description: Single Carrier Dependency — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagSmallPlanLargeAssets:
+          type: boolean
+          nullable: true
+          example: null
+          description: Small Plan Large Assets — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionSmallPlanLargeAssets:
+          type: string
+          nullable: true
+          example: null
+          description: Small Plan Large Assets — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagStaleValuation:
+          type: boolean
+          nullable: true
+          example: null
+          description: Stale Valuation — true = flagged, false = not flagged, null = insufficient data.
+        benefitsRagFlagDescriptionStaleValuation:
+          type: string
+          nullable: true
+          example: null
+          description: Stale Valuation — human-readable explanation when flagged; null otherwise.
+        benefitsRagFlagUnderfundedPension:
+          type: boolean
+          nullable: true
+          example: null
+          description: Underfunded Pension — true = flagged, false = not flagged, null = insufficient
+            data.
+        benefitsRagFlagDescriptionUnderfundedPension:
+          type: string
+          nullable: true
+          example: null
+          description: Underfunded Pension — human-readable explanation when flagged; null otherwise.
+      required:
+      - benefitsRagFlagComplianceAmendmentNeeded
+      - benefitsRagFlagDescriptionComplianceAmendmentNeeded
+      - benefitsRagFlagCorrectiveDistributions
+      - benefitsRagFlagDescriptionCorrectiveDistributions
+      - benefitsRagFlagDecliningPlanAssets
+      - benefitsRagFlagDescriptionDecliningPlanAssets
+      - benefitsRagFlagDelinquentContributions
+      - benefitsRagFlagDescriptionDelinquentContributions
+      - benefitsRagFlagExcessiveServiceProviderFees
+      - benefitsRagFlagDescriptionExcessiveServiceProviderFees
+      - benefitsRagFlagFidelityBondTooLow
+      - benefitsRagFlagDescriptionFidelityBondTooLow
+      - benefitsRagFlagFrozenPlan
+      - benefitsRagFlagDescriptionFrozenPlan
+      - benefitsRagFlagHas5500Audit
+      - benefitsRagFlagDescriptionHas5500Audit
+      - benefitsRagFlagHighAverageAccountBalance
+      - benefitsRagFlagDescriptionHighAverageAccountBalance
+      - benefitsRagFlagHighBrokerCommissionRate
+      - benefitsRagFlagDescriptionHighBrokerCommissionRate
+      - benefitsRagFlagHighExpenseRatio
+      - benefitsRagFlagDescriptionHighExpenseRatio
+      - benefitsRagFlagHighFees
+      - benefitsRagFlagDescriptionHighFees
+      - benefitsRagFlagHighParticipantTurnover
+      - benefitsRagFlagDescriptionHighParticipantTurnover
+      - benefitsRagFlagHighPremiumPerCapita
+      - benefitsRagFlagDescriptionHighPremiumPerCapita
+      - benefitsRagFlagHighRetireeAssets
+      - benefitsRagFlagDescriptionHighRetireeAssets
+      - benefitsRagFlagHighTurnoverRatio
+      - benefitsRagFlagDescriptionHighTurnoverRatio
+      - benefitsRagFlagIndirectCompensationHeavy
+      - benefitsRagFlagDescriptionIndirectCompensationHeavy
+      - benefitsRagFlagLargeAssetDrop
+      - benefitsRagFlagDescriptionLargeAssetDrop
+      - benefitsRagFlagLateFiling
+      - benefitsRagFlagDescriptionLateFiling
+      - benefitsRagFlagLowParticipationRate
+      - benefitsRagFlagDescriptionLowParticipationRate
+      - benefitsRagFlagMissingAudit
+      - benefitsRagFlagDescriptionMissingAudit
+      - benefitsRagFlagMultiplePlansSingleEmployer
+      - benefitsRagFlagDescriptionMultiplePlansSingleEmployer
+      - benefitsRagFlagNegativeNetAssets
+      - benefitsRagFlagDescriptionNegativeNetAssets
+      - benefitsRagFlagNegativeNetIncome
+      - benefitsRagFlagDescriptionNegativeNetIncome
+      - benefitsRagFlagNetParticipantOutflow
+      - benefitsRagFlagDescriptionNetParticipantOutflow
+      - benefitsRagFlagNewPlan
+      - benefitsRagFlagDescriptionNewPlan
+      - benefitsRagFlagNoCurrentBroker
+      - benefitsRagFlagDescriptionNoCurrentBroker
+      - benefitsRagFlagNoEmployerContributions
+      - benefitsRagFlagDescriptionNoEmployerContributions
+      - benefitsRagFlagNoInsuranceOnWelfarePlan
+      - benefitsRagFlagDescriptionNoInsuranceOnWelfarePlan
+      - benefitsRagFlagNoStopLoss
+      - benefitsRagFlagDescriptionNoStopLoss
+      - benefitsRagFlagPlanRecentlyTerminated
+      - benefitsRagFlagDescriptionPlanRecentlyTerminated
+      - benefitsRagFlagPolicyExpiringSoon
+      - benefitsRagFlagDescriptionPolicyExpiringSoon
+      - benefitsRagFlagQualifiedAuditOpinion
+      - benefitsRagFlagDescriptionQualifiedAuditOpinion
+      - benefitsRagFlagRelatedPartyTransactions
+      - benefitsRagFlagDescriptionRelatedPartyTransactions
+      - benefitsRagFlagSingleCarrierDependency
+      - benefitsRagFlagDescriptionSingleCarrierDependency
+      - benefitsRagFlagSmallPlanLargeAssets
+      - benefitsRagFlagDescriptionSmallPlanLargeAssets
+      - benefitsRagFlagStaleValuation
+      - benefitsRagFlagDescriptionStaleValuation
+      - benefitsRagFlagUnderfundedPension
+      - benefitsRagFlagDescriptionUnderfundedPension
+    DotData:
+      type: object
+      properties:
+        units:
+          type: number
+          nullable: true
+          example: 87
+          description: Number of power units (trucks/tractors) registered with FMCSA.
+        drivers:
+          type: number
+          nullable: true
+          example: 112
+          description: Number of CDL drivers registered with FMCSA.
+        violations:
+          type: boolean
+          example: false
+        bipdPrimary:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        bipdExcess:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        cargo:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        surety:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+      required:
+      - units
+      - drivers
+      - violations
+      - bipdPrimary
+      - bipdExcess
+      - cargo
+      - surety
+    DotInsuranceLine:
+      type: object
+      properties:
+        renewalDate:
+          type: string
+          nullable: true
+          example: '2026-08-15'
+          description: DOT coverage renewal date (ISO YYYY-MM-DD).
+        carrier:
+          type: string
+          nullable: true
+          example: Progressive Commercial
+          description: DOT coverage carrier name.
+      required:
+      - renewalDate
+      - carrier
+    EnrichProspectsDto:
+      type: object
+      properties:
+        filters:
+          description: Filter group(s) selecting which prospects to enrich. Conditions inside one object
+            are **ANDed**. Narrow filters return better contact match rates and avoid burning credits
+            on `no_email` rows.
+          example:
+          - state:
+            - TX
+            naicsList:
+            - '484110'
+            - '484121'
+            minEmployeesNumber: 25
+            maxEmployeesNumber: 250
+            hasWc: true
+            hasDot: true
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchProspectsFiltersDto'
+        maxProspects:
+          type: number
+          description: Cap on the number of prospects to enrich in this run (1–100). Credits reserved
+            scale with this number — start small (e.g. 10) for new integrations.
+          default: 100
+          minimum: 1
+          maximum: 100
+          example: 25
+      required:
+      - filters
+    EnrichProspectsResponseData:
+      type: object
+      properties:
+        taskId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+          description: Opaque job identifier — pass to GET /v1/jobs/{taskId}.
+        status:
+          type: string
+          example: pending
+          description: Initial job state immediately after accept.
+        pollUrl:
+          type: string
+          example: /v1/jobs/550e8400-e29b-41d4-a716-446655440000
+          description: Relative path to poll for job completion.
+        creditsReserved:
+          type: number
+          example: 25
+          description: Credits reserved up front (≤ maxProspects). Final charge in metadata.creditsUsed
+            on the completed job — only `enriched` rows are billed.
+        estimatedWaitSeconds:
+          type: number
+          description: Expected job duration in seconds (typical ~120).
+          example: 120
+      required:
+      - taskId
+      - status
+      - pollUrl
+      - creditsReserved
+      - estimatedWaitSeconds
+    InsuranceLineData:
+      type: object
+      properties:
+        renewalDate:
+          type: string
+          nullable: true
+          example: '2026-09-01'
+          description: Policy renewal date (ISO YYYY-MM-DD). Present for WC, pension, and welfare/benefits
+            lines.
+        carrier:
+          type: string
+          nullable: true
+          example: Travelers
+          description: Insurance carrier name for this line.
+        broker:
+          type: string
+          nullable: true
+          example: Marsh McLennan Agency
+          description: Broker name. Present for WC, pension, and welfare/benefits lines.
+        participants:
+          type: number
+          nullable: true
+          example: 142
+          description: Number of covered participants. Only present for pension and welfare/benefits lines.
+      required:
+      - renewalDate
+      - carrier
+    OshaData:
+      type: object
+      properties:
+        healthViolations:
+          type: boolean
+          example: false
+        safetyViolations:
+          type: boolean
+          example: true
+      required:
+      - healthViolations
+      - safetyViolations
+    PaginationResponse:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+          description: 1-based page number returned.
+        limit:
+          type: integer
+          example: 25
+          description: Page size used for this response.
+        total:
+          type: integer
+          example: 1842
+          description: Total prospects matching the filters across all pages.
+      required:
+      - page
+      - limit
+      - total
+    ProspectInsurance:
+      type: object
+      properties:
+        wc:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/InsuranceLineData'
+        pension:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/InsuranceLineData'
+        benefits:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/InsuranceLineData'
+        fidelityBond:
+          type: boolean
+          example: false
+        osha:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/OshaData'
+        dot:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/DotData'
+      required:
+      - wc
+      - pension
+      - benefits
+      - fidelityBond
+      - osha
+      - dot
+    ProspectIrs990:
+      type: object
+      properties:
+        reportType:
+          type: string
+          nullable: true
+          example: '990'
+          description: IRS form variant filed (e.g. "990", "990-EZ", "990-PF").
+        reportYear:
+          type: integer
+          nullable: true
+          example: 2024
+        totalRevenue:
+          type: number
+          nullable: true
+          example: 12450000
+          description: Total revenue in USD.
+        totalExpenses:
+          type: number
+          nullable: true
+          example: 11820000
+          description: Total expenses in USD.
+        totalNetAssets:
+          type: number
+          nullable: true
+          example: 3650000
+          description: Total net assets at fiscal year end, in USD.
+        history:
+          description: Up to 11 years of historical IRS total expenses, descending by year. Only present
+            when the requesting user has the csvHasIrsHistoricalData entitlement.
+          type: array
+          items:
+            $ref: '#/components/schemas/ProspectIrs990HistoryEntry'
+      required:
+      - reportType
+      - reportYear
+      - totalRevenue
+      - totalExpenses
+      - totalNetAssets
+    ProspectIrs990HistoryEntry:
+      type: object
+      properties:
+        year:
+          type: integer
+          example: 2023
+        totalExpenses:
+          type: number
+          nullable: true
+          example: 11200000
+          description: Total expenses for the year, in USD.
+      required:
+      - year
+      - totalExpenses
+    ProspectResponse:
+      type: object
+      properties:
+        prospectId:
+          type: integer
+          example: 8472193
+        standardCompanyName:
+          type: string
+          example: Lone Star Freight Lines, Inc.
+        state:
+          type: string
+          nullable: true
+          example: TX
+        city:
+          type: string
+          nullable: true
+          example: Dallas
+        zipCode:
+          type: string
+          nullable: true
+          example: '75201'
+        address:
+          type: string
+          nullable: true
+          example: 4200 Stemmons Fwy
+        primaryVertical:
+          type: string
+          nullable: true
+          example: Trucking
+        naicsCode:
+          type: string
+          nullable: true
+          example: '484110'
+        naicsList:
+          type: string
+          nullable: true
+          example: 484110, 484121
+        ntee:
+          type: string
+          nullable: true
+          example: B82
+          description: NTEE classification code. Only present when the requesting user has the nteeFilter
+            entitlement.
+        salesVolumeRange:
+          type: string
+          nullable: true
+          example: $10M–$25M
+        hqPhone:
+          type: string
+          nullable: true
+          example: +1-214-555-0142
+        ein:
+          type: string
+          nullable: true
+          example: 74-2918374
+        employeeRange:
+          type: string
+          nullable: true
+          example: 50-249
+        websiteUrl:
+          type: string
+          nullable: true
+          example: https://lonestarfreight.com
+        linkedinUrl:
+          type: string
+          nullable: true
+          example: https://linkedin.com/company/lone-star-freight
+        insurance:
+          $ref: '#/components/schemas/ProspectInsurance'
+        irs990:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/ProspectIrs990'
+        xDatePredictions:
+          nullable: true
+          description: Modeled renewal-date predictions. Only present when the requesting user has the
+            xDatePredictions entitlement.
+          allOf:
+          - $ref: '#/components/schemas/XDatePredictions'
+        benefitsRedFlags:
+          nullable: true
+          description: Benefits Red Flags (38 risk indicators from Form 5500). Only present when the requesting
+            user has the isBenefitsRedFlagFilter entitlement. Each flag is true (flagged), false (not
+            flagged), or null (insufficient data). Paired benefitsRagFlagDescription* fields carry the
+            explanation when a flag is triggered.
+          allOf:
+          - $ref: '#/components/schemas/BenefitsRedFlags'
+        contacts:
+          type: object
+          nullable: true
+          example: null
+          description: Always null in search response — use /v1/prospects/enrich for contacts
+      required:
+      - prospectId
+      - standardCompanyName
+      - state
+      - city
+      - zipCode
+      - address
+      - primaryVertical
+      - naicsCode
+      - naicsList
+      - salesVolumeRange
+      - hqPhone
+      - ein
+      - employeeRange
+      - websiteUrl
+      - linkedinUrl
+      - insurance
+      - irs990
+      - contacts
+    SearchProspectsDto:
+      type: object
+      properties:
+        filters:
+          description: Filter group(s). Within a single object, conditions are **ANDed** together. Pass
+            one object for a typical search — multiple objects are reserved for advanced segment combinations.
+          example:
+          - state:
+            - TX
+            naicsList:
+            - '484110'
+            - '484121'
+            minEmployeesNumber: 25
+            maxEmployeesNumber: 250
+            hasWc: true
+            hasDot: true
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchProspectsFiltersDto'
+        page:
+          type: integer
+          description: 1-based page number
+          example: 1
+          minimum: 1
+        limit:
+          type: integer
+          description: Results per page
+          example: 25
+          minimum: 1
+          maximum: 100
+    SearchProspectsFiltersDto:
+      type: object
+      properties:
+        state:
+          description: Two-letter US state code(s). Any prospect in *one of* these states matches.
+          example:
+          - TX
+          - FL
+          type: array
+          items:
+            type: string
+        city:
+          description: City name(s).
+          example:
+          - Houston
+          - Dallas
+          type: array
+          items:
+            type: string
+        county:
+          description: County name(s).
+          example:
+          - Harris
+          - Dallas
+          type: array
+          items:
+            type: string
+        zip:
+          description: 5-digit US ZIP code(s).
+          example:
+          - '75201'
+          - '77002'
+          type: array
+          items:
+            type: string
+        naicsList:
+          description: '6-digit NAICS code(s). Common P&C prospect verticals: 484110 (general freight
+            trucking), 236220 (commercial construction), 238210 (electrical contractors), 722511 (full-service
+            restaurants).'
+          example:
+          - '484110'
+          - '484121'
+          type: array
+          items:
+            type: string
+        ntee:
+          description: IRS NTEE code(s) for nonprofit classification.
+          example:
+          - A
+          - B20
+          type: array
+          items:
+            type: string
+        vertical:
+          description: 'Primary vertical(s). Examples: "Trucking", "Construction", "Manufacturing", "Restaurants".'
+          example:
+          - Trucking
+          type: array
+          items:
+            type: string
+        prospectName:
+          type: string
+          description: Fuzzy partial match on company name. Use this when you have a known target account.
+          example: Swift Transportation
+        websiteUrl:
+          type: string
+          description: Website domain or URL. Bare domain (no scheme) is preferred and matches subdomains
+            too.
+          example: swifttrans.com
+        websiteDomain:
+          type: string
+          description: Exact website domain match (no scheme, no path).
+          example: swifttrans.com
+        ein:
+          type: string
+          description: Employer Identification Number (EIN).
+          example: 12-3456789
+        minEmployeesNumber:
+          type: integer
+          description: Inclusive lower bound on employee count.
+          example: 10
+        maxEmployeesNumber:
+          type: integer
+          description: Inclusive upper bound on employee count. Must be ≥ minEmployeesNumber when both
+            are set.
+          example: 250
+        minSalesVolume:
+          type: integer
+          description: Inclusive lower bound on annual sales volume (USD).
+          example: 1000000
+        maxSalesVolume:
+          type: integer
+          description: Inclusive upper bound on annual sales volume (USD). Must be ≥ minSalesVolume when
+            both are set.
+          example: 50000000
+        hasLinkedin:
+          type: boolean
+          description: Restrict to prospects with a LinkedIn profile.
+          example: true
+        hasWebsite:
+          type: boolean
+          description: Restrict to prospects with a website on file.
+          example: true
+        hasContactEmailEnriched:
+          type: boolean
+          description: Restrict to prospects that have had contact emails enriched.
+          example: true
+        hasWc:
+          type: boolean
+          description: Restrict to prospects with workers-compensation policy data on file. Strong signal
+            for P&C cross-sell.
+          example: true
+        hasOsha:
+          type: boolean
+          description: Restrict to prospects with OSHA inspection/violation records.
+          example: true
+        hasOshaViolations:
+          type: boolean
+          description: Restrict to prospects with recorded OSHA violations.
+          example: true
+        wcCarrierNameList:
+          description: WC carrier name(s) — exact matches within the WC carrier list.
+          example:
+          - Travelers
+          - Zurich
+          type: array
+          items:
+            type: string
+        wcBrokerNameList:
+          description: WC broker name(s) — exact matches within the WC broker list.
+          example:
+          - Marsh
+          - Aon
+          type: array
+          items:
+            type: string
+        wcRenewalMonth:
+          type: integer
+          description: Single WC renewal month (1–12). Unlike `wcRenewalMonths`, this triggers nearest-x-date
+            sorting so results are ordered by proximity to a target renewal date.
+          example: 6
+          minimum: 1
+          maximum: 12
+        wcRenewalMonths:
+          description: Plain multi-month filter for WC renewal (1–12). Returns prospects whose WC policy
+            renews in any of the listed months. Does not affect sort order — use `wcRenewalMonth` for
+            nearest-date sorting.
+          example:
+          - 1
+          - 4
+          - 7
+          - 10
+          type: array
+          items:
+            type: number
+        fromWcRenewalDate:
+          type: string
+          description: Earliest WC renewal date (ISO 8601).
+          example: '2025-01-01'
+          format: date
+        toWcRenewalDate:
+          type: string
+          description: Latest WC renewal date (ISO 8601).
+          example: '2025-12-31'
+          format: date
+        hasDot:
+          type: boolean
+          description: Restrict to prospects with FMCSA/DOT records (trucking, commercial auto). Pair
+            with trucking NAICS for best results.
+          example: true
+        hasDotmcmxff:
+          type: boolean
+          description: Restrict to DOT carriers with MX/MF (Mexico cross-border) authority. MCMXFF = Motor
+            Carrier Mexico authority or Form & Fitness.
+          example: true
+        hasDotViolations:
+          type: boolean
+          description: Restrict to DOT carriers with recorded violations.
+          example: true
+        hasDotbipdExcess:
+          type: boolean
+          description: Restrict to DOT carriers with Bodily Injury & Property Damage (BIPD) excess liability
+            coverage on file.
+          example: true
+        hasDotbipdPrimary:
+          type: boolean
+          description: Restrict to DOT carriers with Bodily Injury & Property Damage (BIPD) primary liability
+            coverage on file.
+          example: true
+        hasDotCargo:
+          type: boolean
+          description: Restrict to DOT carriers with cargo insurance on file.
+          example: true
+        hasDotSurety:
+          type: boolean
+          description: Restrict to DOT carriers with surety bond on file.
+          example: true
+        hasDotCoverages:
+          type: boolean
+          description: Restrict to DOT carriers with any DOT coverage on file.
+          example: true
+        hasDotTrust:
+          type: boolean
+          description: Restrict to DOT carriers with a DOT Trust filing.
+          example: true
+        dotNumber:
+          type: string
+          description: FMCSA DOT number.
+          example: '123456'
+        minDotDrivers:
+          type: integer
+          description: Inclusive lower bound on number of DOT drivers.
+          example: 5
+        maxDotDrivers:
+          type: integer
+          description: Inclusive upper bound on number of DOT drivers.
+          example: 100
+        minDotUnits:
+          type: integer
+          description: Inclusive lower bound on number of DOT power units.
+          example: 5
+        maxDotUnits:
+          type: integer
+          description: Inclusive upper bound on number of DOT power units.
+          example: 100
+        dotCarrierNameList:
+          description: DOT carrier name(s) — exact matches within the DOT carrier list.
+          example:
+          - Progressive
+          - Old Republic
+          type: array
+          items:
+            type: string
+        dotbipdMaxLimit:
+          type: integer
+          description: Maximum Bodily Injury & Property Damage (BIPD) liability limit on file (USD).
+          example: 1000000
+        dotbipdExcessRenewalMonth:
+          type: integer
+          description: DOT BIPD Excess policy renewal month (1–12).
+          example: 6
+          minimum: 1
+          maximum: 12
+        dotbipdPrimaryRenewalMonth:
+          type: integer
+          description: DOT BIPD Primary policy renewal month (1–12).
+          example: 6
+          minimum: 1
+          maximum: 12
+        dotTrustRenewalMonth:
+          type: integer
+          description: DOT Trust policy renewal month (1–12).
+          example: 3
+          minimum: 1
+          maximum: 12
+        dotCargoRenewalMonth:
+          type: integer
+          description: DOT Cargo policy renewal month (1–12).
+          example: 3
+          minimum: 1
+          maximum: 12
+        dotSuretyRenewalMonth:
+          type: integer
+          description: DOT Surety policy renewal month (1–12).
+          example: 3
+          minimum: 1
+          maximum: 12
+        predictedAutoXMonth:
+          type: integer
+          description: Predicted commercial auto policy renewal month (1–12).
+          example: 6
+          minimum: 1
+          maximum: 12
+        predictedGeneralLiabilityXMonth:
+          type: integer
+          description: Predicted general liability policy renewal month (1–12).
+          example: 6
+          minimum: 1
+          maximum: 12
+        has5500:
+          type: boolean
+          description: Restrict to prospects with any Form 5500 welfare/benefits filing.
+          example: true
+        hasBenefitsPension:
+          type: boolean
+          description: Restrict to prospects with Form 5500 pension records (defined-benefit pension exposure).
+          example: true
+        hasBenefitsWelfare:
+          type: boolean
+          description: Restrict to prospects with Form 5500 welfare plan filings.
+          example: true
+        has5500Contact:
+          type: boolean
+          description: Restrict to prospects with a Form 5500 signatory contact on file.
+          example: true
+        benefitsCarrierNameList:
+          description: Benefits carrier name(s) — exact matches within the 5500 carrier list.
+          example:
+          - Aetna
+          - UnitedHealthcare
+          type: array
+          items:
+            type: string
+        benefitsBrokerNameList:
+          description: Benefits broker name(s) — exact matches within the 5500 broker list.
+          example:
+          - Mercer
+          - Willis
+          type: array
+          items:
+            type: string
+        fromBenefitsRenewalDate:
+          type: string
+          description: Earliest benefits (pension/welfare) renewal date (ISO 8601).
+          example: '2025-01-01'
+          format: date
+        toBenefitsRenewalDate:
+          type: string
+          description: Latest benefits (pension/welfare) renewal date (ISO 8601).
+          example: '2025-12-31'
+          format: date
+        benefitsRenewalMonths:
+          description: Benefits renewal month(s) (1–12) — matches pension or welfare renewal month.
+          example:
+          - 1
+          - 7
+          type: array
+          items:
+            type: number
+        pensionRenewalMonth:
+          type: integer
+          description: Pension plan renewal month (1–12). Triggers nearest-x-date sorting.
+          example: 1
+          minimum: 1
+          maximum: 12
+        welfareRenewalMonth:
+          type: integer
+          description: Welfare plan renewal month (1–12). Triggers nearest-x-date sorting.
+          example: 1
+          minimum: 1
+          maximum: 12
+        minPensionParticipants:
+          type: integer
+          description: Inclusive lower bound on pension plan participant count.
+          example: 50
+        maxPensionParticipants:
+          type: integer
+          description: Inclusive upper bound on pension plan participant count.
+          example: 500
+        minWelfareParticipants:
+          type: integer
+          description: Inclusive lower bound on welfare plan participant count.
+          example: 50
+        maxWelfareParticipants:
+          type: integer
+          description: Inclusive upper bound on welfare plan participant count.
+          example: 500
+        minBenefitsTotalAssets:
+          type: integer
+          description: Inclusive lower bound on 5500 plan total assets (USD, end of year).
+          example: 1000000
+        maxBenefitsTotalAssets:
+          type: number
+          description: Inclusive upper bound on 5500 plan total assets (USD, end of year).
+          example: 100000000
+        benefitsServiceProviderList:
+          description: Service provider name(s) listed on Schedule C of Form 5500.
+          example:
+          - Fidelity
+          - Vanguard
+          type: array
+          items:
+            type: string
+        benefitsServiceProviderCode:
+          type: string
+          description: Single Form 5500 Schedule C service-provider relationship code. Use `benefitsServiceProviderCodes`
+            for multi-code filtering.
+          example: '15'
+        benefitsServiceProviderCodes:
+          description: Form 5500 Schedule C service-provider relationship code(s). Matches prospects with
+            any of the listed codes. Superset of `benefitsServiceProviderCode`.
+          example:
+          - '15'
+          - '50'
+          type: array
+          items:
+            type: string
+        benefitsServiceProviderCompensationMin:
+          type: number
+          description: Minimum service provider compensation amount (USD, Schedule C).
+          example: 10000
+        benefitsServiceProviderCompensationMax:
+          type: number
+          description: Maximum service provider compensation amount (USD, Schedule C).
+          example: 500000
+        latestBenefitsPlanYear:
+          type: string
+          description: Latest welfare plan year begin date (ISO 8601). Filters on the most recent 5500
+            welfare filing date.
+          example: '2023-01-01'
+        latestPensionPlanYear:
+          type: string
+          format: date
+          description: Latest pension plan year begin date (ISO 8601).
+          example: '2023-01-01'
+        latestBenefitsSignatoryPolicyBegin:
+          type: string
+          format: date
+          description: Latest welfare signatory first policy begin date (ISO 8601).
+          example: '2022-01-01'
+        latestPensionSignatoryPolicyBegin:
+          type: string
+          format: date
+          description: Latest pension signatory first policy begin date (ISO 8601).
+          example: '2022-01-01'
+        latestBenefitsBrokeragePolicyBegin:
+          type: string
+          format: date
+          description: Latest welfare broker first policy begin date (ISO 8601).
+          example: '2022-01-01'
+        latestPensionBrokeragePolicyBegin:
+          type: string
+          format: date
+          description: Latest pension broker first policy begin date (ISO 8601).
+          example: '2022-01-01'
+        latestBenefitsCarrierPolicyBegin:
+          type: string
+          format: date
+          description: Latest welfare carrier first policy begin date (ISO 8601).
+          example: '2022-01-01'
+        latestPensionCarrierPolicyBegin:
+          type: string
+          format: date
+          description: Latest pension carrier first policy begin date (ISO 8601).
+          example: '2022-01-01'
+        hasOffline5500AiInsights:
+          type: boolean
+          description: Restrict to prospects with offline 5500 AI insights generated.
+          example: true
+        hasIrs:
+          type: boolean
+          description: Restrict to prospects with IRS Form 990 records (nonprofits).
+          example: true
+        irs501Ind:
+          type: boolean
+          description: Restrict to IRS 501(c) tax-exempt organizations.
+          example: true
+        fidelityBondInd:
+          type: boolean
+          description: Restrict to organizations with a fidelity bond indication on their 990.
+          example: true
+        irsFormType:
+          type: string
+          description: IRS form type (e.g. "990", "990-EZ", "990-PF").
+          example: '990'
+        has990Contact:
+          type: boolean
+          description: Restrict to nonprofits with directors/officers listed on the 990.
+          example: true
+        minIrsTotalRevenue:
+          type: number
+          description: Inclusive lower bound on IRS total revenue (USD).
+          example: 500000
+        maxIrsTotalRevenue:
+          type: number
+          description: Inclusive upper bound on IRS total revenue (USD).
+          example: 10000000
+        minIrsTotalExpenses:
+          type: number
+          description: Inclusive lower bound on IRS total expenses (USD).
+          example: 500000
+        maxIrsTotalExpenses:
+          type: number
+          description: Inclusive upper bound on IRS total expenses (USD).
+          example: 10000000
+        minIrsTotalNetIncome:
+          type: number
+          description: Inclusive lower bound on IRS net income (USD).
+          example: 0
+        maxIrsTotalNetIncome:
+          type: number
+          description: Inclusive upper bound on IRS net income (USD).
+          example: 5000000
+        minIrsTotalNetAssets:
+          type: integer
+          description: Inclusive lower bound on IRS total net assets (USD).
+          example: 1000000
+        maxIrsTotalNetAssets:
+          type: integer
+          description: Inclusive upper bound on IRS total net assets (USD).
+          example: 50000000
+        minIrsGrossReceipts:
+          type: number
+          description: Inclusive lower bound on IRS gross receipts (USD).
+          example: 500000
+        maxIrsGrossReceipts:
+          type: number
+          description: Inclusive upper bound on IRS gross receipts (USD).
+          example: 10000000
+        benefitsRagFlagComplianceAmendmentNeeded:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Compliance Amendment Needed.'
+          example: true
+        benefitsRagFlagCorrectiveDistributions:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Corrective Distributions.'
+          example: true
+        benefitsRagFlagDecliningPlanAssets:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Declining Plan Assets.'
+          example: true
+        benefitsRagFlagDelinquentContributions:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Delinquent Contributions.'
+          example: true
+        benefitsRagFlagExcessiveServiceProviderFees:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Excessive Service Provider Fees.'
+          example: true
+        benefitsRagFlagFidelityBondTooLow:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Fidelity Bond Too Low.'
+          example: true
+        benefitsRagFlagFrozenPlan:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Frozen Plan.'
+          example: true
+        benefitsRagFlagHas5500Audit:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Has 5500 Audit.'
+          example: true
+        benefitsRagFlagHighAverageAccountBalance:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Average Account Balance.'
+          example: true
+        benefitsRagFlagHighBrokerCommissionRate:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Broker Commission Rate.'
+          example: true
+        benefitsRagFlagHighExpenseRatio:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Expense Ratio.'
+          example: true
+        benefitsRagFlagHighFees:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Fees.'
+          example: true
+        benefitsRagFlagHighParticipantTurnover:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Participant Turnover.'
+          example: true
+        benefitsRagFlagHighPremiumPerCapita:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Premium Per Capita.'
+          example: true
+        benefitsRagFlagHighRetireeAssets:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Retiree Assets.'
+          example: true
+        benefitsRagFlagHighTurnoverRatio:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Turnover Ratio.'
+          example: true
+        benefitsRagFlagIndirectCompensationHeavy:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Indirect Compensation Heavy.'
+          example: true
+        benefitsRagFlagLargeAssetDrop:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Large Asset Drop.'
+          example: true
+        benefitsRagFlagLateFiling:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Late Filing.'
+          example: true
+        benefitsRagFlagLowParticipationRate:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Low Participation Rate.'
+          example: true
+        benefitsRagFlagMissingAudit:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Missing Audit.'
+          example: true
+        benefitsRagFlagMultiplePlansSingleEmployer:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Multiple Plans Single Employer.'
+          example: true
+        benefitsRagFlagNegativeNetAssets:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Negative Net Assets.'
+          example: true
+        benefitsRagFlagNegativeNetIncome:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Negative Net Income.'
+          example: true
+        benefitsRagFlagNetParticipantOutflow:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Net Participant Outflow.'
+          example: true
+        benefitsRagFlagNewPlan:
+          type: boolean
+          description: 'Restrict to prospects flagged for: New Plan.'
+          example: true
+        benefitsRagFlagNoCurrentBroker:
+          type: boolean
+          description: 'Restrict to prospects flagged for: No Current Broker.'
+          example: true
+        benefitsRagFlagNoEmployerContributions:
+          type: boolean
+          description: 'Restrict to prospects flagged for: No Employer Contributions.'
+          example: true
+        benefitsRagFlagNoInsuranceOnWelfarePlan:
+          type: boolean
+          description: 'Restrict to prospects flagged for: No Insurance On Welfare Plan.'
+          example: true
+        benefitsRagFlagNoStopLoss:
+          type: boolean
+          description: 'Restrict to prospects flagged for: No Stop Loss.'
+          example: true
+        benefitsRagFlagPlanRecentlyTerminated:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Plan Recently Terminated.'
+          example: true
+        benefitsRagFlagPolicyExpiringSoon:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Policy Expiring Soon.'
+          example: true
+        benefitsRagFlagQualifiedAuditOpinion:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Qualified Audit Opinion.'
+          example: true
+        benefitsRagFlagRelatedPartyTransactions:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Related Party Transactions.'
+          example: true
+        benefitsRagFlagSingleCarrierDependency:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Single Carrier Dependency.'
+          example: true
+        benefitsRagFlagSmallPlanLargeAssets:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Small Plan Large Assets.'
+          example: true
+        benefitsRagFlagStaleValuation:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Stale Valuation.'
+          example: true
+        benefitsRagFlagUnderfundedPension:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Underfunded Pension.'
+          example: true
+    SearchProspectsResponseData:
+      type: object
+      properties:
+        prospects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProspectResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+      - prospects
+      - pagination
+    XDatePredictions:
+      type: object
+      properties:
+        generalLiability:
+          type: string
+          nullable: true
+          example: '2026-04-15'
+          description: Predicted General Liability renewal date (ISO YYYY-MM-DD).
+        commercialAuto:
+          type: string
+          nullable: true
+          example: '2026-07-01'
+          description: Predicted Commercial Auto renewal date (ISO YYYY-MM-DD).
+      required:
+      - generalLiability
+      - commercialAuto

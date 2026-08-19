@@ -1,0 +1,170 @@
+generated: '2026-08-14'
+method: derived
+source: >-
+  openapi/_original/leo-openapi.json (https://api.meetleo.com/openapi.json),
+  live probes of https://api.meetleo.com and https://mcp.meetleo.com
+docs: https://api.meetleo.com/docs
+notes: >-
+  LeO publishes no prose developer guide -- the Swagger UI at
+  https://api.meetleo.com/docs is the whole reference. Everything below is derived
+  from the published spec and from live probes, and each row names its evidence.
+  Where a convention is absent, that absence is recorded rather than filled in.
+base_url: https://api.meetleo.com
+authentication:
+  style: HTTP bearer, JWT
+  header: 'Authorization: Bearer <jwt>'
+  applies_to: all operations except GET /health
+  detail: authentication/leo-authentication.yml
+  source: openapi components.securitySchemes.bearer
+versioning:
+  style: uri-path
+  current: v1
+  spec_version: '1.0'
+  pattern: https://api.meetleo.com/v1/<resource>
+  unversioned_paths:
+  - /health
+  - /openapi.json
+  - /docs
+  breaking_change_policy: not published
+  source: openapi paths + info.version
+media_types:
+  request: application/json
+  response: application/json; charset=utf-8
+  problem_json: false
+pagination:
+  style: page-number
+  applies_to:
+  - ProspectsController_search
+  location: request body
+  params:
+  - name: page
+    type: integer
+    minimum: 1
+    description: 1-based page number.
+  - name: limit
+    type: integer
+    minimum: 1
+    maximum: 100
+    example: 25
+    description: Results per page. Hard maximum of 100.
+  response_fields:
+  - pagination.page
+  - pagination.limit
+  - pagination.total
+  total_count: true
+  cursor: false
+  link_header: false
+  source: SearchProspectsDto, PaginationResponse
+filtering:
+  style: request-body filter groups
+  shape: 'filters: [ { <condition>: <value>, ... } ]'
+  boolean_logic: >-
+    Conditions inside a single filter object are ANDed. Multiple filter objects
+    are described in the spec as "reserved for advanced segment combinations".
+  filter_count: 134
+  detail: >-
+    SearchProspectsFiltersDto declares 134 filter properties spanning geography,
+    NAICS/NTEE, firmographics, workers' comp, OSHA, DOT/FMCSA, Form 5500 benefits
+    and pension, IRS 990, predicted x-dates and 39 benefits red-flag booleans. The
+    same filter shape is accepted by both POST /v1/prospects/search and
+    POST /v1/prospects/enrich.
+  source: openapi/leo-prospects-api-openapi.yml (SearchProspectsFiltersDto)
+field_expansion:
+  supported: false
+  note: >-
+    No expand / fields / include parameter exists. Field visibility is instead
+    entitlement-driven -- e.g. ProspectResponse.ntee is documented as "only present
+    when the requesting user has the nteeFilter entitlement".
+async_pattern:
+  supported: true
+  operation: ProspectsController_enrich
+  accepted_status: 202
+  handle_field: taskId
+  poll_field: pollUrl
+  poll_operation: JobsController_getJob
+  poll_interval_seconds: 5
+  typical_completion_seconds: 120
+  max_wait_seconds: 300
+  terminal_states:
+  - completed
+  - failed
+  note: >-
+    Callbacks/webhooks are not offered; polling is the only completion signal.
+  source: openapi/leo-prospects-api-openapi.yml, openapi/leo-jobs-api-openapi.yml
+response_envelope:
+  present: true
+  applies_to: >-
+    Declared in the spec only on GET /v1/jobs/{taskId} (JobPollEnvelopeDto), but
+    observed live on an unmatched /v1/* route, so it appears to be the application
+    -wide envelope.
+  fields:
+  - version
+  - processTime
+  - data
+  - errors
+  - metadata
+  detail: errors/leo-problem-types.yml
+request_id_tracing:
+  supported: true
+  field: metadata.requestId
+  format: uuid
+  header: none observed
+  note: >-
+    The correlation id is carried in the response BODY, not a response header, so a
+    client must parse JSON to log it. AWS API Gateway also returns its own
+    apigw-requestid response header, which is infrastructure-level and not the
+    LeO application id.
+  source: JobPollMetadataDto; live observation 2026-08-14
+metering:
+  model: credits
+  balance_operation: CreditsController_getCreditBalance
+  balance_modes:
+  - individual
+  - pool
+  reservation: >-
+    POST /v1/prospects/enrich reserves credits up front (creditsReserved, capped by
+    maxProspects, itself capped at 100) before the job runs.
+  billing_rule: >-
+    Only prospects whose enrichmentStatus is "enriched" are charged. "no_email" and
+    "failed" rows are free. GET /v1/prospects/{prospectId} costs 1 credit. POST
+    /v1/prospects/search consumes no enrichment credits.
+  in_band_signal:
+  - metadata.creditsUsed
+  - metadata.creditsRemaining
+  exhaustion_status: 402
+  note: >-
+    Credit state is returned in the response body on every enveloped response,
+    which is unusually good practice for an agent client -- it can budget without a
+    separate balance call.
+  source: openapi/leo-credits-api-openapi.yml, JobPollMetadataDto
+idempotency:
+  supported: false
+  header: none
+  note: >-
+    No Idempotency-Key header, no idempotent-retry guarantee and no request-hash
+    de-duplication is declared anywhere in the spec or the Swagger UI. This matters
+    because POST /v1/prospects/enrich reserves credits: a retried enrich after a
+    network timeout can reserve a second batch. Recorded as a real gap, not wired
+    as an Idempotency pointer in apis.yml.
+rate_limiting:
+  documented: false
+  signal_headers: none published
+  exhaustion_status: 429
+  detail: rate-limits/leo-rate-limits.yml
+errors:
+  format: custom envelope (errors[] array); not RFC 9457
+  detail: errors/leo-problem-types.yml
+lifecycle:
+  detail: lifecycle/leo-lifecycle.yml
+entitlements:
+  note: >-
+    Access is gated at two levels: plan flags (plan.hasApiAccess,
+    plan.hasMcpAccess on GET /v1/account) and per-field entitlements such as
+    nteeFilter. A client should call GET /v1/account first and branch on the flags.
+gaps:
+- No idempotency mechanism on a credit-consuming POST.
+- No published rate limits and no RateLimit-*/Retry-After headers.
+- No RFC 9457 problem+json.
+- No sandbox or test mode.
+- No webhooks; asynchronous work is poll-only.
+- No servers[] block in the published spec, so the base URL must be inferred from the host serving it.

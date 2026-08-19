@@ -1,0 +1,1 @@
+{"resource":"https://mcp.meetleo.com","authorization_servers":["https://mcp.meetleo.com"],"scopes_supported":["openid","aws.cognito.signin.user.admin","https://mcp.meetleo.com/prospects:read","https://mcp.meetleo.com/prospects:enrich","https://mcp.meetleo.com/account:read"],"bearer_methods_supported":["header"]}

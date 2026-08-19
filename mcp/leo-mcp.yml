@@ -1,0 +1,169 @@
+generated: '2026-08-14'
+method: probed
+source: >-
+  https://www.meetleo.com/mcp (301 -> https://content.meetleo.com/mcp.html);
+  live JSON-RPC probe of https://mcp.meetleo.com/mcp;
+  https://mcp.meetleo.com/.well-known/oauth-protected-resource
+status: published
+first_party: true
+notes: >-
+  LeO ships a first-party, hosted, remote MCP server -- the "LeO MCP Connector" --
+  at https://mcp.meetleo.com/mcp. It is marketed from the primary navigation of
+  meetleo.com and labelled "MCP Connector - Live". This supersedes the round-1
+  finding that LeO "publishes no first-party product API or MCP server"; that
+  conclusion was drawn from probing only the Wix marketing host. The Wix Site MCP
+  recorded previously is a different, platform-provided server and is now kept
+  separately in mcp/leo-site-mcp.yml.
+  The live tools/list is OAuth-gated: an anonymous JSON-RPC call returns HTTP 401
+  with a WWW-Authenticate header naming RFC 9728 resource metadata, so real tool
+  inputSchemas could NOT be read and are NOT reproduced here. The tool names below
+  come from LeO's own published workflow illustration on the connector page and are
+  attributed with explicit confidence; they are not invented and not treated as a
+  verified tool list.
+deployment:
+  mode: remote
+  endpoint: https://mcp.meetleo.com/mcp
+  install: null
+  package: null
+  auth: oauth
+  verified: probed
+server:
+  name: LeO MCP Connector
+  transport: http
+  url: https://mcp.meetleo.com/mcp
+  vendor: LeO
+  vendor_docs: https://www.meetleo.com/mcp
+  first_party: true
+  authentication: oauth2 (authorization_code + PKCE S256)
+  scope: LeO product data - prospect search, prospect enrichment, account/entitlements
+  tenancy: >-
+    "The connector authenticates against your existing tenant and respects your
+    entitlements and credit balance." (https://www.meetleo.com/mcp)
+  account_required: true
+  dynamic_client_registration: false
+verified:
+  date: '2026-08-14'
+  initialize:
+    status: 401
+    body: >-
+      {"jsonrpc":"2.0","error":{"code":-32001,"message":"Authentication required.
+      Provide a token via the Authorization header."},"id":null}
+    www_authenticate: >-
+      Bearer resource_metadata="https://mcp.meetleo.com/.well-known/oauth-protected-resource"
+  tools_list:
+    status: 401
+    note: Same challenge. Tool schemas require an authenticated introspection.
+  health:
+    url: https://mcp.meetleo.com/health
+    status: 200
+    body: '{"status":"ok"}'
+  discovery:
+  - url: https://mcp.meetleo.com/.well-known/oauth-protected-resource
+    status: 200
+  - url: https://mcp.meetleo.com/.well-known/oauth-authorization-server
+    status: 200
+  - url: https://mcp.meetleo.com/.well-known/openid-configuration
+    status: 200
+  - url: https://mcp.meetleo.com/register
+    status: 404
+    note: No RFC 7591 dynamic client registration.
+authorization:
+  resource: https://mcp.meetleo.com
+  issuer: https://mcp.meetleo.com
+  authorization_endpoint: https://insights-app-auth.meetleo.com/oauth2/authorize
+  token_endpoint: https://insights-app-auth.meetleo.com/oauth2/token
+  identity_provider: AWS Cognito (us-east-1_RnOkUWIRc)
+  scopes:
+  - https://mcp.meetleo.com/prospects:read
+  - https://mcp.meetleo.com/prospects:enrich
+  - https://mcp.meetleo.com/account:read
+  detail: scopes/leo-scopes.yml
+tools_confidence: >-
+  MEDIUM for the three LeO-attributed tools, LOW/rejected for the rest. The
+  connector page illustrates a six-step chained workflow. Three of those steps
+  correspond exactly to LeO's three published OAuth scopes and to LeO's three REST
+  tag groups; the other three (email send, CRM write, report email) have no
+  corresponding LeO scope and no corresponding REST operation, so they are read as
+  tools contributed by OTHER servers or by the assistant in the same chain, not as
+  LeO tools. That reading is recorded, not asserted as fact.
+tools:
+- name: search_prospects
+  attribution: leo
+  confidence: medium
+  description_source: >-
+    "Queries the database to find matching businesses across 200+ filters"
+    (https://www.meetleo.com/mcp workflow illustration)
+  backing_scope: https://mcp.meetleo.com/prospects:read
+  backing_rest: ProspectsController_search
+  input_schema: not readable (OAuth-gated); the REST operation's SearchProspectsDto is the closest public shape
+- name: get_prospect
+  attribution: leo
+  confidence: medium
+  description_source: >-
+    "Enriches every carrier with its DOT record, fleet size, incumbent, and
+    Trucking Triggers" (https://www.meetleo.com/mcp workflow illustration)
+  backing_scope: https://mcp.meetleo.com/prospects:read
+  backing_rest: ProspectsController_getById
+  input_schema: not readable (OAuth-gated)
+- name: talking_points
+  attribution: leo
+  confidence: medium
+  description_source: >-
+    "Turns each carrier's own trigger data into a specific, non-generic opening
+    angle" (https://www.meetleo.com/mcp workflow illustration)
+  backing_scope: https://mcp.meetleo.com/prospects:read (inferred)
+  backing_rest: none
+  note: >-
+    No REST operation exposes Talking Points, and no schema in the published
+    OpenAPI models them. If this tool exists it is MCP-only capability.
+  input_schema: not readable (OAuth-gated)
+tools_observed_in_workflow_not_attributed_to_leo:
+- name: compose_email / send
+  reason: >-
+    No LeO OAuth scope covers mail; the page describes sending "from your mailbox",
+    i.e. the user's own mail tool.
+- name: log_to_crm
+  reason: No LeO OAuth scope or REST operation writes to a CRM.
+- name: daily_report
+  reason: >-
+    Described as "Emails you a same-morning summary" -- an assistant/scheduler
+    behaviour, not a LeO data capability.
+advertised_capabilities:
+- Reach 25M+ U.S. businesses across 200+ intelligence filters
+- Renewal dates (actual and predicted x-dates) for workers' comp, general liability, commercial auto and benefits
+- Form 5500 welfare and pension financials, including incumbent broker and carrier
+- Benefits red flags explained in plain English
+- DOT Intelligence - FMCSA power units, drivers, BIPD primary/excess, cargo, surety, trust filings, violations
+- Trucking Triggers - event-level in-play signals
+- IRS Form 990 / 990-EZ / 990-PF nonprofit financials
+- OSHA inspection and citation history
+- Talking Points - account-specific opening angles
+compatibility_claimed:
+- Claude
+- ChatGPT / OpenAI
+- Google Gemini
+- Microsoft Copilot
+- custom agents
+setup:
+  steps:
+  - Bring an existing LeO account (the connector honours its entitlements and credit balance).
+  - Add the connector by pointing the assistant at the LeO endpoint and authorizing.
+  - Describe the outcome; the assistant discovers the filter schema itself.
+  quote: A settings-level task in every major client - no code, no keys to manage.
+  demo: https://calendly.com/saar-miron/leo-mcp
+caveats:
+- >-
+  Access is entitlement-gated twice over -- a LeO account is required, the plan must
+  carry hasMcpAccess, and calls consume credits -- so this is an agent surface for
+  existing customers, not an openly reachable one.
+- >-
+  There is no dynamic client registration, so an MCP client cannot self-register;
+  a client_id must be issued by LeO out of band. That is a real friction point for
+  the "point your assistant at the endpoint" story the page tells.
+- >-
+  Tool names and descriptions here are read from a marketing illustration, not from
+  tools/list. Anyone integrating should introspect the live server with a token.
+related:
+  rest_api: openapi/leo-prospects-api-openapi.yml
+  crosswalk: mcp/leo-tool-crosswalk.yml
+  site_mcp: mcp/leo-site-mcp.yml

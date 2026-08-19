@@ -1,0 +1,77 @@
+openapi: 3.0.0
+info:
+  title: LeO Public API - account
+  description: External API for account management, credits, prospect search, and contact enrichment This
+    document carries only the `account` operations, split from LeO's published openapi.json.
+  version: '1.0'
+servers:
+- url: https://api.meetleo.com
+  description: 'LeO Public API production base (verified live 2026-08-14: GET /health -> 200, GET /openapi.json
+    -> 200)'
+tags:
+- name: account
+  description: Authenticated user identity and plan entitlements, including whether the account has API
+    and MCP access.
+paths:
+  /v1/account:
+    get:
+      operationId: AccountController_getAccount
+      summary: Get account info
+      description: Returns the authenticated user identity and plan entitlements. Plan data is cached
+        for 60 seconds.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponseDto'
+        '401':
+          description: Unauthorized
+      tags:
+      - account
+      security:
+      - bearer: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    AccountResponseDto:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: abc123-def456
+        email:
+          type: string
+          example: user@example.com
+        tenantId:
+          type: string
+          example: tenant-abc
+        plan:
+          $ref: '#/components/schemas/PlanDto'
+      required:
+      - userId
+      - email
+      - tenantId
+      - plan
+    PlanDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Pro
+        hasApiAccess:
+          type: boolean
+          example: true
+        hasMcpAccess:
+          type: boolean
+          example: true
+      required:
+      - name
+      - hasApiAccess
+      - hasMcpAccess

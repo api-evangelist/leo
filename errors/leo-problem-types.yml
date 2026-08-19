@@ -1,0 +1,153 @@
+generated: '2026-08-14'
+method: derived
+source: openapi/_original/leo-openapi.json
+notes: >-
+  Derived from the response codes declared on every operation in LeO's published
+  OpenAPI, plus the error envelope observed on a live unauthenticated request to
+  https://api.meetleo.com/v1/openapi.json (a 404 that returned the full envelope).
+  LeO does NOT use RFC 9457 application/problem+json. It uses a custom JSON
+  envelope in which errors are carried in an `errors[]` array alongside `data`,
+  `version`, `processTime` and `metadata`. The envelope is declared in the spec as
+  JobPollEnvelopeDto and JobErrorItemDto and was confirmed live. LeO publishes no
+  prose error reference page, so the remediation text below is derived from the
+  operation descriptions in the spec and is marked as such.
+format: custom-envelope
+problem_json: false
+rfc9457: false
+envelope:
+  shape: |
+    {
+      "version": "1.0",
+      "processTime": 0,
+      "data": null,
+      "errors": [{"code": "NOT_FOUND", "message": "Cannot GET /v1/openapi.json"}],
+      "metadata": {
+        "requestId": "78a64aba-3d1c-4908-86ac-6574368e0a60",
+        "creditsUsed": 0,
+        "creditsRemaining": 0
+      }
+    }
+  fields:
+  - name: errors
+    type: array
+    item_schema: JobErrorItemDto
+    description: Zero or more {code, message} pairs. Empty array on success.
+  - name: errors[].code
+    type: string
+    description: Machine-readable error code, e.g. NOT_FOUND.
+  - name: errors[].message
+    type: string
+    description: Human-readable message.
+  - name: data
+    type: object|null
+    description: Null when the call errored.
+  - name: metadata.requestId
+    type: string (uuid)
+    description: Per-request correlation id. Quote it in support requests.
+  - name: metadata.creditsUsed
+    type: number
+    description: Credits actually charged by this call.
+  - name: metadata.creditsRemaining
+    type: number
+    description: Credit balance after the call.
+  source: >-
+    openapi/leo-jobs-api-openapi.yml (JobPollEnvelopeDto, JobErrorItemDto);
+    live observation of https://api.meetleo.com/v1/openapi.json -> 404
+  observed: '2026-08-14'
+gateway_envelope:
+  shape: '{"message":"Not Found"}'
+  note: >-
+    Requests that never reach the application -- unmatched routes at the AWS API
+    Gateway edge -- return a bare {"message":"..."} object with no requestId and no
+    errors[] array. Clients must handle both shapes.
+  observed: '2026-08-14'
+status_count: 6
+statuses:
+- status: 401
+  title: Unauthorized
+  declared_on:
+  - AccountController_getAccount
+  - CreditsController_getCreditBalance
+  - ProspectsController_search
+  - ProspectsController_getById
+  - ProspectsController_enrich
+  - JobsController_getJob
+  remediation: >-
+    Present a valid JWT in the Authorization header. Verify the account's plan
+    carries hasApiAccess (GET /v1/account).
+  method: derived
+- status: 402
+  title: Insufficient credits
+  declared_on:
+  - ProspectsController_getById
+  - ProspectsController_enrich
+  remediation: >-
+    Check GET /v1/credits/balance for available vs reserved credits. Enrichment
+    reserves credits up to maxProspects before the job runs; a single prospect
+    fetch costs 1 credit.
+  method: derived
+- status: 404
+  title: Not found
+  declared_on:
+  - ProspectsController_getById
+  - JobsController_getJob
+  detail: >-
+    "Prospect not found" on GET /v1/prospects/{prospectId}; "Job not found or
+    expired" on GET /v1/jobs/{taskId}.
+  remediation: >-
+    Jobs expire. Poll GET /v1/jobs/{taskId} within the documented five-minute
+    window rather than retrieving results later.
+  method: derived
+- status: 422
+  title: Validation error
+  declared_on:
+  - ProspectsController_search
+  - ProspectsController_enrich
+  detail: >-
+    "Validation error" on search; "No prospects match filters" on enrich -- the
+    same status carries two distinct meanings.
+  remediation: >-
+    On enrich, a 422 usually means the filter set matched zero prospects. Preview
+    the same filter shape with POST /v1/prospects/search first, which does not
+    consume enrichment credits.
+  method: derived
+- status: 429
+  title: Too many requests
+  declared_on:
+  - ProspectsController_search
+  - ProspectsController_getById
+  - ProspectsController_enrich
+  - JobsController_getJob
+  detail: >-
+    Declared verbatim in the spec as "Too many requests (HTTP API stage throttling
+    or upstream limits)".
+  remediation: >-
+    Back off and retry. No numeric limit, window or RateLimit/Retry-After header is
+    published; see rate-limits/leo-rate-limits.yml.
+  method: derived
+- status: 202
+  title: Accepted (not an error)
+  declared_on:
+  - ProspectsController_enrich
+  detail: >-
+    Recorded here because it changes the client contract: enrichment is
+    asynchronous and returns taskId, pollUrl, creditsReserved and
+    estimatedWaitSeconds instead of results.
+  method: derived
+job_level_errors:
+  note: >-
+    A job can complete at the HTTP level and still fail per prospect. Inspect
+    data.status (pending / processing / completed / failed) and, within a completed
+    job, each prospect's enrichmentStatus.
+  enrichment_status_values:
+  - value: enriched
+    meaning: Email and title returned; a credit was charged.
+  - value: no_email
+    meaning: Prospect matched but no contact was found; no credit charged.
+  - value: failed
+    meaning: This prospect errored.
+  source: openapi/leo-jobs-api-openapi.yml
+gaps:
+- No published error-code reference page; the set of errors[].code values is undocumented.
+- No RFC 9457 problem+json media type is offered on any operation.
+- No response schema is attached to any 4xx/5xx response in the spec -- only a description string.

@@ -1,0 +1,35 @@
+generated: '2026-08-14'
+method: generated
+source: >-
+  Packaged Agent Skills generated from LeO's published OpenAPI, fetched verbatim
+  from https://api.meetleo.com/openapi.json on 2026-08-14 (source in
+  openapi/_original/, split one-per-tag under openapi/). Every step is grounded in
+  an operationId verified verbatim in the spec; no operation, parameter or field
+  name is invented. Cross-cutting rules cite ../authentication/, ../conventions/,
+  ../errors/, ../rate-limits/, ../lifecycle/ and ../data-model/.
+notes: >-
+  LeO publishes no first-party skills, AGENTS.md or agent instructions of its own --
+  probed https://www.meetleo.com/llms.txt (200, marketing content only), the
+  Swagger UI at https://api.meetleo.com/docs, and the MCP Connector page. These are
+  API Evangelist generations, marked method: generated.
+skill_count: 3
+skills:
+- file: leo-preflight-account-and-credits.md
+  name: Pre-flight a LeO integration - entitlements and credit budget
+  api: openapi/leo-account-api-openapi.yml
+  operations: [AccountController_getAccount, CreditsController_getCreditBalance, AppController_health]
+- file: leo-search-prospects-by-renewal-window.md
+  name: Build a prospect list by insurance renewal window
+  api: openapi/leo-prospects-api-openapi.yml
+  operations: [ProspectsController_search, ProspectsController_getById]
+- file: leo-enrich-prospect-contacts.md
+  name: Enrich LeO prospects with contact data
+  api: openapi/leo-prospects-api-openapi.yml
+  operations: [ProspectsController_search, ProspectsController_enrich, JobsController_getJob, CreditsController_getCreditBalance]
+coverage:
+  operations_in_spec: 7
+  operations_covered: 6
+  uncovered: []
+  note: >-
+    All six authenticated operations plus GET /health are exercised across the
+    three skills. Nothing is left uncovered because the surface is small.

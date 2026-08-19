@@ -1,0 +1,70 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  npm registry, PyPI, GitHub org lookup, https://api.meetleo.com/docs,
+  https://www.meetleo.com/mcp
+package_count: 0
+official_count: 0
+notes: >-
+  LeO ships NO client libraries. Searched npm (by name and by full-text search for
+  "meetleo"), PyPI, and GitHub for a LeO organization; nothing first-party exists.
+  The API documentation surface is a bare Swagger UI with no SDK section, and the
+  MCP Connector page explicitly sells the opposite of a package -- "A settings-level
+  task in every major client -- no code, no keys to manage" -- i.e. LeO's chosen
+  distribution for programmatic access is a hosted MCP endpoint the user points a
+  client at, not an installable library. No CDN-distributed component or script tag
+  was found either. No SDKs pointer is wired in apis.yml, because there is no SDK.
+packages: []
+searched:
+- registry: npm
+  query: meetleo
+  status: 404
+  version: null
+- registry: npm
+  query: '@meetleo/sdk'
+  status: 404
+  version: null
+- registry: npm
+  query: '@meetleo/mcp'
+  status: 404
+  version: null
+- registry: npm
+  query: full-text search "meetleo"
+  status: 200
+  result: zero packages returned
+  version: null
+- registry: npm
+  query: leo-api
+  status: 200
+  version: 1.0.0
+  published: '2018-07-23'
+  official: false
+  rejected: true
+  rejection_reason: >-
+    Not LeO. "Node JS CLI for LEO Personal Assistant", published by maintainer
+    mikeike24, repository github.com/MikeIke24/leo-cli. Unrelated project that
+    happens to share the name.
+- registry: pypi
+  query: meetleo
+  status: 404
+  version: null
+- registry: pypi
+  query: leo-api
+  status: 404
+  version: null
+- registry: github
+  query: orgs/meetleo
+  status: 404
+  version: null
+- registry: github
+  query: orgs/leo-insurance
+  status: 404
+  version: null
+- registry: github
+  query: orgs/meetleo-ai
+  status: 404
+  version: null
+prior_finding_carried_forward: >-
+  The github.com/meetleo account belongs to an unrelated company, MeetLeonard, and
+  is deliberately not linked from this profile.
+checked: '2026-08-14'

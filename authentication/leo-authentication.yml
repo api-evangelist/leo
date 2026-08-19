@@ -1,0 +1,88 @@
+generated: '2026-08-14'
+method: probed
+source: >-
+  openapi/_original/leo-openapi.json (https://api.meetleo.com/openapi.json),
+  https://mcp.meetleo.com/.well-known/oauth-protected-resource,
+  https://mcp.meetleo.com/.well-known/oauth-authorization-server,
+  live 401 challenge from https://mcp.meetleo.com/mcp
+docs: https://api.meetleo.com/docs
+notes: >-
+  LeO runs two authenticated surfaces with the same identity provider behind them.
+  The REST API at https://api.meetleo.com declares a single HTTP bearer scheme
+  carrying a JWT, applied per-operation to every path except GET /health. The MCP
+  Connector at https://mcp.meetleo.com/mcp is OAuth 2.1-shaped: an unauthenticated
+  JSON-RPC call returns HTTP 401 with a WWW-Authenticate header pointing at RFC
+  9728 protected-resource metadata, which in turn names an AWS Cognito user pool
+  (us-east-1_RnOkUWIRc) fronted by https://insights-app-auth.meetleo.com. No API
+  key, mTLS or basic-auth surface was found. There is no public self-service
+  credential issuance: LeO's own MCP page states the connector "authenticates
+  against your existing tenant and respects your entitlements and credit balance",
+  and account entitlement flags hasApiAccess / hasMcpAccess gate access per plan.
+summary:
+  types:
+  - http
+  - oauth2
+  primary: bearer JWT
+  credential_issuance: account-gated (no public self-service key page found)
+schemes:
+- name: bearer
+  surface: REST
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  in: header
+  header: Authorization
+  applies_to: every operation except GET /health
+  source: openapi/_original/leo-openapi.json
+  sources:
+  - openapi/leo-account-api-openapi.yml
+  - openapi/leo-credits-api-openapi.yml
+  - openapi/leo-jobs-api-openapi.yml
+  - openapi/leo-prospects-api-openapi.yml
+  unauthenticated_response:
+    status: 401
+    description: Unauthorized (declared on every secured operation in the spec)
+- name: oauth2-mcp
+  surface: MCP
+  type: oauth2
+  flow: authorization_code
+  pkce: S256
+  in: header
+  header: Authorization
+  resource: https://mcp.meetleo.com
+  issuer: https://mcp.meetleo.com
+  authorization_endpoint: https://insights-app-auth.meetleo.com/oauth2/authorize
+  token_endpoint: https://insights-app-auth.meetleo.com/oauth2/token
+  revocation_endpoint: https://insights-app-auth.meetleo.com/oauth2/revoke
+  jwks_uri: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_RnOkUWIRc/.well-known/jwks.json
+  identity_provider: AWS Cognito (us-east-1_RnOkUWIRc)
+  dynamic_client_registration: false
+  scopes: scopes/leo-scopes.yml
+  source: https://mcp.meetleo.com/.well-known/oauth-protected-resource
+  unauthenticated_response:
+    status: 401
+    body: >-
+      {"jsonrpc":"2.0","error":{"code":-32001,"message":"Authentication required.
+      Provide a token via the Authorization header."},"id":null}
+    www_authenticate: >-
+      Bearer resource_metadata="https://mcp.meetleo.com/.well-known/oauth-protected-resource"
+    probed: '2026-08-14'
+entitlements:
+- field: plan.hasApiAccess
+  schema: PlanDto
+  description: Whether the authenticated account's plan permits REST API access.
+  source: openapi/leo-account-api-openapi.yml
+- field: plan.hasMcpAccess
+  schema: PlanDto
+  description: Whether the authenticated account's plan permits MCP Connector access.
+  source: openapi/leo-account-api-openapi.yml
+gaps:
+- >-
+  No published developer-portal page documents how to obtain a REST bearer token;
+  the Swagger UI at https://api.meetleo.com/docs presents the scheme but not the
+  issuance flow. Credentials appear to be issued through the application or by
+  sales.
+- >-
+  No RFC 7591 dynamic client registration endpoint (POST /register returns 404),
+  so an MCP client cannot self-register.
+- No /.well-known/security.txt is served on any LeO host.

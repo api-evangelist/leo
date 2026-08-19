@@ -1,0 +1,127 @@
+generated: '2026-08-14'
+method: derived
+source: >-
+  openapi/_original/leo-openapi.json;
+  https://mcp.meetleo.com/.well-known/oauth-protected-resource;
+  https://www.meetleo.com/mcp
+notes: >-
+  Binds LeO's MCP Connector tools to the REST operations that back them. The live
+  tools/list is OAuth-gated (HTTP 401), so this crosswalk is built from two public
+  sources instead: LeO's three published OAuth resource scopes, which partition the
+  product surface exactly, and the tool names in LeO's own workflow illustration on
+  https://www.meetleo.com/mcp. Confidence is set honestly per row and no tool is
+  given an inputSchema it was not observed to have. The strongest evidence in this
+  file is the scope-to-tag alignment: the three scopes
+  (prospects:read, prospects:enrich, account:read) map one-to-one onto the three
+  authenticated REST tag groups (prospects, prospects-enrich+jobs,
+  account+credits), which is what you would expect if the connector is a thin agent
+  facade over this REST API.
+surfaces:
+  openapi:
+    url: https://api.meetleo.com/openapi.json
+    local: openapi/_original/leo-openapi.json
+    gated: false
+    operations: 7
+  mcp:
+    url: https://mcp.meetleo.com/mcp
+    gated: true
+    gate: OAuth 2.1 (Cognito); tools/list returns 401 anonymously
+    tools_observed: 0
+    tools_named_in_docs: 3
+  graphql:
+    present: false
+coverage:
+  rest_operations: 7
+  rest_operations_secured: 6
+  mcp_tools_named: 3
+  crosswalk_rows: 3
+  mcp_only: 1
+  rest_only: 4
+  confidence_high: 0
+  confidence_medium: 2
+  confidence_low: 1
+crosswalk:
+- tool: search_prospects
+  category: prospects
+  scope: https://mcp.meetleo.com/prospects:read
+  rest:
+  - ProspectsController_search
+  binding: semantic + scope alignment
+  confidence: medium
+  input_schema_source: openapi SearchProspectsDto (filters[], page, limit)
+  note: >-
+    The connector page says the assistant "discovers the full filter schema itself",
+    which implies the tool exposes the same 134-property SearchProspectsFiltersDto
+    the REST operation takes. Not verified against a live inputSchema.
+- tool: get_prospect
+  category: prospects
+  scope: https://mcp.meetleo.com/prospects:read
+  rest:
+  - ProspectsController_getById
+  binding: semantic + scope alignment
+  confidence: medium
+  input_schema_source: openapi path parameter prospectId (integer)
+  note: >-
+    In LeO's illustrated workflow this step is described as enriching each carrier
+    with DOT record, fleet size, incumbent and Trucking Triggers -- which is the
+    shape of the full ProspectResponse returned by GET /v1/prospects/{prospectId},
+    not the async contact-enrichment job. Costs 1 credit per call in REST.
+- tool: talking_points
+  category: prospects
+  scope: https://mcp.meetleo.com/prospects:read
+  rest: []
+  binding: none
+  confidence: low
+  note: >-
+    Named in LeO's workflow and sold as a headline capability ("Talking Points --
+    account-specific angles your producers can open with"), but no REST operation
+    or schema in the published OpenAPI produces them. Listed here so the gap is
+    visible, and repeated in mcp_only below.
+mcp_only:
+- tool: talking_points
+  reason: >-
+    No public REST operation generates talking points and no component schema models
+    them. Either an MCP-only capability or a surface LeO has not published in REST.
+rest_only:
+- operation: ProspectsController_enrich
+  path: POST /v1/prospects/enrich
+  scope_that_would_cover_it: https://mcp.meetleo.com/prospects:enrich
+  reason: >-
+    LeO publishes a dedicated prospects:enrich scope, so the connector almost
+    certainly exposes an enrichment tool, but no tool name for it appears in any
+    public LeO material. Recorded as rest_only rather than invented.
+- operation: JobsController_getJob
+  path: GET /v1/jobs/{taskId}
+  scope_that_would_cover_it: https://mcp.meetleo.com/prospects:enrich
+  reason: >-
+    Same. An MCP tool wrapping an async job would need to either poll internally or
+    expose a poll tool; neither is documented.
+- operation: AccountController_getAccount
+  path: GET /v1/account
+  scope_that_would_cover_it: https://mcp.meetleo.com/account:read
+  reason: No tool name published, though the account:read scope exists to cover it.
+- operation: CreditsController_getCreditBalance
+  path: GET /v1/credits/balance
+  scope_that_would_cover_it: https://mcp.meetleo.com/account:read
+  reason: >-
+    No tool name published. Relevant to agents: this is how an agent would check its
+    budget before a credit-consuming call.
+excluded:
+- operation: AppController_health
+  path: GET /health
+  reason: Unauthenticated infrastructure health check; not a product capability.
+- tool: compose_email / send
+  reason: >-
+    Appears in LeO's illustrated chain but no LeO scope covers mail and the page
+    describes sending "from your mailbox". Read as a non-LeO tool in the same chain.
+- tool: log_to_crm
+  reason: No LeO scope or REST operation writes to a CRM. Read as a non-LeO tool.
+- tool: daily_report
+  reason: Scheduler/assistant behaviour, not a LeO data capability.
+verification_needed:
+- >-
+  Introspect https://mcp.meetleo.com/mcp with a valid bearer token and replace the
+  medium/low confidence rows with real tool names and inputSchemas.
+- >-
+  Confirm whether the connector exposes enrichment as one synchronous tool or as
+  submit+poll, since the REST contract is asynchronous with a five-minute window.

@@ -1,12 +1,18 @@
-generated: '2026-07-19'
+generated: '2026-08-14'
 method: searched
-source: https://www.meetleo.com/ai-transparency
+source: >-
+  https://www.meetleo.com/ai-transparency;
+  openapi/_original/leo-openapi.json (https://api.meetleo.com/openapi.json);
+  https://mcp.meetleo.com/.well-known/oauth-protected-resource;
+  https://mcp.meetleo.com/.well-known/oauth-authorization-server
 notes: >-
-  LeO publishes no OpenAPI, no public developer API and no security/trust center,
-  so most cross-cutting API standards are not assessable rather than failed. The
-  one substantive published claim is HIPAA compliance, attested by an external
-  auditing firm on the AI Transparency page. No SOC 2, ISO 27001, PCI DSS,
-  FedRAMP or CSA STAR claim is published anywhere on the site.
+  Re-assessed 2026-08-14 after LeO's REST API and first-party MCP Connector were
+  found. Round 1 marked most API standards "not assessable - no public API"; a real
+  OpenAPI 3.0.0 document and a real OAuth-protected MCP resource now make several
+  of them assessable, some positively and some negatively. The single substantive
+  regulatory claim is unchanged: HIPAA compliance, attested by an external auditing
+  firm on the AI Transparency page. No SOC 2, ISO 27001, PCI DSS, FedRAMP or CSA
+  STAR claim is published anywhere on the site, and no trust center exists.
 compliance_program:
   url: https://www.meetleo.com/ai-transparency
   certifications:
@@ -17,7 +23,111 @@ compliance_program:
       (https://www.meetleo.com/ai-transparency)
     auditor_named: false
     report_available: false
+  trust_center: false
+  security_page: false
+  probe:
+  - url: https://www.meetleo.com/security
+    status: 404
+  - url: https://www.meetleo.com/trust
+    status: 404
 standards:
+- id: openapi
+  conforms: true
+  evidence: >-
+    OpenAPI 3.0.0 document served at https://api.meetleo.com/openapi.json (HTTP
+    200, application/json), 7 operations, 24 component schemas, rendered by a
+    Swagger UI at https://api.meetleo.com/docs. Parses cleanly. Saved verbatim to
+    openapi/_original/leo-openapi.json.
+  caveat: >-
+    servers[] is empty and info.contact is an empty object, so the document does not
+    name its own base URL or owner. Corrected in overlays/leo-servers-overlay.yaml
+    rather than in the original.
+- id: mcp
+  conforms: true
+  evidence: >-
+    First-party MCP server at https://mcp.meetleo.com/mcp, marketed as the "LeO MCP
+    Connector" from the site's primary navigation. JSON-RPC probe returns a
+    protocol-correct 401 with a WWW-Authenticate header naming RFC 9728 resource
+    metadata. Also a second, platform-provided Wix Site MCP at
+    https://www.meetleo.com/_api/mcp (protocol 2024-11-05, 9 tools).
+- id: oauth2
+  conforms: true
+  evidence: >-
+    OAuth 2.1-shaped authorization for the MCP resource: authorization_code with
+    PKCE S256, code response type, client_secret_basic/post token auth, AWS Cognito
+    user pool us-east-1_RnOkUWIRc behind
+    https://insights-app-auth.meetleo.com. Three resource-URI scopes published.
+  caveat: >-
+    The REST API declares only an HTTP bearer (JWT) scheme with no oauth2 flows, so
+    the two surfaces are documented inconsistently even though they share an IdP.
+- id: rfc9728-oauth-protected-resource
+  conforms: true
+  evidence: >-
+    https://mcp.meetleo.com/.well-known/oauth-protected-resource returns 200 with
+    resource, authorization_servers, scopes_supported and bearer_methods_supported.
+    The 401 challenge references it via WWW-Authenticate resource_metadata.
+- id: rfc8414-authorization-server-metadata
+  conforms: true
+  evidence: >-
+    https://mcp.meetleo.com/.well-known/oauth-authorization-server returns 200 with
+    issuer, authorization/token/revocation/userinfo endpoints, jwks_uri, PKCE
+    methods and supported scopes.
+- id: oidc
+  conforms: true
+  evidence: >-
+    https://mcp.meetleo.com/.well-known/openid-configuration returns 200 (identical
+    to the RFC 8414 document); openid/email/profile scopes and RS256 ID-token
+    signing are advertised.
+  caveat: >-
+    Served by the MCP resource server, not by the authorization-server host itself;
+    https://insights-app-auth.meetleo.com/.well-known/openid-configuration is 404.
+- id: rfc7591-dynamic-client-registration
+  conforms: false
+  evidence: >-
+    No registration_endpoint is advertised and POST https://mcp.meetleo.com/register
+    returns 404. MCP clients cannot self-register.
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: >-
+    No application/problem+json media type on any operation. Errors use a custom
+    envelope with an errors[] array of {code, message}; unmatched gateway routes
+    return a bare {"message":"..."}. See errors/leo-problem-types.yml.
+- id: idempotency
+  conforms: false
+  evidence: >-
+    No Idempotency-Key header or equivalent, on an API whose enrichment POST
+    reserves credits. See conventions/leo-conventions.yml.
+- id: rate-limit-headers
+  conforms: false
+  evidence: >-
+    429 is declared on four operations but no RateLimit-*, X-RateLimit-* or
+    Retry-After header is published or observed. See rate-limits/leo-rate-limits.yml.
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: No deprecation policy, no Sunset/Deprecation headers, no deprecated operations in the spec.
+- id: llms-txt
+  conforms: true
+  evidence: https://www.meetleo.com/llms.txt returns 200 text/plain.
+  caveat: >-
+    It documents only the Wix Site MCP and marketing content. It does not mention
+    the REST API or the first-party MCP Connector, so an agent following llms.txt is
+    routed away from LeO's real API surface.
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: >-
+    No /.well-known/security.txt on www.meetleo.com (400), api.meetleo.com (404) or
+    mcp.meetleo.com (404).
+- id: a2a-agent-card
+  conforms: false
+  evidence: >-
+    No /.well-known/agent-card.json or /.well-known/agent.json on any LeO host.
+    insights-app.meetleo.com answers 200 with an SPA HTML shell for every path,
+    which is not a card.
+- id: asyncapi
+  conforms: null
+  evidence: >-
+    Not assessable - LeO exposes no event, streaming or webhook surface. Async work
+    is poll-only via GET /v1/jobs/{taskId}.
 - id: hipaa
   conforms: true
   evidence: External auditing firm certification stated on the AI Transparency page.
@@ -27,15 +137,6 @@ standards:
     Public page discloses third-party AI model use (OpenAI, Google Gemini,
     Anthropic Claude) plus proprietary ML, and states principles of accuracy,
     transparency, human oversight and data responsibility.
-- id: mcp
-  conforms: true
-  evidence: >-
-    Live Model Context Protocol server (2024-11-05) at
-    https://www.meetleo.com/_api/mcp, advertised in /llms.txt. Platform-provided
-    by Wix, not first-party.
-- id: llms-txt
-  conforms: true
-  evidence: https://www.meetleo.com/llms.txt returns 200 text/plain.
 - id: soc2
   conforms: false
   evidence: No SOC 2 claim published.
@@ -48,15 +149,6 @@ standards:
 - id: gdpr
   conforms: null
   evidence: Not assessed; no explicit GDPR statement found outside the privacy policy.
-- id: oauth2
+- id: fapi
   conforms: null
-  evidence: Not assessable - no public API or OpenAPI securitySchemes.
-- id: oidc
-  conforms: null
-  evidence: Not assessable - /.well-known/openid-configuration returns 400.
-- id: rfc9457-problem-details
-  conforms: null
-  evidence: Not assessable - no public API surface.
-- id: rfc9116-security-txt
-  conforms: false
-  evidence: /.well-known/security.txt returns 400.
+  evidence: Not applicable - not a financial-account API.

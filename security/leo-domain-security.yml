@@ -1,13 +1,41 @@
-generated: '2026-07-19'
+generated: '2026-08-14'
 method: probed
 source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
 hosts:
 - host: www.meetleo.com
   https: true
   tls_version: TLSv1.3
-  cert_expires: Sep  3 14:40:37 2026 GMT
+  cert_expires: Nov 11 21:24:30 2026 GMT
   hsts: true
   hsts_max_age: 31556952
+- host: api.meetleo.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Jan  2 23:59:59 2027 GMT
+  hsts: true
+  hsts_max_age: 31536000
+  hsts_include_subdomains: true
+  hsts_preload: true
+  hsts_note: >-
+    The automated probe recorded null because it reads the header from a 200 on /;
+    this host returns 404 at the root. Corrected from a direct header read of
+    GET https://api.meetleo.com/health (2026-08-14).
+- host: mcp.meetleo.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Jan  2 23:59:59 2027 GMT
+  hsts: true
+  hsts_max_age: 31536000
+  hsts_include_subdomains: true
+  hsts_preload: true
+  hsts_note: >-
+    Same correction; read directly from GET https://mcp.meetleo.com/health
+    (2026-08-14).
+  security_headers:
+  - 'x-frame-options: DENY'
+  - 'x-content-type-options: nosniff'
+  - 'referrer-policy: strict-origin-when-cross-origin'
+  - 'x-xss-protection: 1; mode=block'
 domains:
 - domain: meetleo.com
   dnssec: false

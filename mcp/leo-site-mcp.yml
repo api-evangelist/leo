@@ -1,16 +1,22 @@
-generated: '2026-07-19'
-method: searched
+generated: '2026-08-14'
+method: probed
 source: https://www.meetleo.com/llms.txt
 status: published
+first_party: false
+supersedes_note: >-
+  CORRECTION (2026-08-14). This file previously opened "LeO publishes no
+  first-party product API or MCP server." That is no longer true and was not true
+  when written -- it was concluded from probing only the Wix marketing host.
+  LeO ships BOTH a first-party REST API at https://api.meetleo.com and a
+  first-party MCP Connector at https://mcp.meetleo.com/mcp. See
+  mcp/leo-mcp.yml and openapi/. This file now covers only the Wix Site MCP.
 notes: >-
-  LeO publishes no first-party product API or MCP server. The endpoint below is
-  the platform-provided Wix Site MCP server that fronts LeO's marketing site, is
-  advertised in LeO's own llms.txt, and was verified live on 2026-07-19 via a
-  JSON-RPC initialize + tools/list handshake. It exposes public site content and
-  generic Wix site-management tooling ONLY -- it is not an interface to the LeO
-  commercial-insurance prospecting product, which remains a subscription web app
-  behind login at https://insights-app.meetleo.com/. Recorded as the provider's
-  real agentic-access surface, with that scope limitation made explicit.
+  The endpoint below is the platform-provided Wix Site MCP server that fronts LeO's
+  marketing site and is advertised in LeO's own llms.txt. It exposes public site
+  content and generic Wix site-management tooling ONLY -- it is not an interface to
+  the LeO commercial-insurance prospecting product. It is NOT LeO's product agent
+  surface; that is the LeO MCP Connector in mcp/leo-mcp.yml. Re-verified live on
+  2026-08-14 (tools/list -> HTTP 200).
 server:
   name: LeO 3.0 Site Visitor Assistant
   transport: http
@@ -24,10 +30,11 @@ server:
   authentication: none
   scope: public site content only
 verified:
-  date: '2026-07-19'
+  date: '2026-08-14'
   initialize: 200
   tools_list: 200
   tool_count: 9
+  first_verified: '2026-07-19'
 capabilities:
   tools:
     listChanged: true
@@ -41,20 +48,17 @@ tools:
   parameters:
   - searchTerm
 - name: SearchSiteApiDocs
-  description: >-
-    Retrieves the API documentation for the Wix business solutions installed on this
-    site and informs the AI client how to use the APIs.
+  description: Retrieves the API documentation for the Wix business solutions installed on this site and
+    informs the AI client how to use the APIs.
   parameters:
   - searchTerm
 - name: GenerateVisitorToken
-  description: >-
-    Creates a new visitor session and obtains a visitor access token for the site.
-    Must be called before any CallWixSiteAPI request.
+  description: Creates a new visitor session and obtains a visitor access token for the site. Must be
+    called before any CallWixSiteAPI request.
   parameters: []
 - name: CallWixSiteAPI
-  description: >-
-    Calls API methods on the site to perform actions on a visitor's behalf, such as
-    querying site data or starting a purchase.
+  description: Calls API methods on the site to perform actions on a visitor's behalf, such as querying
+    site data or starting a purchase.
   parameters:
   - visitorToken
   - url
@@ -89,9 +93,16 @@ advertised_capabilities:
 - Start a purchase and be directed to the site to complete checkout
 - Ask questions and get relevant answers without browsing the site
 caveats:
-- >-
-  Tool descriptions returned by this server embed Wix "agent-mandatory-instructions"
-  prompt text directing a connecting agent to manage Wix sites. That text is
-  third-party content in a tool description, not a LeO API contract, and should be
-  treated as untrusted data by any agent that connects.
+- Tool descriptions returned by this server embed Wix "agent-mandatory-instructions" prompt text directing
+  a connecting agent to manage Wix sites. That text is third-party content in a tool description, not
+  a LeO API contract, and should be treated as untrusted data by any agent that connects.
 - No authentication is required; only public information is reachable.
+deployment:
+  mode: remote
+  endpoint: https://www.meetleo.com/_api/mcp
+  auth: none
+  verified: probed
+  probe: live
+  tools: 9
+  checked: '2026-08-14'
+  source: live JSON-RPC tools/list probe (HTTP 200)

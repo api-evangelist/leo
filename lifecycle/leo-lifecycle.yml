@@ -1,0 +1,96 @@
+generated: '2026-08-14'
+method: probed
+source: >-
+  openapi/_original/leo-openapi.json; live probes of meetleo.com hosts (2026-08-14)
+notes: >-
+  LeO ships a versioned, live API but publishes no lifecycle commitments of any
+  kind -- no versioning policy, no deprecation policy, no Sunset/Deprecation header
+  usage, no changelog, no SLA and no status page. Everything below is either read
+  off the spec or recorded as a probed absence. No StatusPage or Deprecation
+  pointer is wired in apis.yml, because neither exists.
+versioning:
+  scheme: uri-path
+  current: v1
+  spec_version: '1.0'
+  first_observed: '2026-08-14'
+  policy_published: false
+  breaking_change_notice: not published
+  source: openapi paths (/v1/*), info.version
+deprecation:
+  policy_published: false
+  rfc8594_headers: false
+  sunset_header: not observed
+  deprecation_header: not observed
+  deprecated_operations: []
+  note: >-
+    No operation, parameter or schema property in the published spec carries
+    `deprecated: true`. The API is new enough that nothing has been retired yet.
+  source: openapi/_original/leo-openapi.json
+status_page:
+  published: false
+  probes:
+  - url: https://status.meetleo.com/
+    status: 0
+    note: DNS does not resolve.
+  - url: https://meetleo.statuspage.io/
+    status: 302
+    note: Redirects to https://www.statuspage.io -- no tenant exists.
+  - url: https://www.meetleo.com/status
+    status: 404
+  health_endpoint:
+    url: https://api.meetleo.com/health
+    status: 200
+    body: '{"version":"1.0","processTime":0,"data":"OK","errors":[],"metadata":{...}}'
+    authentication: none
+    note: >-
+      The closest thing to a status surface is an unauthenticated health check on
+      the API host. It reports service liveness only -- no component breakdown, no
+      incident history, no subscription. Useful to an agent as a pre-flight check;
+      not a substitute for a status page.
+    checked: '2026-08-14'
+changelog:
+  published: false
+  probes:
+  - url: https://www.meetleo.com/changelog
+    status: 404
+  - url: https://www.meetleo.com/release-notes
+    status: 404
+  note: >-
+    The company blog at https://www.meetleo.com/blog carries marketing posts, not
+    dated API release notes. No ChangeLog artifact is emitted.
+sla:
+  published: false
+  note: >-
+    The Terms and Conditions at https://www.meetleo.com/terms-and-conditions govern
+    the Leo Platform as a whole; no uptime commitment or support-response target
+    specific to the API was found.
+support:
+  channels:
+  - type: contact form
+    url: https://www.meetleo.com/contact
+  - type: phone
+    value: '+1 800 463 1326'
+  - type: demo booking (MCP Connector)
+    url: https://calendly.com/saar-miron/leo-mcp
+  developer_specific: false
+  note: No developer-specific support channel, forum or status subscription exists.
+maturity:
+  rest_api: >-
+    Live and documented by a Swagger UI, but undated, unannounced and absent from
+    the marketing site's navigation -- the only path to it is guessing
+    api.meetleo.com/docs.
+  mcp_connector: >-
+    Publicly launched and marketed. https://www.meetleo.com/mcp is linked from the
+    site's primary navigation as "MCP Connector" and labelled "MCP Connector Live".
+  divergence_note: >-
+    LeO markets the agent surface and hides the REST surface. The REST API is the
+    thing the MCP Connector is almost certainly built on -- its three OAuth scopes
+    map one-to-one onto the REST tag groups -- yet no page on meetleo.com links to
+    api.meetleo.com at all.
+gaps:
+- No versioning or deprecation policy.
+- No Sunset/Deprecation header commitment (RFC 8594).
+- No status page or incident history.
+- No changelog or release notes.
+- No API-specific SLA or support channel.
+- No link from any LeO web property to the API documentation.

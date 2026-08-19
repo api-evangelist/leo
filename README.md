@@ -52,26 +52,54 @@ Founded by CEO Liri Halperin Segal. Techstars portfolio company. Certified HIPAA
 
 ## API surface
 
-**LeO publishes no public developer API.** There is no developer portal, API reference, OpenAPI/AsyncAPI definition, SDK, CLI, sandbox, changelog, status page or webhook surface. Probes on 2026-07-19 found `docs.`, `developer.`, `status.` and `trust.` subdomains unresolved, `/api`, `/developers` and `/docs` returning 404, and every `/.well-known/` path returning 400. The product is a subscription web application behind login.
+**Correction (2026-08-14).** An earlier round of this profile stated that "LeO publishes no public developer API." That was wrong. It was concluded from probing only the Wix-managed marketing host `www.meetleo.com`, which returns HTTP 400 for every `/.well-known/` path and 404 for `/api`, `/docs` and `/developers`. Probing the **API host root** instead found a live, first-party contract.
 
-Two real machine-readable surfaces do exist and are captured here:
+LeO ships two programmatic surfaces, both first-party and both entitlement-gated to existing customers:
 
-| Artifact | What it is |
-|---|---|
-| `llms/leo-llms.txt` | LeO's published `/llms.txt` (200, `text/plain`), saved verbatim |
-| `mcp/leo-mcp.yml` | Live Wix-provided **Site MCP** endpoint at `https://www.meetleo.com/_api/mcp`, advertised in that llms.txt and verified via a JSON-RPC `initialize` + `tools/list` handshake (9 tools) |
+| Surface | Where | Auth | Evidence |
+|---|---|---|---|
+| **Leo Public API** (REST) | `https://api.meetleo.com` | Bearer JWT | OpenAPI 3.0.0 at [`/openapi.json`](https://api.meetleo.com/openapi.json) (HTTP 200), Swagger UI at [`/docs`](https://api.meetleo.com/docs), health check at `/health` |
+| **LeO MCP Connector** | `https://mcp.meetleo.com/mcp` | OAuth 2.1 (auth code + PKCE S256, AWS Cognito) | Marketed at [meetleo.com/mcp](https://www.meetleo.com/mcp); JSON-RPC probe returns a protocol-correct 401 with `WWW-Authenticate` naming RFC 9728 metadata; `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server` both 200 |
 
-The MCP server is platform-provided by Wix, not first-party, and reaches **public marketing content only** — it is not an interface to the LeO prospecting product. Its tool descriptions embed Wix "agent-mandatory-instructions" prompt text; connecting agents should treat that as untrusted data.
+The REST contract carries 7 operations across 4 tags and 24 component schemas: account entitlements, credit balance, prospect search across a **134-property** filter schema, single-prospect retrieval, and asynchronous contact enrichment with job polling. `POST /v1/prospects/search` is free; `GET /v1/prospects/{prospectId}` costs 1 credit; `POST /v1/prospects/enrich` reserves credits and charges only rows that come back `enriched`.
+
+The MCP Connector publishes three resource scopes — `prospects:read`, `prospects:enrich`, `account:read` — which map one-to-one onto the REST tag groups, so the connector reads as a thin agent facade over the same API.
+
+### What LeO does not publish
+
+- **No status page, changelog, SLA, versioning policy or deprecation policy.** `status.meetleo.com` does not resolve; `meetleo.statuspage.io` has no tenant. The only availability signal is `GET https://api.meetleo.com/health`.
+- **No idempotency mechanism** on `POST /v1/prospects/enrich`, which reserves credits — a blind retry after a timeout can reserve twice.
+- **No published rate limits.** `429` is declared on four operations as "HTTP API stage throttling or upstream limits" with no numeric limit and no `RateLimit-*` / `Retry-After` headers.
+- **No SDKs, CLI, sandbox, webhooks or AsyncAPI.** No first-party package exists on npm, PyPI or GitHub.
+- **No `security.txt`, trust center, vulnerability disclosure programme or A2A agent card** on any host.
+- **No RFC 9457 problem+json** — errors use a custom `errors[]` envelope, and gateway-level failures use a different shape again.
+- **No API pricing.** The pricing page renders tier prices client-side from a Wix service that 403s anonymously, and neither it nor the MCP page states what a credit costs or which tier carries `hasApiAccess` / `hasMcpAccess`.
+- **No link from any LeO web property to `api.meetleo.com`.** LeO markets the agent surface from its primary navigation and leaves the REST surface undiscoverable. `llms.txt` documents only the Wix Site MCP and routes agents away from the real API.
 
 ## Artifacts
 
 | Path | Type | Method |
 |---|---|---|
 | `apis.yml` | APIs.json 0.20 profile | — |
-| `llms/leo-llms.txt` | LLMsTxt | searched |
-| `mcp/leo-mcp.yml` | MCPServer | searched |
+| `openapi/_original/leo-openapi.json` | OpenAPI 3.0.0, verbatim | searched |
+| `openapi/leo-{prospects,jobs,account,credits,system}-api-openapi.yml` | OpenAPI, split one-per-tag | searched |
+| `overlays/leo-servers-overlay.yaml` | Overlay 1.0.0 (adds the `servers[]` the spec omits) | derived |
+| `mcp/leo-mcp.yml` | MCPServer — first-party LeO MCP Connector | probed |
+| `mcp/leo-tool-crosswalk.yml` | ToolCrosswalk | derived |
+| `mcp/leo-site-mcp.yml` | MCPServer — Wix Site MCP (platform-provided, not first-party) | probed |
+| `scopes/leo-scopes.yml` | OAuthScopes | probed |
+| `authentication/leo-authentication.yml` | Authentication | probed |
+| `conventions/leo-conventions.yml` | Conventions | derived |
+| `errors/leo-problem-types.yml` | ErrorCatalog | derived |
+| `data-model/leo-data-model.yml` | DataModel | derived |
+| `lifecycle/leo-lifecycle.yml` | Lifecycle | probed |
+| `rate-limits/leo-rate-limits.yml` | RateLimits (limit_count: 0) | probed |
+| `plans/leo-plans-pricing.yml` | Plans | searched |
+| `packages/leo-packages.yml` | negative record (no SDKs exist) | searched |
+| `skills/` | AgentSkill ×3 + index | generated |
 | `conformance/leo-conformance.yml` | Conformance / Compliance | searched |
+| `well-known/` | WellKnown — 3 documents on `mcp.meetleo.com` | probed |
 | `security/leo-domain-security.yml` | DomainSecurity | probed |
-| `well-known/leo-well-known.yml` | negative probe record (no documents) | searched |
+| `llms/leo-llms.txt` | LLMsTxt, verbatim | searched |
 
-Not applicable — no vulnerability disclosure program, trust center, `security.txt`, packages/SDKs, or GitHub organization was found. (The `github.com/meetleo` account belongs to an unrelated company, MeetLeonard, and is deliberately **not** linked.) Spec-grounded artifacts — overlays, error catalog, data model, scopes, authentication, agent skills, Arazzo — require an OpenAPI definition and are skipped rather than fabricated.
+Not applicable — no vulnerability disclosure programme, trust center, `security.txt`, SDK/package, CLI, sandbox, changelog, event/webhook surface, or A2A agent card was found. (The `github.com/meetleo` account belongs to an unrelated company, MeetLeonard, and is deliberately **not** linked.)

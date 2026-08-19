@@ -1,0 +1,117 @@
+generated: '2026-08-14'
+method: searched
+source: https://www.meetleo.com/pricing
+secondary_source: https://www.meetleo.com/mcp
+plan_count: 4
+api_pricing_published: false
+notes: >-
+  LeO publishes a pricing page, but the prices are not in the page a machine can
+  read. https://www.meetleo.com/pricing is a Wix pricing-plans widget: the served
+  HTML contains only placeholder tokens ([PLAN TITLE], [PLAN DESCRIPTION], $0) and
+  the real figures are injected client-side from a Wix paid-plans service. The
+  service endpoints (/_api/paid-plans/v1/plans, /_api/paid-plans/v2/plans) return
+  HTTP 403 "Pricing Plans instanceId not in context" to an anonymous caller, so no
+  price could be read without executing the page. Tier NAMES, the feature matrix,
+  the billing options and the trial terms ARE in the served HTML and are recorded
+  verbatim below. Crucially, NOTHING on the pricing page mentions the API, the MCP
+  Connector, credits-per-call, or which tier carries hasApiAccess / hasMcpAccess --
+  so the commercial terms for the developer surface are unpublished.
+billing:
+  periods:
+  - monthly
+  - annual
+  annual_discount: 40%
+  annual_note: 'Page states "Save 40%!" and shows a "$832 annually billed" reference figure.'
+  trial:
+    offered: true
+    length_days: 14
+    label: Start 14 days free trial
+  credits:
+    granted: annually upfront
+    quote: Credits are provided annually upfront
+  currency: USD
+plans:
+- name: P&C COMMERCIAL
+  price: null
+  price_note: Rendered client-side; not present in the served HTML.
+  billing_periods:
+  - monthly
+  - annual
+  target: Property & casualty commercial-lines producers
+  api_access: not stated
+  mcp_access: not stated
+- name: BENEFITS PRO
+  price: null
+  price_note: Rendered client-side; not present in the served HTML.
+  billing_periods:
+  - monthly
+  - annual
+  target: Employee benefits advisors
+  api_access: not stated
+  mcp_access: not stated
+- name: AGENCY SCALE
+  price: null
+  price_note: >-
+    Rendered client-side. The single price literal in the served HTML, "$832
+    annually billed", sits in the annual-toggle block but is not bound to a named
+    tier in the static markup, so it is NOT attributed to a plan here.
+  billing_periods:
+  - monthly
+  - annual
+  includes: All Included! P&C, Nonprofits and Benefits Prospecting
+  api_access: not stated
+  mcp_access: not stated
+- name: Enterprise
+  price: null
+  price_note: Contact sales. Page copy - "Need an Enterprise solution? Get in touch with Sales".
+  billing_periods: []
+  api_access: not stated
+  mcp_access: not stated
+feature_matrix:
+  note: Feature rows compared across tiers on the pricing page, verbatim.
+  rows:
+  - Firmographics
+  - Key Contacts
+  - Renewal Dates
+  - P&C Data and Filters
+  - Benefits Data and Filters
+  - Nonprofits Data and Filters
+  - Outreaching & Exporting
+  - Light CRM
+  - Search & AI Discovery
+  absent:
+  - API access
+  - MCP Connector access
+  - Credit allowance per tier
+developer_surface_commercials:
+  api_access_gate:
+    field: plan.hasApiAccess
+    operation: AccountController_getAccount
+    source: openapi/leo-account-api-openapi.yml
+  mcp_access_gate:
+    field: plan.hasMcpAccess
+    operation: AccountController_getAccount
+    source: openapi/leo-account-api-openapi.yml
+  consumption_model: credits
+  credit_rules:
+  - POST /v1/prospects/search consumes no enrichment credits.
+  - GET /v1/prospects/{prospectId} consumes 1 credit.
+  - POST /v1/prospects/enrich reserves up to maxProspects credits; only rows returning enrichmentStatus "enriched" are charged.
+  source: openapi/_original/leo-openapi.json, https://www.meetleo.com/mcp
+  gap: >-
+    The spec states what CONSUMES a credit but never what a credit COSTS, and the
+    pricing page never says how many credits a tier includes. A prospective API
+    consumer cannot price an integration from public material.
+evidence:
+- url: https://www.meetleo.com/pricing
+  status: 200
+  note: Wix pricing-plans widget; placeholder tokens only in the served HTML.
+- url: https://www.meetleo.com/_api/paid-plans/v1/plans
+  status: 403
+  note: '{"message":"Pricing Plans instanceId not in context"}'
+- url: https://www.meetleo.com/_api/paid-plans/v2/plans
+  status: 403
+- url: https://www.meetleo.com/mcp
+  status: 200
+  note: 301 to https://content.meetleo.com/mcp.html. States a LeO account is required and consumption is credit-based; names no price.
+checked: '2026-08-14'

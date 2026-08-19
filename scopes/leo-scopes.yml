@@ -1,0 +1,103 @@
+generated: '2026-08-14'
+method: probed
+source: https://mcp.meetleo.com/.well-known/oauth-protected-resource
+docs: https://www.meetleo.com/mcp
+notes: >-
+  LeO's OpenAPI declares only an HTTP bearer (JWT) scheme with no oauth2 flows,
+  so no scopes can be derived from the spec. The scopes below are read verbatim
+  from the two anonymous discovery documents the LeO MCP Connector publishes:
+  the RFC 9728 protected-resource metadata at
+  https://mcp.meetleo.com/.well-known/oauth-protected-resource and the RFC 8414
+  authorization-server metadata at
+  https://mcp.meetleo.com/.well-known/oauth-authorization-server. They are
+  resource-URI-namespaced scopes issued by an AWS Cognito user pool
+  (us-east-1_RnOkUWIRc) fronted by https://insights-app-auth.meetleo.com. LeO
+  publishes no prose scope/permission reference page; the descriptions below are
+  derived from the matching REST operations in openapi/ and are marked as such.
+authorization_server:
+  issuer: https://mcp.meetleo.com
+  authorization_endpoint: https://insights-app-auth.meetleo.com/oauth2/authorize
+  token_endpoint: https://insights-app-auth.meetleo.com/oauth2/token
+  revocation_endpoint: https://insights-app-auth.meetleo.com/oauth2/revoke
+  userinfo_endpoint: https://insights-app-auth.meetleo.com/oauth2/userInfo
+  end_session_endpoint: https://insights-app-auth.meetleo.com/logout
+  jwks_uri: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_RnOkUWIRc/.well-known/jwks.json
+  response_types_supported:
+  - code
+  code_challenge_methods_supported:
+  - S256
+  token_endpoint_auth_methods_supported:
+  - client_secret_basic
+  - client_secret_post
+  dynamic_client_registration: false
+  dcr_probe:
+    url: https://mcp.meetleo.com/register
+    status: 404
+    note: >-
+      No RFC 7591 registration endpoint is advertised or served, so MCP clients
+      cannot self-register; a client_id must be issued by LeO out of band.
+resource:
+  resource: https://mcp.meetleo.com
+  bearer_methods_supported:
+  - header
+scope_count: 7
+scopes:
+- name: https://mcp.meetleo.com/prospects:read
+  resource_scope: true
+  description: >-
+    Read access to the LeO prospect graph -- firmographics, NAICS/NTEE class,
+    renewal dates, workers' comp, OSHA, DOT/FMCSA, Form 5500 and IRS 990 data.
+  method: derived
+  maps_to:
+  - ProspectsController_search
+  - ProspectsController_getById
+  source: openapi/leo-prospects-api-openapi.yml
+- name: https://mcp.meetleo.com/prospects:enrich
+  resource_scope: true
+  description: >-
+    Permission to queue a contact-enrichment job that resolves decision-maker
+    emails and titles and consumes credits.
+  method: derived
+  maps_to:
+  - ProspectsController_enrich
+  - JobsController_getJob
+  source: openapi/leo-prospects-api-openapi.yml, openapi/leo-jobs-api-openapi.yml
+- name: https://mcp.meetleo.com/account:read
+  resource_scope: true
+  description: >-
+    Read the authenticated identity, tenant, plan entitlements
+    (hasApiAccess / hasMcpAccess) and credit balance.
+  method: derived
+  maps_to:
+  - AccountController_getAccount
+  - CreditsController_getCreditBalance
+  source: openapi/leo-account-api-openapi.yml, openapi/leo-credits-api-openapi.yml
+- name: openid
+  resource_scope: false
+  description: Standard OpenID Connect scope; requests an ID token.
+  method: probed
+- name: email
+  resource_scope: false
+  description: Standard OIDC claim scope. Advertised by the authorization server only.
+  method: probed
+- name: profile
+  resource_scope: false
+  description: Standard OIDC claim scope. Advertised by the authorization server only.
+  method: probed
+- name: aws.cognito.signin.user.admin
+  resource_scope: false
+  description: >-
+    AWS Cognito built-in scope granting the token holder self-service management
+    of its own user attributes. Not a LeO product scope.
+  method: probed
+observations:
+- >-
+  The three LeO product scopes map one-to-one onto the three REST tag groups that
+  require authentication (prospects, jobs+enrich, account+credits). Nothing in the
+  scope set corresponds to email sending, CRM writes or reporting, which supports
+  reading the compose_email / log_to_crm / daily_report steps in LeO's published
+  workflow illustration as client-side or third-party tools rather than LeO tools.
+- >-
+  Scope names are absolute resource URIs, the AWS Cognito resource-server
+  convention, so a client must request the full URI string, not a bare
+  "prospects:read".

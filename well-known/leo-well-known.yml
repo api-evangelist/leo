@@ -1,31 +1,139 @@
-generated: '2026-07-19'
-method: searched
-source: live probe of https://www.meetleo.com/.well-known/*
-host: https://www.meetleo.com
-found: 0
+generated: '2026-08-14'
+method: probed
+source: live probes of /.well-known/* on every LeO host
+hosts_probed:
+- https://www.meetleo.com
+- https://api.meetleo.com
+- https://mcp.meetleo.com
+- https://insights-app-auth.meetleo.com
+- https://insights-app.meetleo.com
+found: 3
 notes: >-
-  No /.well-known/ discovery documents are published. The host is a Wix-managed
-  site that returns HTTP 400 for every /.well-known/ path rather than 404, so the
-  path space is not served at all. Recorded as a negative probe result; no
-  WellKnown or SecurityTxt pointer is wired in apis.yml because no document
-  exists. Absence is a valid, expected result for a provider with no public API.
+  Round 1 (2026-07-19) probed only the Wix marketing host www.meetleo.com, which
+  returns HTTP 400 for every /.well-known/ path, and recorded a clean negative.
+  Re-probing on 2026-08-14 against the API and MCP hosts found three real
+  documents on https://mcp.meetleo.com -- an RFC 9728 OAuth protected-resource
+  document, an RFC 8414 authorization-server metadata document, and the same
+  metadata served at /.well-known/openid-configuration. All three are anonymous,
+  return application/json, and name LeO's own Cognito-backed authorization server
+  at https://insights-app-auth.meetleo.com. This is a REAL hit, so a WellKnown
+  pointer is wired in apis.yml. No security.txt is served on any host, so no
+  SecurityTxt pointer is emitted. insights-app.meetleo.com is a single-page
+  application that answers HTTP 200 with an HTML shell for every path including
+  /.well-known/* -- those 200s are NOT documents and are recorded as misses.
 documents:
-- path: /.well-known/security.txt
-  status: 400
-- path: /.well-known/openid-configuration
-  status: 400
-- path: /.well-known/oauth-authorization-server
-  status: 400
-- path: /.well-known/api-catalog
-  status: 400
-- path: /.well-known/ai-plugin.json
-  status: 400
+- host: https://mcp.meetleo.com
+  path: /.well-known/oauth-protected-resource
+  status: 200
+  content_type: application/json; charset=utf-8
+  file: leo-oauth-protected-resource.json
+  note: >-
+    RFC 9728 protected-resource metadata for the LeO MCP Connector. Declares
+    resource https://mcp.meetleo.com, bearer_methods_supported [header], and
+    three LeO-namespaced scopes plus openid and the Cognito user-admin scope.
+- host: https://mcp.meetleo.com
+  path: /.well-known/oauth-authorization-server
+  status: 200
+  content_type: application/json; charset=utf-8
+  file: leo-oauth-authorization-server.json
+  note: >-
+    RFC 8414 authorization-server metadata. issuer https://mcp.meetleo.com,
+    authorization/token/revocation/userinfo endpoints on
+    https://insights-app-auth.meetleo.com, PKCE S256, response_types [code],
+    jwks_uri on an AWS Cognito user pool (us-east-1_RnOkUWIRc).
+- host: https://mcp.meetleo.com
+  path: /.well-known/openid-configuration
+  status: 200
+  content_type: application/json; charset=utf-8
+  file: leo-openid-configuration.json
+  note: Byte-identical to the oauth-authorization-server document.
+misses:
+- host: https://www.meetleo.com
+  paths:
+  - path: /.well-known/security.txt
+    status: 400
+  - path: /.well-known/openid-configuration
+    status: 400
+  - path: /.well-known/oauth-authorization-server
+    status: 400
+  - path: /.well-known/api-catalog
+    status: 400
+  - path: /.well-known/ai-plugin.json
+    status: 400
+  - path: /.well-known/agent-card.json
+    status: 400
+  - path: /.well-known/agent.json
+    status: 400
+  note: Wix-managed host; the /.well-known/ path space is not served at all.
+- host: https://api.meetleo.com
+  paths:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: https://mcp.meetleo.com
+  paths:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/oauth-protected-resource/mcp
+    status: 404
+- host: https://insights-app-auth.meetleo.com
+  paths:
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/security.txt
+    status: 404
+  note: >-
+    The Cognito hosted-UI domain does not serve discovery metadata itself; the
+    metadata is published by the MCP resource server instead.
+- host: https://insights-app.meetleo.com
+  paths:
+  - path: /.well-known/agent-card.json
+    status: 200
+  - path: /.well-known/security.txt
+    status: 200
+  note: >-
+    SOFT 200. This host is an SPA catch-all that returns the same 3,169-byte HTML
+    shell for every path. Not documents; treated as misses.
 related:
-- path: /llms.txt
+- host: https://www.meetleo.com
+  path: /llms.txt
   status: 200
   file: ../llms/leo-llms.txt
-  note: Present and captured; advertises the site MCP endpoint.
-- path: /robots.txt
+- host: https://www.meetleo.com
+  path: /robots.txt
   status: 200
-- path: /sitemap.xml
+- host: https://www.meetleo.com
+  path: /sitemap.xml
+  status: 200
+- host: https://api.meetleo.com
+  path: /openapi.json
+  status: 200
+  file: ../openapi/_original/leo-openapi.json
+- host: https://api.meetleo.com
+  path: /docs
+  status: 200
+  note: Swagger UI rendering the published openapi.json.
+- host: https://api.meetleo.com
+  path: /health
   status: 200

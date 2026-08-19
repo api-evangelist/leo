@@ -1,0 +1,84 @@
+generated: '2026-08-14'
+method: probed
+source: >-
+  openapi/_original/leo-openapi.json; live unauthenticated responses from
+  https://api.meetleo.com (2026-08-14)
+docs: https://api.meetleo.com/docs
+limit_count: 0
+notes: >-
+  LeO publishes NO numeric rate limits. Every credit-consuming operation declares
+  a 429 response described verbatim as "Too many requests (HTTP API stage
+  throttling or upstream limits)" -- which tells a client that throttling exists at
+  the AWS API Gateway stage and upstream, but never says at what rate, over what
+  window, or per what principal. No RateLimit-*, X-RateLimit-* or Retry-After
+  header was observed on any live response, and none is declared in the spec, so an
+  agent has no runtime signal at all: it learns it is over the limit only by being
+  rejected, and cannot tell how long to wait. Recorded as an honest zero.
+declared_status: 429
+declared_on:
+- ProspectsController_search
+- ProspectsController_getById
+- ProspectsController_enrich
+- JobsController_getJob
+not_declared_on:
+- AccountController_getAccount
+- CreditsController_getCreditBalance
+- AppController_health
+limits: []
+headers:
+  published: []
+  observed: []
+  probe:
+    urls:
+    - url: https://api.meetleo.com/health
+      status: 200
+    - url: https://api.meetleo.com/openapi.json
+      status: 200
+    - url: https://api.meetleo.com/v1/account
+      status: 401
+    checked: '2026-08-14'
+    result: >-
+      No RateLimit-*, X-RateLimit-*, Retry-After or equivalent header present on
+      any response. Response headers are AWS/CloudFront infrastructure headers
+      (apigw-requestid, x-cache, via, x-amz-cf-*) plus standard security headers.
+retry_after: false
+adjacent_quota:
+  note: >-
+    The real consumption ceiling on this API is CREDITS, not requests per second,
+    and unlike the rate limit the credit budget IS exposed at runtime.
+  signals:
+  - GET /v1/credits/balance -> available, reserved
+  - metadata.creditsUsed on every enveloped response
+  - metadata.creditsRemaining on every enveloped response
+  exhaustion_status: 402
+  hard_caps:
+  - name: search page size
+    field: SearchProspectsDto.limit
+    max: 100
+  - name: prospects per enrichment run
+    field: EnrichProspectsDto.maxProspects
+    max: 100
+    default: 100
+  detail: conventions/leo-conventions.yml
+polling_guidance:
+  note: >-
+    The only cadence guidance LeO publishes anywhere is for job polling, stated in
+    the operation description rather than as a rate limit.
+  interval_seconds: 5
+  typical_completion_seconds: 120
+  give_up_after_seconds: 300
+  source: openapi/leo-jobs-api-openapi.yml (JobsController_getJob description)
+mcp_surface:
+  endpoint: https://mcp.meetleo.com/mcp
+  note: >-
+    The MCP Connector is OAuth-gated, so no authenticated call could be made and no
+    limits could be observed. LeO's MCP page states the connector "respects your
+    entitlements and credit balance", implying the same credit ceiling applies.
+  probe:
+    url: https://mcp.meetleo.com/mcp
+    status: 401
+    checked: '2026-08-14'
+gaps:
+- No numeric limit, window or burst is published for any endpoint.
+- No RateLimit-* / Retry-After headers, so 429 handling can only be blind exponential backoff.
+- 429 is declared on four operations but not on /v1/account or /v1/credits/balance; whether those are exempt or the spec is incomplete is not stated.

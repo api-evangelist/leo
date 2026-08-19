@@ -1,5 +1,5 @@
 # LeO 3.0
-> The Leo website offers an AI-powered platform designed to help insurance sales professionals streamline prospecting and close more deals. It provides resources like whitepapers and guides, alongside its core service which features AI-driven automation, superior data accuracy, and advanced filtering for P&C and employee benefits. The platform aims to accelerate sales cycles and improve lead generation through real-time data and pre-meeting planning tools. Leo emphasizes enterprise-grade security and compliance, positioning itself as a modern solution for the evolving insurance industry.
+> LeO provides an AI-powered platform designed to help insurance professionals close more deals by identifying and nurturing leads. The platform offers advanced filtering, ideal timing insights through a renewal date database, and smart outreach tools to fill calendars. It also assists with pre-meeting planning by providing insights into current solutions, carriers, brokers, and coverages. LeO aims to empower insurance agents and brokers with modern tools for efficient prospecting and business growth.
 
 ## Homepage link
 - [home](https://www.meetleo.com/)

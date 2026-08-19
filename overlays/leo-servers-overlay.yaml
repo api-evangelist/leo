@@ -1,0 +1,80 @@
+overlay: 1.0.0
+info:
+  title: LeO Public API - base URL and metadata overlay
+  version: 1.0.0
+  x-generated: '2026-08-14'
+  x-method: derived
+  x-source: >-
+    Applies to openapi/_original/leo-openapi.json, fetched verbatim from
+    https://api.meetleo.com/openapi.json on 2026-08-14. Captures API Evangelist
+    enhancements only; the original is never mutated.
+  x-rationale: >-
+    LeO's published spec ships with an EMPTY servers[] array, no info.contact, no
+    info.license, no termsOfService and no tags[] declarations. An agent that reads
+    the document alone cannot determine where to send a request. The base URL added
+    here is not a guess - it is the host that serves the document itself, confirmed
+    live by GET https://api.meetleo.com/health -> 200 and by the Swagger UI at
+    https://api.meetleo.com/docs, which resolves the same relative paths.
+extends: ../openapi/_original/leo-openapi.json
+actions:
+- target: $
+  description: Add the production server the spec omits.
+  update:
+    servers:
+    - url: https://api.meetleo.com
+      description: >-
+        LeO Public API production base. Verified live 2026-08-14 (GET /health ->
+        200, GET /openapi.json -> 200). Sourced from the host serving the spec, not
+        inferred from the marketing domain.
+- target: $.info
+  description: Add contact, terms and provenance metadata absent from the original.
+  update:
+    contact:
+      name: LeO
+      url: https://www.meetleo.com/contact
+    termsOfService: https://www.meetleo.com/terms-and-conditions
+    x-documentation: https://api.meetleo.com/docs
+    x-provider: LeO (meetleo.com)
+    x-agent-surface: https://mcp.meetleo.com/mcp
+- target: $
+  description: Declare the tag set the original leaves empty.
+  update:
+    tags:
+    - name: account
+      description: Authenticated identity, tenant and plan entitlements.
+    - name: credits
+      description: Credit balance - available, reserved, individual or pool.
+    - name: prospects
+      description: Search, retrieve and enrich commercial-insurance prospects.
+    - name: jobs
+      description: Poll asynchronous contact-enrichment jobs.
+- target: $.paths['/health'].get
+  description: >-
+    Tag the only untagged operation so it splits cleanly, and record that it is the
+    de facto status surface (LeO publishes no status page).
+  update:
+    tags:
+    - system
+    summary: Service health check
+    description: >-
+      Unauthenticated liveness probe. Returns the standard response envelope with
+      data "OK". This is the only availability signal LeO publishes; there is no
+      status page.
+- target: $.paths['/v1/prospects/enrich'].post
+  description: Flag the absence of an idempotency mechanism on a credit-reserving POST.
+  update:
+    x-idempotent: false
+    x-idempotency-key-supported: false
+    x-caution: >-
+      This operation reserves credits before doing work and offers no
+      Idempotency-Key header. A blind retry after a timeout can reserve a second
+      batch. Poll GET /v1/jobs/{taskId} before retrying.
+- target: $.components.securitySchemes.bearer
+  description: Record how the bearer credential is actually obtained.
+  update:
+    description: >-
+      JWT bearer token. LeO publishes no self-service key page; access is gated by
+      the account's plan entitlement flag plan.hasApiAccess (GET /v1/account). The
+      sibling MCP Connector at https://mcp.meetleo.com uses the same AWS Cognito
+      identity provider (us-east-1_RnOkUWIRc) via OAuth 2.1 authorization_code +
+      PKCE. See authentication/leo-authentication.yml.

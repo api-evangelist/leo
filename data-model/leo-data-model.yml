@@ -1,0 +1,243 @@
+generated: '2026-08-14'
+method: derived
+source: openapi/_original/leo-openapi.json ($ref graph + id-reference fields)
+notes: >-
+  Derived from the 24 component schemas and the $ref edges between them in LeO's
+  published OpenAPI. LeO publishes no object reference page, so there are no
+  documented id prefixes; identifiers are a bare integer (prospectId) and a UUID
+  (taskId). Nothing here is invented -- every entity, field and edge is present in
+  the spec.
+entity_count: 8
+identifiers:
+- name: prospectId
+  type: integer
+  example: 8472193
+  prefix: none
+  note: Bare integer, not an opaque prefixed string.
+- name: taskId
+  type: string (uuid)
+  example: 550e8400-e29b-41d4-a716-446655440000
+  note: Enrichment job handle. Expires -- GET /v1/jobs/{taskId} declares a 404 "Job not found or expired".
+- name: tenantId
+  type: string
+  note: Account tenancy. Not addressable by any operation.
+- name: poolId
+  type: string
+  note: Shared credit pool identifier; present only when credits.plan is "pool".
+entities:
+- name: Account
+  schema: AccountResponseDto
+  operations:
+  - AccountController_getAccount
+  fields:
+  - userId
+  - email
+  - tenantId
+  - plan
+  root: true
+- name: Plan
+  schema: PlanDto
+  fields:
+  - name
+  - hasApiAccess
+  - hasMcpAccess
+  note: Entitlement carrier. Decides whether REST and MCP access are permitted at all.
+- name: CreditBalance
+  schema: CreditBalanceResponseDto
+  operations:
+  - CreditsController_getCreditBalance
+  fields:
+  - available
+  - reserved
+  - plan (individual|pool)
+  - poolId
+  root: true
+- name: Prospect
+  schema: ProspectResponse
+  operations:
+  - ProspectsController_search
+  - ProspectsController_getById
+  key: prospectId
+  fields:
+  - prospectId
+  - standardCompanyName
+  - state
+  - city
+  - zipCode
+  - address
+  - primaryVertical
+  - naicsCode
+  - naicsList
+  - ntee
+  - salesVolumeRange
+  - hqPhone
+  - ein
+  - employeeRange
+  - websiteUrl
+  - linkedinUrl
+  - insurance
+  - irs990
+  - xDatePredictions
+  - benefitsRedFlags
+  - contacts
+  root: true
+  note: >-
+    The central entity. contacts is always null on search results -- populated only
+    through the enrichment job path.
+- name: ProspectInsurance
+  schema: ProspectInsurance
+  fields:
+  - wc
+  - pension
+  - benefits
+  - fidelityBond
+  - osha
+  - dot
+  note: Composite of the insurance data layers hanging off a Prospect.
+- name: EnrichmentJob
+  schema: JobStatusDataDto
+  operations:
+  - ProspectsController_enrich
+  - JobsController_getJob
+  key: taskId
+  fields:
+  - taskId
+  - status (pending|processing|completed|failed)
+  - prospects
+  root: true
+- name: EnrichedProspectJobItem
+  schema: EnrichedProspectJobItemDto
+  fields:
+  - prospectId
+  - enrichmentStatus (enriched|no_email|failed)
+- name: Irs990
+  schema: ProspectIrs990
+  fields:
+  - reportType
+  - reportYear
+  - totalRevenue
+  - totalExpenses
+  - totalNetAssets
+  - history
+relationships:
+- from: Account
+  to: Plan
+  type: has_one
+  via: plan
+  binding: $ref
+- from: CreditBalance
+  to: Account
+  type: belongs_to
+  via: authenticated principal
+  binding: implicit
+  note: The balance is scoped to the caller; there is no accountId field on it.
+- from: Prospect
+  to: ProspectInsurance
+  type: has_one
+  via: insurance
+  binding: $ref
+- from: Prospect
+  to: Irs990
+  type: has_one
+  via: irs990
+  binding: $ref (nullable)
+  note: Present only for nonprofit prospects.
+- from: Prospect
+  to: XDatePredictions
+  type: has_one
+  via: xDatePredictions
+  binding: $ref
+- from: Prospect
+  to: BenefitsRedFlags
+  type: has_one
+  via: benefitsRedFlags
+  binding: $ref
+  note: 39 boolean flags, each paired with a plain-English description field.
+- from: ProspectInsurance
+  to: InsuranceLineData
+  type: has_many
+  via: wc, pension, benefits
+  binding: $ref
+  note: Three named lines, each carrying renewalDate, carrier, broker, participants.
+- from: ProspectInsurance
+  to: OshaData
+  type: has_one
+  via: osha
+  binding: $ref
+- from: ProspectInsurance
+  to: DotData
+  type: has_one
+  via: dot
+  binding: $ref
+- from: DotData
+  to: DotInsuranceLine
+  type: has_many
+  via: bipdPrimary, bipdExcess, cargo, surety
+  binding: $ref
+- from: Irs990
+  to: ProspectIrs990HistoryEntry
+  type: has_many
+  via: history
+  binding: $ref
+- from: SearchProspectsResponseData
+  to: Prospect
+  type: has_many
+  via: prospects
+  binding: $ref
+- from: SearchProspectsResponseData
+  to: PaginationResponse
+  type: has_one
+  via: pagination
+  binding: $ref
+- from: EnrichmentJob
+  to: EnrichedProspectJobItem
+  type: has_many
+  via: prospects
+  binding: $ref
+- from: EnrichedProspectJobItem
+  to: Prospect
+  type: belongs_to
+  via: prospectId
+  binding: id-reference
+  note: >-
+    The only cross-entity id reference in the model. A completed job returns
+    prospectId + enrichmentStatus; a client re-reads the full record with
+    GET /v1/prospects/{prospectId}, which costs a credit.
+- from: SearchProspectsDto
+  to: SearchProspectsFiltersDto
+  type: has_many
+  via: filters
+  binding: $ref
+- from: EnrichProspectsDto
+  to: SearchProspectsFiltersDto
+  type: has_many
+  via: filters
+  binding: $ref
+  note: >-
+    Search and enrich share one filter schema, which is why a search can be used to
+    preview an enrich without spending enrichment credits.
+data_layers:
+  note: >-
+    LeO's own MCP page names eight data layers; six of them are visible as
+    structured schema in this spec.
+  layers:
+  - name: Renewal dates (x-dates)
+    schema: InsuranceLineData.renewalDate, XDatePredictions
+  - name: Form 5500 financials
+    schema: InsuranceLineData (pension, benefits) + benefits filters
+  - name: Benefits red flags
+    schema: BenefitsRedFlags (39 flags)
+  - name: DOT Intelligence
+    schema: DotData, DotInsuranceLine
+  - name: 990 nonprofit financials
+    schema: ProspectIrs990, ProspectIrs990HistoryEntry
+  - name: OSHA violations
+    schema: OshaData
+  - name: Trucking Triggers
+    schema: not modelled in the public spec
+  - name: Talking Points
+    schema: not modelled in the public spec
+  gap: >-
+    Trucking Triggers and Talking Points are advertised on
+    https://www.meetleo.com/mcp but have no representation in the published REST
+    contract, so they are either MCP-only capabilities or not yet public.
