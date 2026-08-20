@@ -62,6 +62,23 @@ tags:
 - Prospecting
 - Data Enrichment
 - Sales Intelligence
+- Non-Profit
+- Trucking
+- MCP
+- agent-native
+tags_raw:
+- Company
+- Insurance
+- Commercial Insurance
+- Property and Casualty
+- Employee Benefits
+- Insurtech
+- Artificial Intelligence
+- Sales
+- Lead Generation
+- Prospecting
+- Data Enrichment
+- Sales Intelligence
 - Nonprofits
 - Trucking
 - MCP
@@ -77,6 +94,19 @@ apis:
   humanURL: https://api.meetleo.com/docs
   baseURL: https://api.meetleo.com
   tags:
+  - Insurance
+  - Commercial Insurance
+  - Prospecting
+  - Sales Intelligence
+  - Data Enrichment
+  - Company Data
+  - Contact Data
+  - Workers Compensation
+  - dot-fmcsa
+  - form-5500
+  - IRS 990
+  - OSHA
+  tags_raw:
   - insurance
   - commercial-insurance
   - prospecting
@@ -134,6 +164,13 @@ apis:
   humanURL: https://www.meetleo.com/mcp
   baseURL: https://mcp.meetleo.com
   tags:
+  - MCP
+  - agent-native
+  - Insurance
+  - Prospecting
+  - Sales Intelligence
+  - Data Enrichment
+  tags_raw:
   - mcp
   - agent-native
   - insurance
@@ -165,6 +202,10 @@ apis:
   humanURL: https://www.meetleo.com/llms.txt
   baseURL: https://www.meetleo.com/_api/mcp
   tags:
+  - MCP
+  - Site Content
+  - Wix
+  tags_raw:
   - mcp
   - site-content
   - wix
