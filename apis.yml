@@ -232,6 +232,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/leo-capability-edges.yml
+  name: LeO Business Capability Map
 - type: Website
   url: https://www.meetleo.com/
 - type: Pricing
