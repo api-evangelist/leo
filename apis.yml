@@ -77,7 +77,7 @@ tags:
 - Non-Profit
 - Trucking
 - MCP
-- agent-native
+- Agent Native
 tags_raw:
 - Company
 - Insurance
@@ -107,17 +107,17 @@ apis:
   baseURL: https://api.meetleo.com
   tags:
   - Insurance
-  - Commercial Insurance
-  - Prospecting
-  - Sales Intelligence
+  - commercial-insurance
+  - prospecting
+  - sales-intelligence
   - Data Enrichment
-  - Company Data
-  - Contact Data
-  - Workers Compensation
+  - company-data
+  - contact-data
+  - workers-compensation
   - dot-fmcsa
   - form-5500
-  - IRS 990
-  - OSHA
+  - irs-990
+  - osha
   tags_raw:
   - insurance
   - commercial-insurance
@@ -179,8 +179,8 @@ apis:
   - MCP
   - agent-native
   - Insurance
-  - Prospecting
-  - Sales Intelligence
+  - prospecting
+  - sales-intelligence
   - Data Enrichment
   tags_raw:
   - mcp
@@ -215,8 +215,8 @@ apis:
   baseURL: https://www.meetleo.com/_api/mcp
   tags:
   - MCP
-  - Site Content
-  - Wix
+  - site-content
+  - wix
   tags_raw:
   - mcp
   - site-content
