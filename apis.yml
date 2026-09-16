@@ -98,11 +98,10 @@ tags_raw:
 apis:
 - name: LeO Public API
   description: >-
-    REST API for account entitlements, credit balance, commercial-insurance
-    prospect search across 134 filter properties, single-prospect retrieval, and
-    asynchronous decision-maker contact enrichment with job polling. OpenAPI 3.0.0
-    published at https://api.meetleo.com/openapi.json and rendered by a Swagger UI
-    at /docs. Bearer JWT auth; metered in credits with a 402 on exhaustion.
+    REST API for account entitlements, credit balance, commercial-insurance prospect search across 134
+    filter properties, single-prospect retrieval, and asynchronous decision-maker contact enrichment with
+    job polling. OpenAPI 3.0.0 published at https://api.meetleo.com/openapi.json and rendered by a Swagger
+    UI at /docs. Bearer JWT auth; metered in credits with a 402 on exhaustion.
   humanURL: https://api.meetleo.com/docs
   baseURL: https://api.meetleo.com
   tags:
@@ -141,8 +140,6 @@ apis:
   - type: OpenAPI
     url: openapi/leo-credits-api-openapi.yml
   - type: OpenAPI
-    url: openapi/leo-system-api-openapi.yml
-  - type: OpenAPI
     url: https://api.meetleo.com/openapi.json
   - type: Documentation
     url: https://api.meetleo.com/docs
@@ -166,13 +163,12 @@ apis:
     url: skills/_index.yml
 - name: LeO MCP Connector
   description: >-
-    First-party, hosted, remote MCP server exposing LeO's insurance intelligence --
-    25M+ US businesses across 200+ filters, x-dates, Form 5500 financials, benefits
-    red flags, DOT Intelligence, Trucking Triggers, IRS 990 data, OSHA violations
-    and Talking Points -- to Claude, ChatGPT, Gemini, Copilot and custom agents.
-    OAuth 2.1 (authorization_code + PKCE S256) over an AWS Cognito user pool, with
-    RFC 9728 and RFC 8414 discovery documents published anonymously. Requires a LeO
-    account and honours its entitlements and credit balance.
+    First-party, hosted, remote MCP server exposing LeO's insurance intelligence -- 25M+ US businesses
+    across 200+ filters, x-dates, Form 5500 financials, benefits red flags, DOT Intelligence, Trucking
+    Triggers, IRS 990 data, OSHA violations and Talking Points -- to Claude, ChatGPT, Gemini, Copilot
+    and custom agents. OAuth 2.1 (authorization_code + PKCE S256) over an AWS Cognito user pool, with
+    RFC 9728 and RFC 8414 discovery documents published anonymously. Requires a LeO account and honours
+    its entitlements and credit balance.
   humanURL: https://www.meetleo.com/mcp
   baseURL: https://mcp.meetleo.com
   tags:
@@ -206,11 +202,10 @@ apis:
     url: https://www.meetleo.com/mcp
 - name: LeO Site MCP (Wix-provided)
   description: >-
-    Platform-provided Wix Site MCP server fronting LeO's marketing site, advertised
-    in LeO's llms.txt. Nine tools covering business details, site search and generic
-    Wix site tooling. Unauthenticated, public marketing content only -- NOT an
-    interface to the LeO prospecting product. Recorded for completeness and clearly
-    distinguished from the first-party MCP Connector.
+    Platform-provided Wix Site MCP server fronting LeO's marketing site, advertised in LeO's llms.txt.
+    Nine tools covering business details, site search and generic Wix site tooling. Unauthenticated, public
+    marketing content only -- NOT an interface to the LeO prospecting product. Recorded for completeness
+    and clearly distinguished from the first-party MCP Connector.
   humanURL: https://www.meetleo.com/llms.txt
   baseURL: https://www.meetleo.com/_api/mcp
   tags:
@@ -226,6 +221,16 @@ apis:
     url: mcp/leo-site-mcp.yml
   - type: LLMsTxt
     url: llms/leo-llms.txt
+- aid: leo:leo-health-api
+  name: LeO Health API
+  description: The Health API from LeO — 1 operation(s) for health.
+  humanURL: https://api.meetleo.com/docs
+  baseURL: https://api.meetleo.com
+  tags:
+  - Health
+  properties:
+  - type: OpenAPI
+    url: openapi/leo-health-api-openapi.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
