@@ -1,31 +1,29 @@
-# Kin Score artifact — leo — 2026-08-20T165047
+# Kin Score artifact — leo — 2026-09-20T205903
 # The API Evangelist rating (https://github.com/api-evangelist/kin-score). Generated; do not edit.
 ---
 kin_score:
   slug: leo
-  schema_version: 0.12.0
-  scored_at: '2026-08-20'
-  run_ts: 2026-08-20T165047
-  composite: 56.7
-  band: strong
+  schema_version: 0.22.0
+  scored_at: '2026-09-20'
+  run_ts: 2026-09-20T205903
+  composite: 49.7
+  band: developing
   facets:
-    discoverability: 81.5
-    contract_quality: 56.6
-    governance: 30.3
+    discoverability: 75.9
+    contract_quality: 44.2
+    contract_governance: 18.2
     operational_transparency: 0.0
     developer_ergonomics: 37.5
-    commercial_clarity: 77.6
-    contract_governance: 30.3
     access_clarity: 77.6
   agent_readiness:
-    score: 35.5
+    score: 30.4
     band: agent-ready
     dimensions:
       spec_presence: true
       agentic_access: false
       reversibility_documented: false
-      mcp_server: documented
-      auth_clarity: true
+      mcp_server: verified
+      auth_clarity: bearer
       idempotency: false
       error_semantics: documented
       openapi_examples: false
@@ -36,11 +34,15 @@ kin_score:
       consent_identity: false
       agent_card: false
       dry_run_mode: false
+      delegated_identity: false
+      protected_resource_metadata: false
+      dynamic_client_registration: false
+      agentic_commerce: false
   regulatory:
     applies: true
     regime: Insurance
     regime_id: insurance
-    score: 78.8
+    score: 71.2
     matched_via: tags
   provenance:
     mcp: first-party
@@ -50,4 +52,4 @@ kin_score:
       total: 5
       derived: 0
       coverage: 0.0
-      callable: 100.0
+      callable: 0.0
