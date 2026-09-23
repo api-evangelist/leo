@@ -1,24 +1,18 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  title: LeO Public API - credits
-  description: External API for account management, credits, prospect search, and contact enrichment This
-    document carries only the `credits` operations, split from LeO's published openapi.json.
+  title: Leo Public Credits API
+  description: External API for account management, credits, prospect search, and contact enrichment
   version: '1.0'
-servers:
-- url: https://api.meetleo.com
-  description: 'LeO Public API production base (verified live 2026-08-14: GET /health -> 200, GET /openapi.json
-    -> 200)'
+  contact: {}
+servers: []
 tags:
-- name: credits
-  description: Credit balance for the authenticated user - available, reserved, and whether credits are
-    individual or pool-based.
+- name: Credits
 paths:
   /v1/credits/balance:
     get:
       operationId: CreditsController_getCreditBalance
       summary: Get credit balance
-      description: Returns the available and reserved credits for the authenticated user, including whether
-        credits are individual or pool-based.
+      description: Returns the available and reserved credits for the authenticated user, including whether credits are individual or pool-based.
       parameters: []
       responses:
         '200':
@@ -30,15 +24,10 @@ paths:
         '401':
           description: Unauthorized
       tags:
-      - credits
+      - Credits
       security:
       - bearer: []
 components:
-  securitySchemes:
-    bearer:
-      scheme: bearer
-      bearerFormat: JWT
-      type: http
   schemas:
     CreditBalanceResponseDto:
       type: object
@@ -62,3 +51,8 @@ components:
       - available
       - reserved
       - plan
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http

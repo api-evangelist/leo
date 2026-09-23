@@ -1,0 +1,34 @@
+{
+  "provider": "leo",
+  "sources": [
+    "_original/leo-openapi.json"
+  ],
+  "outputs": [
+    "leo-health-api-openapi.yml",
+    "leo-account-api-openapi.yml",
+    "leo-credits-api-openapi.yml",
+    "leo-jobs-api-openapi.yml",
+    "leo-prospects-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "leo-openapi.json: upgraded openapi 3.0.0 -> OpenAPI 3.2.0",
+    "leo-openapi.json: tagged paths GET /health -> Health",
+    "leo-openapi.json: declared missing tag: Health",
+    "leo-openapi.json: declared missing tag: account",
+    "leo-openapi.json: declared missing tag: credits",
+    "leo-openapi.json: declared missing tag: jobs",
+    "leo-openapi.json: declared missing tag: prospects",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "leo-account-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "leo-credits-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "leo-health-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "leo-jobs-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "leo-prospects-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

@@ -1,0 +1,27 @@
+openapi: 3.2.0
+info:
+  title: Leo Public Health API
+  description: External API for account management, credits, prospect search, and contact enrichment
+  version: '1.0'
+  contact: {}
+servers: []
+tags:
+- name: Health
+paths:
+  /health:
+    get:
+      operationId: AppController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - Health
+      summary: App controller health
+      x-summary-source: derived
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
