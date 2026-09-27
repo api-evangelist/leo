@@ -53,6 +53,78 @@ paths:
       - bearer: []
 components:
   schemas:
+    JobStatusDataDto:
+      type: object
+      properties:
+        taskId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        status:
+          type: string
+          enum:
+          - pending
+          - processing
+          - completed
+          - failed
+          example: completed
+          description: Poll until this is `completed` or `failed`. Other values mean the job is still running.
+        prospects:
+          description: Populated only when status is `completed`.
+          type: array
+          items:
+            $ref: '#/components/schemas/EnrichedProspectJobItemDto'
+      required:
+      - taskId
+      - status
+    JobErrorItemDto:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ENRICHMENT_FAILED
+        message:
+          type: string
+          example: Enrichment pipeline error — please retry in a few minutes
+      required:
+      - code
+      - message
+    EnrichedProspectJobItemDto:
+      type: object
+      properties:
+        prospectId:
+          type: number
+          example: 8472193
+        enrichmentStatus:
+          type: string
+          description: Outcome of contact enrichment for this prospect. Only `enriched` consumes a credit.
+          enum:
+          - enriched
+          - no_email
+          - failed
+          example: enriched
+      required:
+      - prospectId
+      - enrichmentStatus
+    JobPollMetadataDto:
+      type: object
+      properties:
+        requestId:
+          type: string
+          format: uuid
+          example: a1b2c3d4-5678-90ab-cdef-1234567890ab
+        creditsUsed:
+          type: number
+          example: 18
+          description: Credits actually charged for this job. Only prospects with enrichmentStatus="enriched" are billed; "no_email" and "failed" rows are free.
+        creditsRemaining:
+          type: number
+          example: 1482
+          description: Caller credits remaining after this job.
+      required:
+      - requestId
+      - creditsUsed
+      - creditsRemaining
     JobPollEnvelopeDto:
       type: object
       properties:
@@ -79,78 +151,6 @@ components:
       - data
       - errors
       - metadata
-    JobErrorItemDto:
-      type: object
-      properties:
-        code:
-          type: string
-          example: ENRICHMENT_FAILED
-        message:
-          type: string
-          example: Enrichment pipeline error — please retry in a few minutes
-      required:
-      - code
-      - message
-    JobPollMetadataDto:
-      type: object
-      properties:
-        requestId:
-          type: string
-          format: uuid
-          example: a1b2c3d4-5678-90ab-cdef-1234567890ab
-        creditsUsed:
-          type: number
-          example: 18
-          description: Credits actually charged for this job. Only prospects with enrichmentStatus="enriched" are billed; "no_email" and "failed" rows are free.
-        creditsRemaining:
-          type: number
-          example: 1482
-          description: Caller credits remaining after this job.
-      required:
-      - requestId
-      - creditsUsed
-      - creditsRemaining
-    EnrichedProspectJobItemDto:
-      type: object
-      properties:
-        prospectId:
-          type: number
-          example: 8472193
-        enrichmentStatus:
-          type: string
-          description: Outcome of contact enrichment for this prospect. Only `enriched` consumes a credit.
-          enum:
-          - enriched
-          - no_email
-          - failed
-          example: enriched
-      required:
-      - prospectId
-      - enrichmentStatus
-    JobStatusDataDto:
-      type: object
-      properties:
-        taskId:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        status:
-          type: string
-          enum:
-          - pending
-          - processing
-          - completed
-          - failed
-          example: completed
-          description: Poll until this is `completed` or `failed`. Other values mean the job is still running.
-        prospects:
-          description: Populated only when status is `completed`.
-          type: array
-          items:
-            $ref: '#/components/schemas/EnrichedProspectJobItemDto'
-      required:
-      - taskId
-      - status
   securitySchemes:
     bearer:
       scheme: bearer
