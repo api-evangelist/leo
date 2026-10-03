@@ -184,6 +184,212 @@ paths:
       - bearer: []
 components:
   schemas:
+    ProspectIrs990:
+      type: object
+      properties:
+        reportType:
+          type:
+          - string
+          - 'null'
+          example: '990'
+          description: IRS form variant filed (e.g. "990", "990-EZ", "990-PF").
+        reportYear:
+          type:
+          - integer
+          - 'null'
+          example: 2024
+        totalRevenue:
+          type:
+          - number
+          - 'null'
+          example: 12450000
+          description: Total revenue in USD.
+        totalExpenses:
+          type:
+          - number
+          - 'null'
+          example: 11820000
+          description: Total expenses in USD.
+        totalNetAssets:
+          type:
+          - number
+          - 'null'
+          example: 3650000
+          description: Total net assets at fiscal year end, in USD.
+        history:
+          description: Up to 11 years of historical IRS total expenses, descending by year. Only present when the requesting user has the csvHasIrsHistoricalData entitlement.
+          type: array
+          items:
+            $ref: '#/components/schemas/ProspectIrs990HistoryEntry'
+      required:
+      - reportType
+      - reportYear
+      - totalRevenue
+      - totalExpenses
+      - totalNetAssets
+    ProspectResponse:
+      type: object
+      properties:
+        prospectId:
+          type: integer
+          example: 8472193
+        standardCompanyName:
+          type: string
+          example: Lone Star Freight Lines, Inc.
+        state:
+          type:
+          - string
+          - 'null'
+          example: TX
+        city:
+          type:
+          - string
+          - 'null'
+          example: Dallas
+        zipCode:
+          type:
+          - string
+          - 'null'
+          example: '75201'
+        address:
+          type:
+          - string
+          - 'null'
+          example: 4200 Stemmons Fwy
+        primaryVertical:
+          type:
+          - string
+          - 'null'
+          example: Trucking
+        naicsCode:
+          type:
+          - string
+          - 'null'
+          example: '484110'
+        naicsList:
+          type:
+          - string
+          - 'null'
+          example: 484110, 484121
+        ntee:
+          type:
+          - string
+          - 'null'
+          example: B82
+          description: NTEE classification code. Only present when the requesting user has the nteeFilter entitlement.
+        salesVolumeRange:
+          type:
+          - string
+          - 'null'
+          example: $10M–$25M
+        hqPhone:
+          type:
+          - string
+          - 'null'
+          example: +1-214-555-0142
+        ein:
+          type:
+          - string
+          - 'null'
+          example: 74-2918374
+        employeeRange:
+          type:
+          - string
+          - 'null'
+          example: 50-249
+        websiteUrl:
+          type:
+          - string
+          - 'null'
+          example: https://lonestarfreight.com
+        linkedinUrl:
+          type:
+          - string
+          - 'null'
+          example: https://linkedin.com/company/lone-star-freight
+        insurance:
+          $ref: '#/components/schemas/ProspectInsurance'
+        irs990:
+          allOf:
+          - $ref: '#/components/schemas/ProspectIrs990'
+        xDatePredictions:
+          description: Modeled renewal-date predictions. Only present when the requesting user has the xDatePredictions entitlement.
+          allOf:
+          - $ref: '#/components/schemas/XDatePredictions'
+        benefitsRedFlags:
+          description: Benefits Red Flags (38 risk indicators from Form 5500). Only present when the requesting user has the isBenefitsRedFlagFilter entitlement. Each flag is true (flagged), false (not flagged), or null (insufficient data). Paired benefitsRagFlagDescription* fields carry the explanation when a flag is triggered.
+          allOf:
+          - $ref: '#/components/schemas/BenefitsRedFlags'
+        contacts:
+          type:
+          - object
+          - 'null'
+          example: null
+          description: Always null in search response — use /v1/prospects/enrich for contacts
+      required:
+      - prospectId
+      - standardCompanyName
+      - state
+      - city
+      - zipCode
+      - address
+      - primaryVertical
+      - naicsCode
+      - naicsList
+      - salesVolumeRange
+      - hqPhone
+      - ein
+      - employeeRange
+      - websiteUrl
+      - linkedinUrl
+      - insurance
+      - irs990
+      - contacts
+    ProspectIrs990HistoryEntry:
+      type: object
+      properties:
+        year:
+          type: integer
+          example: 2023
+        totalExpenses:
+          type:
+          - number
+          - 'null'
+          example: 11200000
+          description: Total expenses for the year, in USD.
+      required:
+      - year
+      - totalExpenses
+    EnrichProspectsResponseData:
+      type: object
+      properties:
+        taskId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+          description: Opaque job identifier — pass to GET /v1/jobs/{taskId}.
+        status:
+          type: string
+          example: pending
+          description: Initial job state immediately after accept.
+        pollUrl:
+          type: string
+          example: /v1/jobs/550e8400-e29b-41d4-a716-446655440000
+          description: Relative path to poll for job completion.
+        creditsReserved:
+          type: number
+          example: 25
+          description: Credits reserved up front (≤ maxProspects). Final charge in metadata.creditsUsed on the completed job — only `enriched` rows are billed.
+        estimatedWaitSeconds:
+          type: number
+          description: Expected job duration in seconds (typical ~120).
+          example: 120
+      required:
+      - taskId
+      - status
+      - pollUrl
+      - creditsReserved
+      - estimatedWaitSeconds
     SearchProspectsFiltersDto:
       type: object
       properties:
@@ -819,6 +1025,47 @@ components:
           type: boolean
           description: 'Restrict to prospects flagged for: Underfunded Pension.'
           example: true
+    OshaData:
+      type: object
+      properties:
+        healthViolations:
+          type: boolean
+          example: false
+        safetyViolations:
+          type: boolean
+          example: true
+      required:
+      - healthViolations
+      - safetyViolations
+    SearchProspectsDto:
+      type: object
+      properties:
+        filters:
+          description: Filter group(s). Within a single object, conditions are **ANDed** together. Pass one object for a typical search — multiple objects are reserved for advanced segment combinations.
+          example:
+          - state:
+            - TX
+            naicsList:
+            - '484110'
+            - '484121'
+            minEmployeesNumber: 25
+            maxEmployeesNumber: 250
+            hasWc: true
+            hasDot: true
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchProspectsFiltersDto'
+        page:
+          type: integer
+          description: 1-based page number
+          example: 1
+          minimum: 1
+        limit:
+          type: integer
+          description: Results per page
+          example: 25
+          minimum: 1
+          maximum: 100
     PaginationResponse:
       type: object
       properties:
@@ -838,49 +1085,44 @@ components:
       - page
       - limit
       - total
-    ProspectIrs990:
+    DotData:
       type: object
       properties:
-        reportType:
-          type:
-          - string
-          - 'null'
-          example: '990'
-          description: IRS form variant filed (e.g. "990", "990-EZ", "990-PF").
-        reportYear:
-          type:
-          - integer
-          - 'null'
-          example: 2024
-        totalRevenue:
+        units:
           type:
           - number
           - 'null'
-          example: 12450000
-          description: Total revenue in USD.
-        totalExpenses:
+          example: 87
+          description: Number of power units (trucks/tractors) registered with FMCSA.
+        drivers:
           type:
           - number
           - 'null'
-          example: 11820000
-          description: Total expenses in USD.
-        totalNetAssets:
-          type:
-          - number
-          - 'null'
-          example: 3650000
-          description: Total net assets at fiscal year end, in USD.
-        history:
-          description: Up to 11 years of historical IRS total expenses, descending by year. Only present when the requesting user has the csvHasIrsHistoricalData entitlement.
-          type: array
-          items:
-            $ref: '#/components/schemas/ProspectIrs990HistoryEntry'
+          example: 112
+          description: Number of CDL drivers registered with FMCSA.
+        violations:
+          type: boolean
+          example: false
+        bipdPrimary:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        bipdExcess:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        cargo:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        surety:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
       required:
-      - reportType
-      - reportYear
-      - totalRevenue
-      - totalExpenses
-      - totalNetAssets
+      - units
+      - drivers
+      - violations
+      - bipdPrimary
+      - bipdExcess
+      - cargo
+      - surety
     InsuranceLineData:
       type: object
       properties:
@@ -911,6 +1153,82 @@ components:
       required:
       - renewalDate
       - carrier
+    XDatePredictions:
+      type: object
+      properties:
+        generalLiability:
+          type:
+          - string
+          - 'null'
+          example: '2026-04-15'
+          description: Predicted General Liability renewal date (ISO YYYY-MM-DD).
+        commercialAuto:
+          type:
+          - string
+          - 'null'
+          example: '2026-07-01'
+          description: Predicted Commercial Auto renewal date (ISO YYYY-MM-DD).
+      required:
+      - generalLiability
+      - commercialAuto
+    SearchProspectsResponseData:
+      type: object
+      properties:
+        prospects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProspectResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+      - prospects
+      - pagination
+    DotInsuranceLine:
+      type: object
+      properties:
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2026-08-15'
+          description: DOT coverage renewal date (ISO YYYY-MM-DD).
+        carrier:
+          type:
+          - string
+          - 'null'
+          example: Progressive Commercial
+          description: DOT coverage carrier name.
+      required:
+      - renewalDate
+      - carrier
+    ProspectInsurance:
+      type: object
+      properties:
+        wc:
+          allOf:
+          - $ref: '#/components/schemas/InsuranceLineData'
+        pension:
+          allOf:
+          - $ref: '#/components/schemas/InsuranceLineData'
+        benefits:
+          allOf:
+          - $ref: '#/components/schemas/InsuranceLineData'
+        fidelityBond:
+          type: boolean
+          example: false
+        osha:
+          allOf:
+          - $ref: '#/components/schemas/OshaData'
+        dot:
+          allOf:
+          - $ref: '#/components/schemas/DotData'
+      required:
+      - wc
+      - pension
+      - benefits
+      - fidelityBond
+      - osha
+      - dot
     BenefitsRedFlags:
       type: object
       properties:
@@ -1447,47 +1765,6 @@ components:
       - benefitsRagFlagDescriptionStaleValuation
       - benefitsRagFlagUnderfundedPension
       - benefitsRagFlagDescriptionUnderfundedPension
-    OshaData:
-      type: object
-      properties:
-        healthViolations:
-          type: boolean
-          example: false
-        safetyViolations:
-          type: boolean
-          example: true
-      required:
-      - healthViolations
-      - safetyViolations
-    SearchProspectsDto:
-      type: object
-      properties:
-        filters:
-          description: Filter group(s). Within a single object, conditions are **ANDed** together. Pass one object for a typical search — multiple objects are reserved for advanced segment combinations.
-          example:
-          - state:
-            - TX
-            naicsList:
-            - '484110'
-            - '484121'
-            minEmployeesNumber: 25
-            maxEmployeesNumber: 250
-            hasWc: true
-            hasDot: true
-          type: array
-          items:
-            $ref: '#/components/schemas/SearchProspectsFiltersDto'
-        page:
-          type: integer
-          description: 1-based page number
-          example: 1
-          minimum: 1
-        limit:
-          type: integer
-          description: Results per page
-          example: 25
-          minimum: 1
-          maximum: 100
     EnrichProspectsDto:
       type: object
       properties:
@@ -1515,283 +1792,6 @@ components:
           example: 25
       required:
       - filters
-    SearchProspectsResponseData:
-      type: object
-      properties:
-        prospects:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProspectResponse'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponse'
-      required:
-      - prospects
-      - pagination
-    ProspectInsurance:
-      type: object
-      properties:
-        wc:
-          allOf:
-          - $ref: '#/components/schemas/InsuranceLineData'
-        pension:
-          allOf:
-          - $ref: '#/components/schemas/InsuranceLineData'
-        benefits:
-          allOf:
-          - $ref: '#/components/schemas/InsuranceLineData'
-        fidelityBond:
-          type: boolean
-          example: false
-        osha:
-          allOf:
-          - $ref: '#/components/schemas/OshaData'
-        dot:
-          allOf:
-          - $ref: '#/components/schemas/DotData'
-      required:
-      - wc
-      - pension
-      - benefits
-      - fidelityBond
-      - osha
-      - dot
-    XDatePredictions:
-      type: object
-      properties:
-        generalLiability:
-          type:
-          - string
-          - 'null'
-          example: '2026-04-15'
-          description: Predicted General Liability renewal date (ISO YYYY-MM-DD).
-        commercialAuto:
-          type:
-          - string
-          - 'null'
-          example: '2026-07-01'
-          description: Predicted Commercial Auto renewal date (ISO YYYY-MM-DD).
-      required:
-      - generalLiability
-      - commercialAuto
-    ProspectIrs990HistoryEntry:
-      type: object
-      properties:
-        year:
-          type: integer
-          example: 2023
-        totalExpenses:
-          type:
-          - number
-          - 'null'
-          example: 11200000
-          description: Total expenses for the year, in USD.
-      required:
-      - year
-      - totalExpenses
-    ProspectResponse:
-      type: object
-      properties:
-        prospectId:
-          type: integer
-          example: 8472193
-        standardCompanyName:
-          type: string
-          example: Lone Star Freight Lines, Inc.
-        state:
-          type:
-          - string
-          - 'null'
-          example: TX
-        city:
-          type:
-          - string
-          - 'null'
-          example: Dallas
-        zipCode:
-          type:
-          - string
-          - 'null'
-          example: '75201'
-        address:
-          type:
-          - string
-          - 'null'
-          example: 4200 Stemmons Fwy
-        primaryVertical:
-          type:
-          - string
-          - 'null'
-          example: Trucking
-        naicsCode:
-          type:
-          - string
-          - 'null'
-          example: '484110'
-        naicsList:
-          type:
-          - string
-          - 'null'
-          example: 484110, 484121
-        ntee:
-          type:
-          - string
-          - 'null'
-          example: B82
-          description: NTEE classification code. Only present when the requesting user has the nteeFilter entitlement.
-        salesVolumeRange:
-          type:
-          - string
-          - 'null'
-          example: $10M–$25M
-        hqPhone:
-          type:
-          - string
-          - 'null'
-          example: +1-214-555-0142
-        ein:
-          type:
-          - string
-          - 'null'
-          example: 74-2918374
-        employeeRange:
-          type:
-          - string
-          - 'null'
-          example: 50-249
-        websiteUrl:
-          type:
-          - string
-          - 'null'
-          example: https://lonestarfreight.com
-        linkedinUrl:
-          type:
-          - string
-          - 'null'
-          example: https://linkedin.com/company/lone-star-freight
-        insurance:
-          $ref: '#/components/schemas/ProspectInsurance'
-        irs990:
-          allOf:
-          - $ref: '#/components/schemas/ProspectIrs990'
-        xDatePredictions:
-          description: Modeled renewal-date predictions. Only present when the requesting user has the xDatePredictions entitlement.
-          allOf:
-          - $ref: '#/components/schemas/XDatePredictions'
-        benefitsRedFlags:
-          description: Benefits Red Flags (38 risk indicators from Form 5500). Only present when the requesting user has the isBenefitsRedFlagFilter entitlement. Each flag is true (flagged), false (not flagged), or null (insufficient data). Paired benefitsRagFlagDescription* fields carry the explanation when a flag is triggered.
-          allOf:
-          - $ref: '#/components/schemas/BenefitsRedFlags'
-        contacts:
-          type:
-          - object
-          - 'null'
-          example: null
-          description: Always null in search response — use /v1/prospects/enrich for contacts
-      required:
-      - prospectId
-      - standardCompanyName
-      - state
-      - city
-      - zipCode
-      - address
-      - primaryVertical
-      - naicsCode
-      - naicsList
-      - salesVolumeRange
-      - hqPhone
-      - ein
-      - employeeRange
-      - websiteUrl
-      - linkedinUrl
-      - insurance
-      - irs990
-      - contacts
-    EnrichProspectsResponseData:
-      type: object
-      properties:
-        taskId:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-          description: Opaque job identifier — pass to GET /v1/jobs/{taskId}.
-        status:
-          type: string
-          example: pending
-          description: Initial job state immediately after accept.
-        pollUrl:
-          type: string
-          example: /v1/jobs/550e8400-e29b-41d4-a716-446655440000
-          description: Relative path to poll for job completion.
-        creditsReserved:
-          type: number
-          example: 25
-          description: Credits reserved up front (≤ maxProspects). Final charge in metadata.creditsUsed on the completed job — only `enriched` rows are billed.
-        estimatedWaitSeconds:
-          type: number
-          description: Expected job duration in seconds (typical ~120).
-          example: 120
-      required:
-      - taskId
-      - status
-      - pollUrl
-      - creditsReserved
-      - estimatedWaitSeconds
-    DotData:
-      type: object
-      properties:
-        units:
-          type:
-          - number
-          - 'null'
-          example: 87
-          description: Number of power units (trucks/tractors) registered with FMCSA.
-        drivers:
-          type:
-          - number
-          - 'null'
-          example: 112
-          description: Number of CDL drivers registered with FMCSA.
-        violations:
-          type: boolean
-          example: false
-        bipdPrimary:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-        bipdExcess:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-        cargo:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-        surety:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-      required:
-      - units
-      - drivers
-      - violations
-      - bipdPrimary
-      - bipdExcess
-      - cargo
-      - surety
-    DotInsuranceLine:
-      type: object
-      properties:
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2026-08-15'
-          description: DOT coverage renewal date (ISO YYYY-MM-DD).
-        carrier:
-          type:
-          - string
-          - 'null'
-          example: Progressive Commercial
-          description: DOT coverage carrier name.
-      required:
-      - renewalDate
-      - carrier
   securitySchemes:
     bearer:
       scheme: bearer

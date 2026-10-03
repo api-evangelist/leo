@@ -53,30 +53,6 @@ paths:
       - bearer: []
 components:
   schemas:
-    JobStatusDataDto:
-      type: object
-      properties:
-        taskId:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        status:
-          type: string
-          enum:
-          - pending
-          - processing
-          - completed
-          - failed
-          example: completed
-          description: Poll until this is `completed` or `failed`. Other values mean the job is still running.
-        prospects:
-          description: Populated only when status is `completed`.
-          type: array
-          items:
-            $ref: '#/components/schemas/EnrichedProspectJobItemDto'
-      required:
-      - taskId
-      - status
     JobErrorItemDto:
       type: object
       properties:
@@ -151,6 +127,30 @@ components:
       - data
       - errors
       - metadata
+    JobStatusDataDto:
+      type: object
+      properties:
+        taskId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        status:
+          type: string
+          enum:
+          - pending
+          - processing
+          - completed
+          - failed
+          example: completed
+          description: Poll until this is `completed` or `failed`. Other values mean the job is still running.
+        prospects:
+          description: Populated only when status is `completed`.
+          type: array
+          items:
+            $ref: '#/components/schemas/EnrichedProspectJobItemDto'
+      required:
+      - taskId
+      - status
   securitySchemes:
     bearer:
       scheme: bearer
