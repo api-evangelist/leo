@@ -184,49 +184,6 @@ paths:
       - bearer: []
 components:
   schemas:
-    ProspectIrs990:
-      type: object
-      properties:
-        reportType:
-          type:
-          - string
-          - 'null'
-          example: '990'
-          description: IRS form variant filed (e.g. "990", "990-EZ", "990-PF").
-        reportYear:
-          type:
-          - integer
-          - 'null'
-          example: 2024
-        totalRevenue:
-          type:
-          - number
-          - 'null'
-          example: 12450000
-          description: Total revenue in USD.
-        totalExpenses:
-          type:
-          - number
-          - 'null'
-          example: 11820000
-          description: Total expenses in USD.
-        totalNetAssets:
-          type:
-          - number
-          - 'null'
-          example: 3650000
-          description: Total net assets at fiscal year end, in USD.
-        history:
-          description: Up to 11 years of historical IRS total expenses, descending by year. Only present when the requesting user has the csvHasIrsHistoricalData entitlement.
-          type: array
-          items:
-            $ref: '#/components/schemas/ProspectIrs990HistoryEntry'
-      required:
-      - reportType
-      - reportYear
-      - totalRevenue
-      - totalExpenses
-      - totalNetAssets
     ProspectResponse:
       type: object
       properties:
@@ -345,6 +302,91 @@ components:
       - insurance
       - irs990
       - contacts
+    ProspectInsurance:
+      type: object
+      properties:
+        wc:
+          allOf:
+          - $ref: '#/components/schemas/InsuranceLineData'
+        pension:
+          allOf:
+          - $ref: '#/components/schemas/InsuranceLineData'
+        benefits:
+          allOf:
+          - $ref: '#/components/schemas/InsuranceLineData'
+        fidelityBond:
+          type: boolean
+          example: false
+        osha:
+          allOf:
+          - $ref: '#/components/schemas/OshaData'
+        dot:
+          allOf:
+          - $ref: '#/components/schemas/DotData'
+      required:
+      - wc
+      - pension
+      - benefits
+      - fidelityBond
+      - osha
+      - dot
+    SearchProspectsResponseData:
+      type: object
+      properties:
+        prospects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProspectResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+      - prospects
+      - pagination
+    EnrichProspectsDto:
+      type: object
+      properties:
+        filters:
+          description: Filter group(s) selecting which prospects to enrich. Conditions inside one object are **ANDed**. Narrow filters return better contact match rates and avoid burning credits on `no_email` rows.
+          example:
+          - state:
+            - TX
+            naicsList:
+            - '484110'
+            - '484121'
+            minEmployeesNumber: 25
+            maxEmployeesNumber: 250
+            hasWc: true
+            hasDot: true
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchProspectsFiltersDto'
+        maxProspects:
+          type: number
+          description: Cap on the number of prospects to enrich in this run (1–100). Credits reserved scale with this number — start small (e.g. 10) for new integrations.
+          default: 100
+          minimum: 1
+          maximum: 100
+          example: 25
+      required:
+      - filters
+    XDatePredictions:
+      type: object
+      properties:
+        generalLiability:
+          type:
+          - string
+          - 'null'
+          example: '2026-04-15'
+          description: Predicted General Liability renewal date (ISO YYYY-MM-DD).
+        commercialAuto:
+          type:
+          - string
+          - 'null'
+          example: '2026-07-01'
+          description: Predicted Commercial Auto renewal date (ISO YYYY-MM-DD).
+      required:
+      - generalLiability
+      - commercialAuto
     ProspectIrs990HistoryEntry:
       type: object
       properties:
@@ -360,36 +402,74 @@ components:
       required:
       - year
       - totalExpenses
-    EnrichProspectsResponseData:
+    DotData:
       type: object
       properties:
-        taskId:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-          description: Opaque job identifier — pass to GET /v1/jobs/{taskId}.
-        status:
-          type: string
-          example: pending
-          description: Initial job state immediately after accept.
-        pollUrl:
-          type: string
-          example: /v1/jobs/550e8400-e29b-41d4-a716-446655440000
-          description: Relative path to poll for job completion.
-        creditsReserved:
-          type: number
-          example: 25
-          description: Credits reserved up front (≤ maxProspects). Final charge in metadata.creditsUsed on the completed job — only `enriched` rows are billed.
-        estimatedWaitSeconds:
-          type: number
-          description: Expected job duration in seconds (typical ~120).
-          example: 120
+        units:
+          type:
+          - number
+          - 'null'
+          example: 87
+          description: Number of power units (trucks/tractors) registered with FMCSA.
+        drivers:
+          type:
+          - number
+          - 'null'
+          example: 112
+          description: Number of CDL drivers registered with FMCSA.
+        violations:
+          type: boolean
+          example: false
+        bipdPrimary:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        bipdExcess:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        cargo:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        surety:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
       required:
-      - taskId
-      - status
-      - pollUrl
-      - creditsReserved
-      - estimatedWaitSeconds
+      - units
+      - drivers
+      - violations
+      - bipdPrimary
+      - bipdExcess
+      - cargo
+      - surety
+    InsuranceLineData:
+      type: object
+      properties:
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2026-09-01'
+          description: Policy renewal date (ISO YYYY-MM-DD). Present for WC, pension, and welfare/benefits lines.
+        carrier:
+          type:
+          - string
+          - 'null'
+          example: Travelers
+          description: Insurance carrier name for this line.
+        broker:
+          type:
+          - string
+          - 'null'
+          example: Marsh McLennan Agency
+          description: Broker name. Present for WC, pension, and welfare/benefits lines.
+        participants:
+          type:
+          - number
+          - 'null'
+          example: 142
+          description: Number of covered participants. Only present for pension and welfare/benefits lines.
+      required:
+      - renewalDate
+      - carrier
     SearchProspectsFiltersDto:
       type: object
       properties:
@@ -1025,210 +1105,6 @@ components:
           type: boolean
           description: 'Restrict to prospects flagged for: Underfunded Pension.'
           example: true
-    OshaData:
-      type: object
-      properties:
-        healthViolations:
-          type: boolean
-          example: false
-        safetyViolations:
-          type: boolean
-          example: true
-      required:
-      - healthViolations
-      - safetyViolations
-    SearchProspectsDto:
-      type: object
-      properties:
-        filters:
-          description: Filter group(s). Within a single object, conditions are **ANDed** together. Pass one object for a typical search — multiple objects are reserved for advanced segment combinations.
-          example:
-          - state:
-            - TX
-            naicsList:
-            - '484110'
-            - '484121'
-            minEmployeesNumber: 25
-            maxEmployeesNumber: 250
-            hasWc: true
-            hasDot: true
-          type: array
-          items:
-            $ref: '#/components/schemas/SearchProspectsFiltersDto'
-        page:
-          type: integer
-          description: 1-based page number
-          example: 1
-          minimum: 1
-        limit:
-          type: integer
-          description: Results per page
-          example: 25
-          minimum: 1
-          maximum: 100
-    PaginationResponse:
-      type: object
-      properties:
-        page:
-          type: integer
-          example: 1
-          description: 1-based page number returned.
-        limit:
-          type: integer
-          example: 25
-          description: Page size used for this response.
-        total:
-          type: integer
-          example: 1842
-          description: Total prospects matching the filters across all pages.
-      required:
-      - page
-      - limit
-      - total
-    DotData:
-      type: object
-      properties:
-        units:
-          type:
-          - number
-          - 'null'
-          example: 87
-          description: Number of power units (trucks/tractors) registered with FMCSA.
-        drivers:
-          type:
-          - number
-          - 'null'
-          example: 112
-          description: Number of CDL drivers registered with FMCSA.
-        violations:
-          type: boolean
-          example: false
-        bipdPrimary:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-        bipdExcess:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-        cargo:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-        surety:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-      required:
-      - units
-      - drivers
-      - violations
-      - bipdPrimary
-      - bipdExcess
-      - cargo
-      - surety
-    InsuranceLineData:
-      type: object
-      properties:
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2026-09-01'
-          description: Policy renewal date (ISO YYYY-MM-DD). Present for WC, pension, and welfare/benefits lines.
-        carrier:
-          type:
-          - string
-          - 'null'
-          example: Travelers
-          description: Insurance carrier name for this line.
-        broker:
-          type:
-          - string
-          - 'null'
-          example: Marsh McLennan Agency
-          description: Broker name. Present for WC, pension, and welfare/benefits lines.
-        participants:
-          type:
-          - number
-          - 'null'
-          example: 142
-          description: Number of covered participants. Only present for pension and welfare/benefits lines.
-      required:
-      - renewalDate
-      - carrier
-    XDatePredictions:
-      type: object
-      properties:
-        generalLiability:
-          type:
-          - string
-          - 'null'
-          example: '2026-04-15'
-          description: Predicted General Liability renewal date (ISO YYYY-MM-DD).
-        commercialAuto:
-          type:
-          - string
-          - 'null'
-          example: '2026-07-01'
-          description: Predicted Commercial Auto renewal date (ISO YYYY-MM-DD).
-      required:
-      - generalLiability
-      - commercialAuto
-    SearchProspectsResponseData:
-      type: object
-      properties:
-        prospects:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProspectResponse'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponse'
-      required:
-      - prospects
-      - pagination
-    DotInsuranceLine:
-      type: object
-      properties:
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2026-08-15'
-          description: DOT coverage renewal date (ISO YYYY-MM-DD).
-        carrier:
-          type:
-          - string
-          - 'null'
-          example: Progressive Commercial
-          description: DOT coverage carrier name.
-      required:
-      - renewalDate
-      - carrier
-    ProspectInsurance:
-      type: object
-      properties:
-        wc:
-          allOf:
-          - $ref: '#/components/schemas/InsuranceLineData'
-        pension:
-          allOf:
-          - $ref: '#/components/schemas/InsuranceLineData'
-        benefits:
-          allOf:
-          - $ref: '#/components/schemas/InsuranceLineData'
-        fidelityBond:
-          type: boolean
-          example: false
-        osha:
-          allOf:
-          - $ref: '#/components/schemas/OshaData'
-        dot:
-          allOf:
-          - $ref: '#/components/schemas/DotData'
-      required:
-      - wc
-      - pension
-      - benefits
-      - fidelityBond
-      - osha
-      - dot
     BenefitsRedFlags:
       type: object
       properties:
@@ -1765,11 +1641,29 @@ components:
       - benefitsRagFlagDescriptionStaleValuation
       - benefitsRagFlagUnderfundedPension
       - benefitsRagFlagDescriptionUnderfundedPension
-    EnrichProspectsDto:
+    DotInsuranceLine:
+      type: object
+      properties:
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2026-08-15'
+          description: DOT coverage renewal date (ISO YYYY-MM-DD).
+        carrier:
+          type:
+          - string
+          - 'null'
+          example: Progressive Commercial
+          description: DOT coverage carrier name.
+      required:
+      - renewalDate
+      - carrier
+    SearchProspectsDto:
       type: object
       properties:
         filters:
-          description: Filter group(s) selecting which prospects to enrich. Conditions inside one object are **ANDed**. Narrow filters return better contact match rates and avoid burning credits on `no_email` rows.
+          description: Filter group(s). Within a single object, conditions are **ANDed** together. Pass one object for a typical search — multiple objects are reserved for advanced segment combinations.
           example:
           - state:
             - TX
@@ -1783,15 +1677,121 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SearchProspectsFiltersDto'
-        maxProspects:
-          type: number
-          description: Cap on the number of prospects to enrich in this run (1–100). Credits reserved scale with this number — start small (e.g. 10) for new integrations.
-          default: 100
+        page:
+          type: integer
+          description: 1-based page number
+          example: 1
+          minimum: 1
+        limit:
+          type: integer
+          description: Results per page
+          example: 25
           minimum: 1
           maximum: 100
+    PaginationResponse:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+          description: 1-based page number returned.
+        limit:
+          type: integer
           example: 25
+          description: Page size used for this response.
+        total:
+          type: integer
+          example: 1842
+          description: Total prospects matching the filters across all pages.
       required:
-      - filters
+      - page
+      - limit
+      - total
+    OshaData:
+      type: object
+      properties:
+        healthViolations:
+          type: boolean
+          example: false
+        safetyViolations:
+          type: boolean
+          example: true
+      required:
+      - healthViolations
+      - safetyViolations
+    EnrichProspectsResponseData:
+      type: object
+      properties:
+        taskId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+          description: Opaque job identifier — pass to GET /v1/jobs/{taskId}.
+        status:
+          type: string
+          example: pending
+          description: Initial job state immediately after accept.
+        pollUrl:
+          type: string
+          example: /v1/jobs/550e8400-e29b-41d4-a716-446655440000
+          description: Relative path to poll for job completion.
+        creditsReserved:
+          type: number
+          example: 25
+          description: Credits reserved up front (≤ maxProspects). Final charge in metadata.creditsUsed on the completed job — only `enriched` rows are billed.
+        estimatedWaitSeconds:
+          type: number
+          description: Expected job duration in seconds (typical ~120).
+          example: 120
+      required:
+      - taskId
+      - status
+      - pollUrl
+      - creditsReserved
+      - estimatedWaitSeconds
+    ProspectIrs990:
+      type: object
+      properties:
+        reportType:
+          type:
+          - string
+          - 'null'
+          example: '990'
+          description: IRS form variant filed (e.g. "990", "990-EZ", "990-PF").
+        reportYear:
+          type:
+          - integer
+          - 'null'
+          example: 2024
+        totalRevenue:
+          type:
+          - number
+          - 'null'
+          example: 12450000
+          description: Total revenue in USD.
+        totalExpenses:
+          type:
+          - number
+          - 'null'
+          example: 11820000
+          description: Total expenses in USD.
+        totalNetAssets:
+          type:
+          - number
+          - 'null'
+          example: 3650000
+          description: Total net assets at fiscal year end, in USD.
+        history:
+          description: Up to 11 years of historical IRS total expenses, descending by year. Only present when the requesting user has the csvHasIrsHistoricalData entitlement.
+          type: array
+          items:
+            $ref: '#/components/schemas/ProspectIrs990HistoryEntry'
+      required:
+      - reportType
+      - reportYear
+      - totalRevenue
+      - totalExpenses
+      - totalNetAssets
   securitySchemes:
     bearer:
       scheme: bearer

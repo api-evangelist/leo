@@ -53,35 +53,6 @@ paths:
       - bearer: []
 components:
   schemas:
-    JobErrorItemDto:
-      type: object
-      properties:
-        code:
-          type: string
-          example: ENRICHMENT_FAILED
-        message:
-          type: string
-          example: Enrichment pipeline error — please retry in a few minutes
-      required:
-      - code
-      - message
-    EnrichedProspectJobItemDto:
-      type: object
-      properties:
-        prospectId:
-          type: number
-          example: 8472193
-        enrichmentStatus:
-          type: string
-          description: Outcome of contact enrichment for this prospect. Only `enriched` consumes a credit.
-          enum:
-          - enriched
-          - no_email
-          - failed
-          example: enriched
-      required:
-      - prospectId
-      - enrichmentStatus
     JobPollMetadataDto:
       type: object
       properties:
@@ -151,6 +122,35 @@ components:
       required:
       - taskId
       - status
+    JobErrorItemDto:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ENRICHMENT_FAILED
+        message:
+          type: string
+          example: Enrichment pipeline error — please retry in a few minutes
+      required:
+      - code
+      - message
+    EnrichedProspectJobItemDto:
+      type: object
+      properties:
+        prospectId:
+          type: number
+          example: 8472193
+        enrichmentStatus:
+          type: string
+          description: Outcome of contact enrichment for this prospect. Only `enriched` consumes a credit.
+          enum:
+          - enriched
+          - no_email
+          - failed
+          example: enriched
+      required:
+      - prospectId
+      - enrichmentStatus
   securitySchemes:
     bearer:
       scheme: bearer
