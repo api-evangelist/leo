@@ -115,3 +115,34 @@ evidence:
   status: 200
   note: 301 to https://content.meetleo.com/mcp.html. States a LeO account is required and consumption is credit-based; names no price.
 checked: '2026-08-14'
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - negotiated
+  units: []
+  plans:
+  - name: P&C COMMERCIAL
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
+  - name: BENEFITS PRO
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
+  - name: AGENCY SCALE
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
+  - name: Enterprise
+    access: other
+    model: negotiated
+    model_how: derived
+    units: []
+    periods: []
