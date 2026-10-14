@@ -1,5 +1,5 @@
 generated: '2026-10-12'
-method: none
+method: searched
 source:
 - https://zapier.com/apps/leo/integrations
 - https://n8n.io/integrations/leo/
@@ -10,7 +10,25 @@ checked:
 - https://monid.ai/tools/leo
 - https://n8n.io/integrations/leo/
 - https://zapier.com/apps/leo/integrations
+- vertafore/integrations/vertafore-integration-edges.yml
 summary: null
 marketplace_apps: []
-edges: []
+edges:
+- partner_name: Vertafore (own)
+  partner: vertafore
+  partner_match: mirror
+  mirror_match: domain
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: own
+  evidence: https://www.vertafore.com/leo
+  mirror_of: vertafore/integrations/vertafore-integration-edges.yml
+  apps:
+  - LeO
+  listing_count: 1
+  detected: '2026-10-14'
+  detected_by: mirror-platform-listings.py
+  category: Integration Partners
 templates: []
