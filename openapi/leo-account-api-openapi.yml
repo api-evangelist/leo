@@ -29,6 +29,22 @@ paths:
       - bearer: []
 components:
   schemas:
+    PlanDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Pro
+        hasApiAccess:
+          type: boolean
+          example: true
+        hasMcpAccess:
+          type: boolean
+          example: true
+      required:
+      - name
+      - hasApiAccess
+      - hasMcpAccess
     AccountResponseDto:
       type: object
       properties:
@@ -48,22 +64,6 @@ components:
       - email
       - tenantId
       - plan
-    PlanDto:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Pro
-        hasApiAccess:
-          type: boolean
-          example: true
-        hasMcpAccess:
-          type: boolean
-          example: true
-      required:
-      - name
-      - hasApiAccess
-      - hasMcpAccess
   securitySchemes:
     bearer:
       scheme: bearer
