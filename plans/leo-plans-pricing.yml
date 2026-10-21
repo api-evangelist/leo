@@ -1,27 +1,24 @@
 generated: '2026-08-14'
 method: searched
 source: https://www.meetleo.com/pricing
+name: LeO API Plans
 secondary_source: https://www.meetleo.com/mcp
 plan_count: 4
 api_pricing_published: false
-notes: >-
-  LeO publishes a pricing page, but the prices are not in the page a machine can
-  read. https://www.meetleo.com/pricing is a Wix pricing-plans widget: the served
-  HTML contains only placeholder tokens ([PLAN TITLE], [PLAN DESCRIPTION], $0) and
-  the real figures are injected client-side from a Wix paid-plans service. The
-  service endpoints (/_api/paid-plans/v1/plans, /_api/paid-plans/v2/plans) return
-  HTTP 403 "Pricing Plans instanceId not in context" to an anonymous caller, so no
-  price could be read without executing the page. Tier NAMES, the feature matrix,
-  the billing options and the trial terms ARE in the served HTML and are recorded
-  verbatim below. Crucially, NOTHING on the pricing page mentions the API, the MCP
-  Connector, credits-per-call, or which tier carries hasApiAccess / hasMcpAccess --
-  so the commercial terms for the developer surface are unpublished.
+notes: 'LeO publishes a pricing page, but the prices are not in the page a machine can read. https://www.meetleo.com/pricing
+  is a Wix pricing-plans widget: the served HTML contains only placeholder tokens ([PLAN TITLE], [PLAN DESCRIPTION],
+  $0) and the real figures are injected client-side from a Wix paid-plans service. The service endpoints (/_api/paid-plans/v1/plans,
+  /_api/paid-plans/v2/plans) return HTTP 403 "Pricing Plans instanceId not in context" to an anonymous caller, so
+  no price could be read without executing the page. Tier NAMES, the feature matrix, the billing options and the
+  trial terms ARE in the served HTML and are recorded verbatim below. Crucially, NOTHING on the pricing page mentions
+  the API, the MCP Connector, credits-per-call, or which tier carries hasApiAccess / hasMcpAccess -- so the commercial
+  terms for the developer surface are unpublished.'
 billing:
   periods:
   - monthly
   - annual
   annual_discount: 40%
-  annual_note: 'Page states "Save 40%!" and shows a "$832 annually billed" reference figure.'
+  annual_note: Page states "Save 40%!" and shows a "$832 annually billed" reference figure.
   trial:
     offered: true
     length_days: 14
@@ -32,7 +29,6 @@ billing:
   currency: USD
 plans:
 - name: P&C COMMERCIAL
-  price: null
   price_note: Rendered client-side; not present in the served HTML.
   billing_periods:
   - monthly
@@ -41,7 +37,6 @@ plans:
   api_access: not stated
   mcp_access: not stated
 - name: BENEFITS PRO
-  price: null
   price_note: Rendered client-side; not present in the served HTML.
   billing_periods:
   - monthly
@@ -50,11 +45,9 @@ plans:
   api_access: not stated
   mcp_access: not stated
 - name: AGENCY SCALE
-  price: null
-  price_note: >-
-    Rendered client-side. The single price literal in the served HTML, "$832
-    annually billed", sits in the annual-toggle block but is not bound to a named
-    tier in the static markup, so it is NOT attributed to a plan here.
+  price_note: Rendered client-side. The single price literal in the served HTML, "$832 annually billed", sits in
+    the annual-toggle block but is not bound to a named tier in the static markup, so it is NOT attributed to a
+    plan here.
   billing_periods:
   - monthly
   - annual
@@ -62,7 +55,6 @@ plans:
   api_access: not stated
   mcp_access: not stated
 - name: Enterprise
-  price: null
   price_note: Contact sales. Page copy - "Need an Enterprise solution? Get in touch with Sales".
   billing_periods: []
   api_access: not stated
@@ -96,12 +88,11 @@ developer_surface_commercials:
   credit_rules:
   - POST /v1/prospects/search consumes no enrichment credits.
   - GET /v1/prospects/{prospectId} consumes 1 credit.
-  - POST /v1/prospects/enrich reserves up to maxProspects credits; only rows returning enrichmentStatus "enriched" are charged.
+  - POST /v1/prospects/enrich reserves up to maxProspects credits; only rows returning enrichmentStatus "enriched"
+    are charged.
   source: openapi/_original/leo-openapi.json, https://www.meetleo.com/mcp
-  gap: >-
-    The spec states what CONSUMES a credit but never what a credit COSTS, and the
-    pricing page never says how many credits a tier includes. A prospective API
-    consumer cannot price an integration from public material.
+  gap: The spec states what CONSUMES a credit but never what a credit COSTS, and the pricing page never says how
+    many credits a tier includes. A prospective API consumer cannot price an integration from public material.
 evidence:
 - url: https://www.meetleo.com/pricing
   status: 200
@@ -113,7 +104,8 @@ evidence:
   status: 403
 - url: https://www.meetleo.com/mcp
   status: 200
-  note: 301 to https://content.meetleo.com/mcp.html. States a LeO account is required and consumption is credit-based; names no price.
+  note: 301 to https://content.meetleo.com/mcp.html. States a LeO account is required and consumption is credit-based;
+    names no price.
 checked: '2026-08-14'
 x-canonical:
   generated: '2026-10-08'

@@ -1,0 +1,168 @@
+generated: '2026-10-20'
+method: derived
+generator: derive-vocabulary.py
+source:
+- openapi/leo-account-api-openapi.yml
+- openapi/leo-credits-api-openapi.yml
+- openapi/leo-health-api-openapi.yml
+- openapi/leo-jobs-api-openapi.yml
+- openapi/leo-prospects-api-openapi.yml
+vocabulary:
+  name: LeO Domain Vocabulary
+  description: 'Terms declared by LeO''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions. Derived,
+    not authored.'
+  version: '2026-10-20'
+  terms:
+  - term: PlanDto
+    definition: 'Object declared by the contract with fields: name, hasApiAccess, hasMcpAccess.'
+    tags:
+    - Object
+    source: openapi/leo-account-api-openapi.yml#/components/schemas/PlanDto
+  - term: AccountResponseDto
+    definition: 'Object declared by the contract with fields: userId, email, tenantId, plan.'
+    tags:
+    - Object
+    source: openapi/leo-account-api-openapi.yml#/components/schemas/AccountResponseDto
+  - term: CreditBalanceResponseDto
+    definition: 'Object declared by the contract with fields: available, reserved, plan, poolId.'
+    tags:
+    - Object
+    source: openapi/leo-credits-api-openapi.yml#/components/schemas/CreditBalanceResponseDto
+  - term: EnrichedProspectJobItemDto
+    definition: 'Object declared by the contract with fields: prospectId, enrichmentStatus.'
+    tags:
+    - Object
+    source: openapi/leo-jobs-api-openapi.yml#/components/schemas/EnrichedProspectJobItemDto
+  - term: JobStatusDataDto
+    definition: 'Object declared by the contract with fields: taskId, status, prospects.'
+    tags:
+    - Object
+    source: openapi/leo-jobs-api-openapi.yml#/components/schemas/JobStatusDataDto
+  - term: JobPollMetadataDto
+    definition: 'Object declared by the contract with fields: requestId, creditsUsed, creditsRemaining.'
+    tags:
+    - Object
+    source: openapi/leo-jobs-api-openapi.yml#/components/schemas/JobPollMetadataDto
+  - term: JobErrorItemDto
+    definition: 'Object declared by the contract with fields: code, message.'
+    tags:
+    - Object
+    source: openapi/leo-jobs-api-openapi.yml#/components/schemas/JobErrorItemDto
+  - term: JobPollEnvelopeDto
+    definition: 'Object declared by the contract with fields: version, processTime, data, errors, metadata.'
+    tags:
+    - Object
+    source: openapi/leo-jobs-api-openapi.yml#/components/schemas/JobPollEnvelopeDto
+  - term: DotData
+    definition: 'Object declared by the contract with fields: units, drivers, violations, bipdPrimary, bipdExcess, cargo, surety.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/DotData
+  - term: OshaData
+    definition: 'Object declared by the contract with fields: healthViolations, safetyViolations.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/OshaData
+  - term: SearchProspectsResponseData
+    definition: 'Object declared by the contract with fields: prospects, pagination.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/SearchProspectsResponseData
+  - term: ProspectInsurance
+    definition: 'Object declared by the contract with fields: wc, pension, benefits, fidelityBond, osha, dot.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/ProspectInsurance
+  - term: EnrichProspectsDto
+    definition: 'Object declared by the contract with fields: filters, maxProspects.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/EnrichProspectsDto
+  - term: EnrichProspectsResponseData
+    definition: 'Object declared by the contract with fields: taskId, status, pollUrl, creditsReserved, estimatedWaitSeconds.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/EnrichProspectsResponseData
+  - term: SearchProspectsFiltersDto
+    definition: 'Object declared by the contract with fields: state, city, county, zip, naicsList, ntee, vertical, prospectName, websiteUrl, websiteDomain,
+      ein, minEmployeesNumber. (122 more)'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/SearchProspectsFiltersDto
+  - term: InsuranceLineData
+    definition: 'Object declared by the contract with fields: renewalDate, carrier, broker, participants.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/InsuranceLineData
+  - term: XDatePredictions
+    definition: 'Object declared by the contract with fields: generalLiability, commercialAuto.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/XDatePredictions
+  - term: DotInsuranceLine
+    definition: 'Object declared by the contract with fields: renewalDate, carrier.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/DotInsuranceLine
+  - term: ProspectIrs990
+    definition: 'Object declared by the contract with fields: reportType, reportYear, totalRevenue, totalExpenses, totalNetAssets, history.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/ProspectIrs990
+  - term: SearchProspectsDto
+    definition: 'Object declared by the contract with fields: filters, page, limit.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/SearchProspectsDto
+  - term: BenefitsRedFlags
+    definition: 'Object declared by the contract with fields: benefitsRagFlagComplianceAmendmentNeeded, benefitsRagFlagDescriptionComplianceAmendmentNeeded,
+      benefitsRagFlagCorrectiveDistributions, benefitsRagFlagDescriptionCorrectiveDistributions, benefitsRagFlagDecliningPlanAssets, benefitsRagFlagDescriptionDecliningPlanAssets,
+      benefitsRagFlagDelinquentContributions, benefitsRagFlagDescriptionDelinquentContributions, benefitsRagFlagExcessiveServiceProviderFees,
+      benefitsRagFlagDescriptionExcessiveServiceProviderFees, benefitsRagFlagFidelityBondTooLow, benefitsRagFlagDescriptionFidelityBondTooLow.
+      (64 more)'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/BenefitsRedFlags
+  - term: PaginationResponse
+    definition: 'Object declared by the contract with fields: page, limit, total.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/PaginationResponse
+  - term: ProspectIrs990HistoryEntry
+    definition: 'Object declared by the contract with fields: year, totalExpenses.'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/ProspectIrs990HistoryEntry
+  - term: ProspectResponse
+    definition: 'Object declared by the contract with fields: prospectId, standardCompanyName, state, city, zipCode, address, primaryVertical,
+      naicsCode, naicsList, ntee, salesVolumeRange, hqPhone. (9 more)'
+    tags:
+    - Object
+    source: openapi/leo-prospects-api-openapi.yml#/components/schemas/ProspectResponse
+  - term: Account
+    definition: 'Resource group in the contract; its operation GET /v1/account: Returns the authenticated user identity and plan entitlements.'
+    tags:
+    - Resource Group
+    source: openapi/leo-account-api-openapi.yml
+  - term: Credits
+    definition: 'Resource group in the contract; its operation GET /v1/credits/balance: Returns the available and reserved credits for the authenticated
+      user, including whether credits are individual or pool-based.'
+    tags:
+    - Resource Group
+    source: openapi/leo-credits-api-openapi.yml
+  - term: Health
+    definition: 'Resource group in the contract; its operation GET /health: App controller health'
+    tags:
+    - Resource Group
+    source: openapi/leo-health-api-openapi.yml
+  - term: Jobs
+    definition: 'Resource group in the contract; its operation GET /v1/jobs/{taskId}: Returns the current state of an enrichment job and — once
+      complete — the enriched prospects with contact data.'
+    tags:
+    - Resource Group
+    source: openapi/leo-jobs-api-openapi.yml
+  - term: Prospects
+    definition: 'Resource group in the contract; its operation POST /v1/prospects/search: Synchronous search over the Leo insights database.'
+    tags:
+    - Resource Group
+    source: openapi/leo-prospects-api-openapi.yml

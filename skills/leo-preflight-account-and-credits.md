@@ -1,7 +1,7 @@
 ---
 generated: '2026-08-14'
 method: generated
-name: Pre-flight a LeO integration - entitlements and credit budget
+name: preflight-account-and-credits
 description: Check that the authenticated LeO account is actually permitted to call the API, and read its credit budget, before spending anything.
 api: openapi/leo-account-api-openapi.yml
 operations: [AccountController_getAccount, CreditsController_getCreditBalance, AppController_health]

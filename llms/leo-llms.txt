@@ -1,8 +1,8 @@
 # LeO 3.0
-> LeO provides an AI-powered platform designed to help insurance professionals close more deals by identifying and nurturing leads. The platform offers advanced filtering, ideal timing insights through a renewal date database, and smart outreach tools to fill calendars. It also assists with pre-meeting planning by providing insights into current solutions, carriers, brokers, and coverages. LeO aims to empower insurance agents and brokers with modern tools for efficient prospecting and business growth.
+> The LeO website offers an AI-powered platform designed to help insurance professionals identify and connect with potential clients. It provides advanced filtering tools, smart outreach capabilities, and resources to streamline the sales process. The site also details LeO's privacy policy, terms of service, and compares its features to competitors like Insurance Xdate and Zywave MiEdge.
 
 ## Homepage link
-- [home](https://www.meetleo.com/)
+- [home](https://resources.meetleo.com/)
 
 ## AI Agent Access
 
@@ -10,7 +10,7 @@ This site is powered by Wix and supports the Model Context Protocol (MCP)
 for agentic AI access. AI agents can connect directly to retrieve live,
 up-to-date site content - no scraping required.
 
-- [**Site MCP Endpoint**](https://www.meetleo.com/_api/mcp)
+- [**Site MCP Endpoint**](https://resources.meetleo.com/_api/mcp)
 - [**Wix MCP Docs**](https://dev.wix.com/docs/develop-websites/articles/get-started/about-the-wix-site-mcp)
 
 ## Available MCP Tools

@@ -184,96 +184,693 @@ paths:
       - bearer: []
 components:
   schemas:
-    DotData:
+    InsuranceLineData:
       type: object
       properties:
-        units:
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2026-09-01'
+          description: Policy renewal date (ISO YYYY-MM-DD). Present for WC, pension, and welfare/benefits lines.
+        carrier:
+          type:
+          - string
+          - 'null'
+          example: Travelers
+          description: Insurance carrier name for this line.
+        broker:
+          type:
+          - string
+          - 'null'
+          example: Marsh McLennan Agency
+          description: Broker name. Present for WC, pension, and welfare/benefits lines.
+        participants:
           type:
           - number
           - 'null'
-          example: 87
-          description: Number of power units (trucks/tractors) registered with FMCSA.
-        drivers:
+          example: 142
+          description: Number of covered participants. Only present for pension and welfare/benefits lines.
+      required:
+      - renewalDate
+      - carrier
+    ProspectIrs990:
+      type: object
+      properties:
+        reportType:
+          type:
+          - string
+          - 'null'
+          example: '990'
+          description: IRS form variant filed (e.g. "990", "990-EZ", "990-PF").
+        reportYear:
+          type:
+          - integer
+          - 'null'
+          example: 2024
+        totalRevenue:
           type:
           - number
           - 'null'
-          example: 112
-          description: Number of CDL drivers registered with FMCSA.
-        violations:
-          type: boolean
-          example: false
-        bipdPrimary:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-        bipdExcess:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-        cargo:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-        surety:
-          allOf:
-          - $ref: '#/components/schemas/DotInsuranceLine'
-      required:
-      - units
-      - drivers
-      - violations
-      - bipdPrimary
-      - bipdExcess
-      - cargo
-      - surety
-    OshaData:
-      type: object
-      properties:
-        healthViolations:
-          type: boolean
-          example: false
-        safetyViolations:
-          type: boolean
-          example: true
-      required:
-      - healthViolations
-      - safetyViolations
-    SearchProspectsResponseData:
-      type: object
-      properties:
-        prospects:
+          example: 12450000
+          description: Total revenue in USD.
+        totalExpenses:
+          type:
+          - number
+          - 'null'
+          example: 11820000
+          description: Total expenses in USD.
+        totalNetAssets:
+          type:
+          - number
+          - 'null'
+          example: 3650000
+          description: Total net assets at fiscal year end, in USD.
+        insuranceExpenses:
+          type:
+          - number
+          - 'null'
+          example: 150000
+          description: Insurance expenses reported on the 990, in USD.
+        history:
+          description: Up to 11 years of historical IRS total expenses, descending by year. Only present when the requesting user has the csvHasIrsHistoricalData entitlement.
           type: array
           items:
-            $ref: '#/components/schemas/ProspectResponse'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponse'
+            $ref: '#/components/schemas/ProspectIrs990HistoryEntry'
       required:
-      - prospects
-      - pagination
-    ProspectInsurance:
+      - reportType
+      - reportYear
+      - totalRevenue
+      - totalExpenses
+      - totalNetAssets
+      - insuranceExpenses
+    ProspectIrs990HistoryEntry:
       type: object
       properties:
-        wc:
-          allOf:
-          - $ref: '#/components/schemas/InsuranceLineData'
-        pension:
-          allOf:
-          - $ref: '#/components/schemas/InsuranceLineData'
-        benefits:
-          allOf:
-          - $ref: '#/components/schemas/InsuranceLineData'
-        fidelityBond:
-          type: boolean
-          example: false
-        osha:
-          allOf:
-          - $ref: '#/components/schemas/OshaData'
-        dot:
-          allOf:
-          - $ref: '#/components/schemas/DotData'
+        year:
+          type: integer
+          example: 2023
+        totalExpenses:
+          type:
+          - number
+          - 'null'
+          example: 11200000
+          description: Total expenses for the year, in USD.
       required:
-      - wc
-      - pension
-      - benefits
-      - fidelityBond
-      - osha
-      - dot
+      - year
+      - totalExpenses
+    DotRedFlags:
+      type: object
+      properties:
+        hasFleetDriverHeavy:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Driver-Heavy Fleet — true = flagged, false = not flagged, null = insufficient data.
+        hasFleetDriverHeavyDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Driver-Heavy Fleet — human-readable explanation when flagged; null otherwise.
+        hasFleetSmallActive:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Small Active Fleet — true = flagged, false = not flagged, null = insufficient data.
+        hasFleetSmallActiveDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Small Active Fleet — human-readable explanation when flagged; null otherwise.
+        hasFleetGrowing:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Fleet Growing — true = flagged, false = not flagged, null = insufficient data.
+        hasFleetGrowingDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Fleet Growing — human-readable explanation when flagged; null otherwise.
+        hasFleetShrinking:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Fleet Shrinking — true = flagged, false = not flagged, null = insufficient data.
+        hasFleetShrinkingDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Fleet Shrinking — human-readable explanation when flagged; null otherwise.
+        hasFleetDriversGrowing:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Driver Headcount Growing — true = flagged, false = not flagged, null = insufficient data.
+        hasFleetDriversGrowingDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Driver Headcount Growing — human-readable explanation when flagged; null otherwise.
+        hasFleetDriversShrinking:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Driver Headcount Shrinking — true = flagged, false = not flagged, null = insufficient data.
+        hasFleetDriversShrinkingDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Driver Headcount Shrinking — human-readable explanation when flagged; null otherwise.
+        hasFleetMileageGrowing:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Mileage Growing — true = flagged, false = not flagged, null = insufficient data.
+        hasFleetMileageGrowingDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Mileage Growing — human-readable explanation when flagged; null otherwise.
+        hasFleetOwnershipShifted:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Ownership Mix Shifted — true = flagged, false = not flagged, null = insufficient data.
+        hasFleetOwnershipShiftedDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Ownership Mix Shifted — human-readable explanation when flagged; null otherwise.
+        hasSegmentTruckload:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Truckload Operation — true = flagged, false = not flagged, null = insufficient data.
+        hasSegmentTruckloadDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Truckload Operation — human-readable explanation when flagged; null otherwise.
+        hasSegmentLocalFreight:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Local Freight Operation — true = flagged, false = not flagged, null = insufficient data.
+        hasSegmentLocalFreightDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Local Freight Operation — human-readable explanation when flagged; null otherwise.
+        hasSegmentMotorcoach:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Motorcoach Operator — true = flagged, false = not flagged, null = insufficient data.
+        hasSegmentMotorcoachDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Motorcoach Operator — human-readable explanation when flagged; null otherwise.
+        hasSegmentSchoolBus:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: School Bus Operator — true = flagged, false = not flagged, null = insufficient data.
+        hasSegmentSchoolBusDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: School Bus Operator — human-readable explanation when flagged; null otherwise.
+        hasSegmentShuttle:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Shuttle / Paratransit Operator — true = flagged, false = not flagged, null = insufficient data.
+        hasSegmentShuttleDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Shuttle / Paratransit Operator — human-readable explanation when flagged; null otherwise.
+        hasSegmentLivery:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Livery / Limo Operator — true = flagged, false = not flagged, null = insufficient data.
+        hasSegmentLiveryDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Livery / Limo Operator — human-readable explanation when flagged; null otherwise.
+        hasSegmentHazmat:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Hazmat Carrier — true = flagged, false = not flagged, null = insufficient data.
+        hasSegmentHazmatDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Hazmat Carrier — human-readable explanation when flagged; null otherwise.
+        hasSegmentClassAdded:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: New Business Segment — true = flagged, false = not flagged, null = insufficient data.
+        hasSegmentClassAddedDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: New Business Segment — human-readable explanation when flagged; null otherwise.
+        hasAuthorityNew:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: New Operating Authority — true = flagged, false = not flagged, null = insufficient data.
+        hasAuthorityNewDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: New Operating Authority — human-readable explanation when flagged; null otherwise.
+        hasAuthorityBroker:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Broker Authority — true = flagged, false = not flagged, null = insufficient data.
+        hasAuthorityBrokerDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Broker Authority — human-readable explanation when flagged; null otherwise.
+        hasAuthorityForwarder:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Freight-Forwarder Authority — true = flagged, false = not flagged, null = insufficient data.
+        hasAuthorityForwarderDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Freight-Forwarder Authority — human-readable explanation when flagged; null otherwise.
+        hasAuthorityCrossBorder:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Cross-Border Authority — true = flagged, false = not flagged, null = insufficient data.
+        hasAuthorityCrossBorderDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Cross-Border Authority — human-readable explanation when flagged; null otherwise.
+        hasAuthorityMultiDocket:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Multiple Dockets — true = flagged, false = not flagged, null = insufficient data.
+        hasAuthorityMultiDocketDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Multiple Dockets — human-readable explanation when flagged; null otherwise.
+        hasAuthorityRevocationPending:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Revocation Pending — true = flagged, false = not flagged, null = insufficient data.
+        hasAuthorityRevocationPendingDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Revocation Pending — human-readable explanation when flagged; null otherwise.
+        hasAuthorityReactivated:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Authority Reactivated — true = flagged, false = not flagged, null = insufficient data.
+        hasAuthorityReactivatedDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Authority Reactivated — human-readable explanation when flagged; null otherwise.
+        hasAuthorityDeactivated:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Authority Deactivated — true = flagged, false = not flagged, null = insufficient data.
+        hasAuthorityDeactivatedDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Authority Deactivated — human-readable explanation when flagged; null otherwise.
+        hasSafetyInspectionActivity:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Heavy Inspection Activity — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyInspectionActivityDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Heavy Inspection Activity — human-readable explanation when flagged; null otherwise.
+        hasSafetyOosRate:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: High Out-of-Service Rate — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyOosRateDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: High Out-of-Service Rate — human-readable explanation when flagged; null otherwise.
+        hasSafetyViolationActivity:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: High Violation Activity — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyViolationActivityDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: High Violation Activity — human-readable explanation when flagged; null otherwise.
+        hasSafetyOosViolations:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Out-of-Service Violations — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyOosViolationsDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Out-of-Service Violations — human-readable explanation when flagged; null otherwise.
+        hasSafetyCrashes:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Recent Crashes — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyCrashesDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Recent Crashes — human-readable explanation when flagged; null otherwise.
+        hasSafetyCrashFrequency:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: High Crash Frequency — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyCrashFrequencyDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: High Crash Frequency — human-readable explanation when flagged; null otherwise.
+        hasSafetyCrashFatal:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Fatal Crash — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyCrashFatalDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Fatal Crash — human-readable explanation when flagged; null otherwise.
+        hasSafetyCrashInjury:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Injury Crash — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyCrashInjuryDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Injury Crash — human-readable explanation when flagged; null otherwise.
+        hasSafetyCrashTowaway:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Tow-Away Crash — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyCrashTowawayDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Tow-Away Crash — human-readable explanation when flagged; null otherwise.
+        hasSafetyRatingPoor:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Poor Safety Rating — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyRatingPoorDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Poor Safety Rating — human-readable explanation when flagged; null otherwise.
+        hasSafetyRatingDowngraded:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Safety Rating Downgraded — true = flagged, false = not flagged, null = insufficient data.
+        hasSafetyRatingDowngradedDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Safety Rating Downgraded — human-readable explanation when flagged; null otherwise.
+        hasInsuranceLapsed:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Coverage Lapsed — true = flagged, false = not flagged, null = insufficient data.
+        hasInsuranceLapsedDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Coverage Lapsed — human-readable explanation when flagged; null otherwise.
+        hasInsuranceCarrierChanged:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Carrier Changed — true = flagged, false = not flagged, null = insufficient data.
+        hasInsuranceCarrierChangedDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Carrier Changed — human-readable explanation when flagged; null otherwise.
+        hasInsuranceRenewalWindow:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Renewal Window — true = flagged, false = not flagged, null = insufficient data.
+        hasInsuranceRenewalWindowDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Renewal Window — human-readable explanation when flagged; null otherwise.
+        hasInsuranceNotOnFile:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Required Insurance Not on File — true = flagged, false = not flagged, null = insufficient data.
+        hasInsuranceNotOnFileDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Required Insurance Not on File — human-readable explanation when flagged; null otherwise.
+        hasInsuranceUnderinsured:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Underinsured — true = flagged, false = not flagged, null = insufficient data.
+        hasInsuranceUnderinsuredDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Underinsured — human-readable explanation when flagged; null otherwise.
+        hasFirmRelocated:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Firm Relocated — true = flagged, false = not flagged, null = insufficient data.
+        hasFirmRelocatedDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Firm Relocated — human-readable explanation when flagged; null otherwise.
+        hasFirmRestructured:
+          type:
+          - boolean
+          - 'null'
+          example: null
+          description: Firm Restructured — true = flagged, false = not flagged, null = insufficient data.
+        hasFirmRestructuredDescription:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Firm Restructured — human-readable explanation when flagged; null otherwise.
+      required:
+      - hasFleetDriverHeavy
+      - hasFleetDriverHeavyDescription
+      - hasFleetSmallActive
+      - hasFleetSmallActiveDescription
+      - hasFleetGrowing
+      - hasFleetGrowingDescription
+      - hasFleetShrinking
+      - hasFleetShrinkingDescription
+      - hasFleetDriversGrowing
+      - hasFleetDriversGrowingDescription
+      - hasFleetDriversShrinking
+      - hasFleetDriversShrinkingDescription
+      - hasFleetMileageGrowing
+      - hasFleetMileageGrowingDescription
+      - hasFleetOwnershipShifted
+      - hasFleetOwnershipShiftedDescription
+      - hasSegmentTruckload
+      - hasSegmentTruckloadDescription
+      - hasSegmentLocalFreight
+      - hasSegmentLocalFreightDescription
+      - hasSegmentMotorcoach
+      - hasSegmentMotorcoachDescription
+      - hasSegmentSchoolBus
+      - hasSegmentSchoolBusDescription
+      - hasSegmentShuttle
+      - hasSegmentShuttleDescription
+      - hasSegmentLivery
+      - hasSegmentLiveryDescription
+      - hasSegmentHazmat
+      - hasSegmentHazmatDescription
+      - hasSegmentClassAdded
+      - hasSegmentClassAddedDescription
+      - hasAuthorityNew
+      - hasAuthorityNewDescription
+      - hasAuthorityBroker
+      - hasAuthorityBrokerDescription
+      - hasAuthorityForwarder
+      - hasAuthorityForwarderDescription
+      - hasAuthorityCrossBorder
+      - hasAuthorityCrossBorderDescription
+      - hasAuthorityMultiDocket
+      - hasAuthorityMultiDocketDescription
+      - hasAuthorityRevocationPending
+      - hasAuthorityRevocationPendingDescription
+      - hasAuthorityReactivated
+      - hasAuthorityReactivatedDescription
+      - hasAuthorityDeactivated
+      - hasAuthorityDeactivatedDescription
+      - hasSafetyInspectionActivity
+      - hasSafetyInspectionActivityDescription
+      - hasSafetyOosRate
+      - hasSafetyOosRateDescription
+      - hasSafetyViolationActivity
+      - hasSafetyViolationActivityDescription
+      - hasSafetyOosViolations
+      - hasSafetyOosViolationsDescription
+      - hasSafetyCrashes
+      - hasSafetyCrashesDescription
+      - hasSafetyCrashFrequency
+      - hasSafetyCrashFrequencyDescription
+      - hasSafetyCrashFatal
+      - hasSafetyCrashFatalDescription
+      - hasSafetyCrashInjury
+      - hasSafetyCrashInjuryDescription
+      - hasSafetyCrashTowaway
+      - hasSafetyCrashTowawayDescription
+      - hasSafetyRatingPoor
+      - hasSafetyRatingPoorDescription
+      - hasSafetyRatingDowngraded
+      - hasSafetyRatingDowngradedDescription
+      - hasInsuranceLapsed
+      - hasInsuranceLapsedDescription
+      - hasInsuranceCarrierChanged
+      - hasInsuranceCarrierChangedDescription
+      - hasInsuranceRenewalWindow
+      - hasInsuranceRenewalWindowDescription
+      - hasInsuranceNotOnFile
+      - hasInsuranceNotOnFileDescription
+      - hasInsuranceUnderinsured
+      - hasInsuranceUnderinsuredDescription
+      - hasFirmRelocated
+      - hasFirmRelocatedDescription
+      - hasFirmRestructured
+      - hasFirmRestructuredDescription
     EnrichProspectsDto:
       type: object
       properties:
@@ -299,8 +896,27 @@ components:
           minimum: 1
           maximum: 100
           example: 25
+        maxContactsPerProspect:
+          type: number
+          description: Cap on the number of contacts returned per prospect (1–10). Does not affect billing — a prospect is charged once when it yields any email-bearing contact, regardless of how many contacts are returned.
+          default: 3
+          minimum: 1
+          maximum: 10
+          example: 5
       required:
       - filters
+    OshaData:
+      type: object
+      properties:
+        healthViolations:
+          type: boolean
+          example: false
+        safetyViolations:
+          type: boolean
+          example: true
+      required:
+      - healthViolations
+      - safetyViolations
     EnrichProspectsResponseData:
       type: object
       properties:
@@ -331,6 +947,196 @@ components:
       - pollUrl
       - creditsReserved
       - estimatedWaitSeconds
+    XDatePredictions:
+      type: object
+      properties:
+        generalLiability:
+          type:
+          - string
+          - 'null'
+          example: '2026-04-15'
+          description: Predicted General Liability renewal date (ISO YYYY-MM-DD).
+        commercialAuto:
+          type:
+          - string
+          - 'null'
+          example: '2026-07-01'
+          description: Predicted Commercial Auto renewal date (ISO YYYY-MM-DD).
+      required:
+      - generalLiability
+      - commercialAuto
+    DotData:
+      type: object
+      properties:
+        units:
+          type:
+          - number
+          - 'null'
+          example: 87
+          description: Number of power units (trucks/tractors) registered with FMCSA.
+        drivers:
+          type:
+          - number
+          - 'null'
+          example: 112
+          description: Number of CDL drivers registered with FMCSA.
+        violations:
+          type: boolean
+          example: false
+        bipdPrimary:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        bipdExcess:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        cargo:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        surety:
+          allOf:
+          - $ref: '#/components/schemas/DotInsuranceLine'
+        intrastate:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Operates intrastate. Only present when the requesting user has the hasDotFilter entitlement. true = yes, false = no, null = no data.
+        interstate:
+          type:
+          - boolean
+          - 'null'
+          example: false
+          description: Operates interstate. Only present when the requesting user has the hasDotFilter entitlement. true = yes, false = no, null = no data.
+      required:
+      - units
+      - drivers
+      - violations
+      - bipdPrimary
+      - bipdExcess
+      - cargo
+      - surety
+    ProspectResponse:
+      type: object
+      properties:
+        prospectId:
+          type: integer
+          example: 8472193
+        standardCompanyName:
+          type: string
+          example: Lone Star Freight Lines, Inc.
+        state:
+          type:
+          - string
+          - 'null'
+          example: TX
+        city:
+          type:
+          - string
+          - 'null'
+          example: Dallas
+        zipCode:
+          type:
+          - string
+          - 'null'
+          example: '75201'
+        address:
+          type:
+          - string
+          - 'null'
+          example: 4200 Stemmons Fwy
+        primaryVertical:
+          type:
+          - string
+          - 'null'
+          example: Trucking
+        naicsCode:
+          type:
+          - string
+          - 'null'
+          example: '484110'
+        naicsList:
+          type:
+          - string
+          - 'null'
+          example: 484110, 484121
+        ntee:
+          type:
+          - string
+          - 'null'
+          example: B82
+          description: NTEE classification code. Only present when the requesting user has the nteeFilter entitlement.
+        salesVolumeRange:
+          type:
+          - string
+          - 'null'
+          example: $10M–$25M
+        hqPhone:
+          type:
+          - string
+          - 'null'
+          example: +1-214-555-0142
+        ein:
+          type:
+          - string
+          - 'null'
+          example: '742918374'
+        employeeRange:
+          type:
+          - string
+          - 'null'
+          example: 50-249
+        websiteUrl:
+          type:
+          - string
+          - 'null'
+          example: https://lonestarfreight.com
+        linkedinUrl:
+          type:
+          - string
+          - 'null'
+          example: https://linkedin.com/company/lone-star-freight
+        insurance:
+          $ref: '#/components/schemas/ProspectInsurance'
+        irs990:
+          allOf:
+          - $ref: '#/components/schemas/ProspectIrs990'
+        xDatePredictions:
+          description: Modeled renewal-date predictions. Only present when the requesting user has the xDatePredictions entitlement.
+          allOf:
+          - $ref: '#/components/schemas/XDatePredictions'
+        benefitsRedFlags:
+          description: Benefits Red Flags (38 risk indicators from Form 5500). Only present when the requesting user has the isBenefitsRedFlagFilter entitlement. Each flag is true (flagged), false (not flagged), or null (insufficient data). Paired benefitsRagFlagDescription* fields carry the explanation when a flag is triggered.
+          allOf:
+          - $ref: '#/components/schemas/BenefitsRedFlags'
+        dotRedFlags:
+          description: DOT transportation red flags. Only present when the requesting user has the isDotRedFlagFilter entitlement. Each flag is true (flagged), false (not flagged), or null (insufficient data). Paired *Description fields carry the explanation when a flag is triggered. Intrastate and Interstate live on insurance.dot and require hasDotFilter.
+          allOf:
+          - $ref: '#/components/schemas/DotRedFlags'
+        contacts:
+          type:
+          - object
+          - 'null'
+          example: null
+          description: Always null in search response — use /v1/prospects/enrich for contacts
+      required:
+      - prospectId
+      - standardCompanyName
+      - state
+      - city
+      - zipCode
+      - address
+      - primaryVertical
+      - naicsCode
+      - naicsList
+      - salesVolumeRange
+      - hqPhone
+      - ein
+      - employeeRange
+      - websiteUrl
+      - linkedinUrl
+      - insurance
+      - irs990
+      - contacts
     SearchProspectsFiltersDto:
       type: object
       properties:
@@ -389,6 +1195,10 @@ components:
           type: array
           items:
             type: string
+        prospectId:
+          type: string
+          description: Exact prospect ID from a prior search_prospects result. Use one prospectId per filter group to target the exact prospects you found, instead of re-deriving name/attribute filters (which can match unrelated companies).
+          example: '5648'
         prospectName:
           type: string
           description: Fuzzy partial match on company name. Use this when you have a known target account.
@@ -403,8 +1213,8 @@ components:
           example: swifttrans.com
         ein:
           type: string
-          description: Employer Identification Number (EIN).
-          example: 12-3456789
+          description: Employer Identification Number (EIN) as 9 digits with no hyphen or separators. Matched exactly against the stored value, so a non-canonical form (e.g. "12-3456789") returns no results.
+          example: '123456789'
         minEmployeesNumber:
           type: integer
           description: Inclusive lower bound on employee count.
@@ -462,13 +1272,7 @@ components:
           items:
             type: string
         wcRenewalMonth:
-          type: integer
-          description: Single WC renewal month (1–12). Unlike `wcRenewalMonths`, this triggers nearest-x-date sorting so results are ordered by proximity to a target renewal date.
-          example: 6
-          minimum: 1
-          maximum: 12
-        wcRenewalMonths:
-          description: Plain multi-month filter for WC renewal (1–12). Returns prospects whose WC policy renews in any of the listed months. Does not affect sort order — use `wcRenewalMonth` for nearest-date sorting.
+          description: Multi-month filter for WC renewal (1–12). Returns prospects whose WC policy renews in any of the listed months.
           example:
           - 1
           - 4
@@ -522,6 +1326,14 @@ components:
         hasDotTrust:
           type: boolean
           description: Restrict to DOT carriers with a DOT Trust filing.
+          example: true
+        dotIntrastate:
+          type: boolean
+          description: Restrict to carriers that operate intrastate.
+          example: true
+        dotInterstate:
+          type: boolean
+          description: Restrict to carriers that operate interstate.
           example: true
         dotNumber:
           type: string
@@ -639,14 +1451,6 @@ components:
           description: Latest benefits (pension/welfare) renewal date (ISO 8601).
           example: '2025-12-31'
           format: date
-        benefitsRenewalMonths:
-          description: Benefits renewal month(s) (1–12) — matches pension or welfare renewal month.
-          example:
-          - 1
-          - 7
-          type: array
-          items:
-            type: number
         pensionRenewalMonth:
           type: integer
           description: Pension plan renewal month (1–12). Triggers nearest-x-date sorting.
@@ -814,6 +1618,14 @@ components:
           type: number
           description: Inclusive upper bound on IRS gross receipts (USD).
           example: 10000000
+        minIrsInsuranceExpenses:
+          type: integer
+          description: Inclusive lower bound on IRS insurance expenses (USD).
+          example: 10000
+        maxIrsInsuranceExpenses:
+          type: integer
+          description: Inclusive upper bound on IRS insurance expenses (USD).
+          example: 500000
         benefitsRagFlagComplianceAmendmentNeeded:
           type: boolean
           description: 'Restrict to prospects flagged for: Compliance Amendment Needed.'
@@ -966,144 +1778,174 @@ components:
           type: boolean
           description: 'Restrict to prospects flagged for: Underfunded Pension.'
           example: true
-    InsuranceLineData:
-      type: object
-      properties:
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2026-09-01'
-          description: Policy renewal date (ISO YYYY-MM-DD). Present for WC, pension, and welfare/benefits lines.
-        carrier:
-          type:
-          - string
-          - 'null'
-          example: Travelers
-          description: Insurance carrier name for this line.
-        broker:
-          type:
-          - string
-          - 'null'
-          example: Marsh McLennan Agency
-          description: Broker name. Present for WC, pension, and welfare/benefits lines.
-        participants:
-          type:
-          - number
-          - 'null'
-          example: 142
-          description: Number of covered participants. Only present for pension and welfare/benefits lines.
-      required:
-      - renewalDate
-      - carrier
-    XDatePredictions:
-      type: object
-      properties:
-        generalLiability:
-          type:
-          - string
-          - 'null'
-          example: '2026-04-15'
-          description: Predicted General Liability renewal date (ISO YYYY-MM-DD).
-        commercialAuto:
-          type:
-          - string
-          - 'null'
-          example: '2026-07-01'
-          description: Predicted Commercial Auto renewal date (ISO YYYY-MM-DD).
-      required:
-      - generalLiability
-      - commercialAuto
-    DotInsuranceLine:
-      type: object
-      properties:
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2026-08-15'
-          description: DOT coverage renewal date (ISO YYYY-MM-DD).
-        carrier:
-          type:
-          - string
-          - 'null'
-          example: Progressive Commercial
-          description: DOT coverage carrier name.
-      required:
-      - renewalDate
-      - carrier
-    ProspectIrs990:
-      type: object
-      properties:
-        reportType:
-          type:
-          - string
-          - 'null'
-          example: '990'
-          description: IRS form variant filed (e.g. "990", "990-EZ", "990-PF").
-        reportYear:
-          type:
-          - integer
-          - 'null'
-          example: 2024
-        totalRevenue:
-          type:
-          - number
-          - 'null'
-          example: 12450000
-          description: Total revenue in USD.
-        totalExpenses:
-          type:
-          - number
-          - 'null'
-          example: 11820000
-          description: Total expenses in USD.
-        totalNetAssets:
-          type:
-          - number
-          - 'null'
-          example: 3650000
-          description: Total net assets at fiscal year end, in USD.
-        history:
-          description: Up to 11 years of historical IRS total expenses, descending by year. Only present when the requesting user has the csvHasIrsHistoricalData entitlement.
-          type: array
-          items:
-            $ref: '#/components/schemas/ProspectIrs990HistoryEntry'
-      required:
-      - reportType
-      - reportYear
-      - totalRevenue
-      - totalExpenses
-      - totalNetAssets
-    SearchProspectsDto:
-      type: object
-      properties:
-        filters:
-          description: Filter group(s). Within a single object, conditions are **ANDed** together. Pass one object for a typical search — multiple objects are reserved for advanced segment combinations.
-          example:
-          - state:
-            - TX
-            naicsList:
-            - '484110'
-            - '484121'
-            minEmployeesNumber: 25
-            maxEmployeesNumber: 250
-            hasWc: true
-            hasDot: true
-          type: array
-          items:
-            $ref: '#/components/schemas/SearchProspectsFiltersDto'
-        page:
-          type: integer
-          description: 1-based page number
-          example: 1
-          minimum: 1
-        limit:
-          type: integer
-          description: Results per page
-          example: 25
-          minimum: 1
-          maximum: 100
+        hasFleetDriverHeavy:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Driver-Heavy Fleet.'
+          example: true
+        hasFleetSmallActive:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Small Active Fleet.'
+          example: true
+        hasFleetGrowing:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Fleet Growing.'
+          example: true
+        hasFleetShrinking:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Fleet Shrinking.'
+          example: true
+        hasFleetDriversGrowing:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Driver Headcount Growing.'
+          example: true
+        hasFleetDriversShrinking:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Driver Headcount Shrinking.'
+          example: true
+        hasFleetMileageGrowing:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Mileage Growing.'
+          example: true
+        hasFleetOwnershipShifted:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Ownership Mix Shifted.'
+          example: true
+        hasSegmentTruckload:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Truckload Operation.'
+          example: true
+        hasSegmentLocalFreight:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Local Freight Operation.'
+          example: true
+        hasSegmentMotorcoach:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Motorcoach Operator.'
+          example: true
+        hasSegmentSchoolBus:
+          type: boolean
+          description: 'Restrict to prospects flagged for: School Bus Operator.'
+          example: true
+        hasSegmentShuttle:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Shuttle / Paratransit Operator.'
+          example: true
+        hasSegmentLivery:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Livery / Limo Operator.'
+          example: true
+        hasSegmentHazmat:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Hazmat Carrier.'
+          example: true
+        hasSegmentClassAdded:
+          type: boolean
+          description: 'Restrict to prospects flagged for: New Business Segment.'
+          example: true
+        hasAuthorityNew:
+          type: boolean
+          description: 'Restrict to prospects flagged for: New Operating Authority.'
+          example: true
+        hasAuthorityBroker:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Broker Authority.'
+          example: true
+        hasAuthorityForwarder:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Freight-Forwarder Authority.'
+          example: true
+        hasAuthorityCrossBorder:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Cross-Border Authority.'
+          example: true
+        hasAuthorityMultiDocket:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Multiple Dockets.'
+          example: true
+        hasAuthorityRevocationPending:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Revocation Pending.'
+          example: true
+        hasAuthorityReactivated:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Authority Reactivated.'
+          example: true
+        hasAuthorityDeactivated:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Authority Deactivated.'
+          example: true
+        hasSafetyInspectionActivity:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Heavy Inspection Activity.'
+          example: true
+        hasSafetyOosRate:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Out-of-Service Rate.'
+          example: true
+        hasSafetyViolationActivity:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Violation Activity.'
+          example: true
+        hasSafetyOosViolations:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Out-of-Service Violations.'
+          example: true
+        hasSafetyCrashes:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Recent Crashes.'
+          example: true
+        hasSafetyCrashFrequency:
+          type: boolean
+          description: 'Restrict to prospects flagged for: High Crash Frequency.'
+          example: true
+        hasSafetyCrashFatal:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Fatal Crash.'
+          example: true
+        hasSafetyCrashInjury:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Injury Crash.'
+          example: true
+        hasSafetyCrashTowaway:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Tow-Away Crash.'
+          example: true
+        hasSafetyRatingPoor:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Poor Safety Rating.'
+          example: true
+        hasSafetyRatingDowngraded:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Safety Rating Downgraded.'
+          example: true
+        hasInsuranceLapsed:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Coverage Lapsed.'
+          example: true
+        hasInsuranceCarrierChanged:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Carrier Changed.'
+          example: true
+        hasInsuranceRenewalWindow:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Renewal Window.'
+          example: true
+        hasInsuranceNotOnFile:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Required Insurance Not on File.'
+          example: true
+        hasInsuranceUnderinsured:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Underinsured.'
+          example: true
+        hasFirmRelocated:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Firm Relocated.'
+          example: true
+        hasFirmRestructured:
+          type: boolean
+          description: 'Restrict to prospects flagged for: Firm Restructured.'
+          example: true
     BenefitsRedFlags:
       type: object
       properties:
@@ -1640,6 +2482,47 @@ components:
       - benefitsRagFlagDescriptionStaleValuation
       - benefitsRagFlagUnderfundedPension
       - benefitsRagFlagDescriptionUnderfundedPension
+    SearchProspectsDto:
+      type: object
+      properties:
+        filters:
+          description: Filter group(s). Within a single object, conditions are **ANDed** together. Pass one object for a typical search — multiple objects are reserved for advanced segment combinations.
+          example:
+          - state:
+            - TX
+            naicsList:
+            - '484110'
+            - '484121'
+            minEmployeesNumber: 25
+            maxEmployeesNumber: 250
+            hasWc: true
+            hasDot: true
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchProspectsFiltersDto'
+        page:
+          type: integer
+          description: 1-based page number
+          example: 1
+          minimum: 1
+        limit:
+          type: integer
+          description: Results per page
+          example: 25
+          minimum: 1
+          maximum: 100
+    SearchProspectsResponseData:
+      type: object
+      properties:
+        prospects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProspectResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+      required:
+      - prospects
+      - pagination
     PaginationResponse:
       type: object
       properties:
@@ -1659,139 +2542,52 @@ components:
       - page
       - limit
       - total
-    ProspectIrs990HistoryEntry:
+    DotInsuranceLine:
       type: object
       properties:
-        year:
-          type: integer
-          example: 2023
-        totalExpenses:
+        renewalDate:
           type:
-          - number
+          - string
           - 'null'
-          example: 11200000
-          description: Total expenses for the year, in USD.
+          example: '2026-08-15'
+          description: DOT coverage renewal date (ISO YYYY-MM-DD).
+        carrier:
+          type:
+          - string
+          - 'null'
+          example: Progressive Commercial
+          description: DOT coverage carrier name.
       required:
-      - year
-      - totalExpenses
-    ProspectResponse:
+      - renewalDate
+      - carrier
+    ProspectInsurance:
       type: object
       properties:
-        prospectId:
-          type: integer
-          example: 8472193
-        standardCompanyName:
-          type: string
-          example: Lone Star Freight Lines, Inc.
-        state:
-          type:
-          - string
-          - 'null'
-          example: TX
-        city:
-          type:
-          - string
-          - 'null'
-          example: Dallas
-        zipCode:
-          type:
-          - string
-          - 'null'
-          example: '75201'
-        address:
-          type:
-          - string
-          - 'null'
-          example: 4200 Stemmons Fwy
-        primaryVertical:
-          type:
-          - string
-          - 'null'
-          example: Trucking
-        naicsCode:
-          type:
-          - string
-          - 'null'
-          example: '484110'
-        naicsList:
-          type:
-          - string
-          - 'null'
-          example: 484110, 484121
-        ntee:
-          type:
-          - string
-          - 'null'
-          example: B82
-          description: NTEE classification code. Only present when the requesting user has the nteeFilter entitlement.
-        salesVolumeRange:
-          type:
-          - string
-          - 'null'
-          example: $10M–$25M
-        hqPhone:
-          type:
-          - string
-          - 'null'
-          example: +1-214-555-0142
-        ein:
-          type:
-          - string
-          - 'null'
-          example: 74-2918374
-        employeeRange:
-          type:
-          - string
-          - 'null'
-          example: 50-249
-        websiteUrl:
-          type:
-          - string
-          - 'null'
-          example: https://lonestarfreight.com
-        linkedinUrl:
-          type:
-          - string
-          - 'null'
-          example: https://linkedin.com/company/lone-star-freight
-        insurance:
-          $ref: '#/components/schemas/ProspectInsurance'
-        irs990:
+        wc:
           allOf:
-          - $ref: '#/components/schemas/ProspectIrs990'
-        xDatePredictions:
-          description: Modeled renewal-date predictions. Only present when the requesting user has the xDatePredictions entitlement.
+          - $ref: '#/components/schemas/InsuranceLineData'
+        pension:
           allOf:
-          - $ref: '#/components/schemas/XDatePredictions'
-        benefitsRedFlags:
-          description: Benefits Red Flags (38 risk indicators from Form 5500). Only present when the requesting user has the isBenefitsRedFlagFilter entitlement. Each flag is true (flagged), false (not flagged), or null (insufficient data). Paired benefitsRagFlagDescription* fields carry the explanation when a flag is triggered.
+          - $ref: '#/components/schemas/InsuranceLineData'
+        benefits:
           allOf:
-          - $ref: '#/components/schemas/BenefitsRedFlags'
-        contacts:
-          type:
-          - object
-          - 'null'
-          example: null
-          description: Always null in search response — use /v1/prospects/enrich for contacts
+          - $ref: '#/components/schemas/InsuranceLineData'
+        fidelityBond:
+          type: boolean
+          example: false
+        osha:
+          allOf:
+          - $ref: '#/components/schemas/OshaData'
+        dot:
+          allOf:
+          - $ref: '#/components/schemas/DotData'
       required:
-      - prospectId
-      - standardCompanyName
-      - state
-      - city
-      - zipCode
-      - address
-      - primaryVertical
-      - naicsCode
-      - naicsList
-      - salesVolumeRange
-      - hqPhone
-      - ein
-      - employeeRange
-      - websiteUrl
-      - linkedinUrl
-      - insurance
-      - irs990
-      - contacts
+      - wc
+      - pension
+      - benefits
+      - fidelityBond
+      - osha
+      - dot
   securitySchemes:
     bearer:
       scheme: bearer

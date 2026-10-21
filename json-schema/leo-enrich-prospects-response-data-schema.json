@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/leo/main/json-schema/leo-enrich-prospects-response-data-schema.json",
+  "title": "EnrichProspectsResponseData",
+  "x-generated": "2026-10-20",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/leo-prospects-api-openapi.yml#/components/schemas/EnrichProspectsResponseData",
+  "type": "object",
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Opaque job identifier — pass to GET /v1/jobs/{taskId}."
+    },
+    "status": {
+      "type": "string",
+      "description": "Initial job state immediately after accept."
+    },
+    "pollUrl": {
+      "type": "string",
+      "description": "Relative path to poll for job completion."
+    },
+    "creditsReserved": {
+      "type": "number",
+      "description": "Credits reserved up front (≤ maxProspects). Final charge in metadata.creditsUsed on the completed job — only `enriched` rows are billed."
+    },
+    "estimatedWaitSeconds": {
+      "type": "number",
+      "description": "Expected job duration in seconds (typical ~120)."
+    }
+  },
+  "required": [
+    "taskId",
+    "status",
+    "pollUrl",
+    "creditsReserved",
+    "estimatedWaitSeconds"
+  ]
+}

@@ -1,0 +1,65 @@
+generated: '2026-10-20'
+method: probed
+source: pre-flight dossier (docs platform, portal detections) + CNAME chains and response headers of the hosts apis.yml names
+registry: all/0-working/vendors.yml
+areas_vocabulary:
+- documentation
+- developer-portal
+- api-gateway
+- cdn
+- hosting
+- sdk-generation
+- api-collections
+- status-page
+- support
+- community
+- identity
+- mcp-hosting
+vendors:
+- vendor: cloudfront
+  name: Amazon CloudFront
+  area: cdn
+  host: api.meetleo.com
+  evidence: header:x-amz-cf-id
+  signal: header
+  confidence: high
+  kin_score: []
+- vendor: vercel
+  name: Vercel
+  area: hosting
+  host: www.meetleo.com
+  evidence: header:x-vercel-id
+  signal: header
+  confidence: high
+  kin_score: []
+- vendor: cognito
+  name: Amazon Cognito
+  area: identity
+  host: mcp.meetleo.com
+  evidence: leo-oauth-authorization-server.json names cognito in its OAuth metadata
+  signal: oauth-metadata
+  confidence: high
+  kin_score:
+  - authentication
+reliance:
+  areas_vendor_served:
+  - cdn
+  - hosting
+  - identity
+  vendor_count: 3
+  areas_observed: 12
+  share_of_observable_areas: 0.25
+  note: areas where a third party was DETECTED serving this provider; an area absent here was either self-run or not observed, and this script
+    cannot tell those apart
+checked:
+- 'docs-platform: unreachable'
+- www.meetleo.com (Website)
+- insights-app.meetleo.com (SignUp)
+- insights-app.meetleo.com (Login)
+- www.meetleo.com (Support)
+- api.meetleo.com (Documentation)
+- api.meetleo.com (APIReference)
+- api.meetleo.com (baseURL)
+- mcp.meetleo.com (baseURL)
+- www.meetleo.com (baseURL)
+- www.meetleo.com (mcp)

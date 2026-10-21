@@ -1,7 +1,7 @@
 ---
 generated: '2026-08-14'
 method: generated
-name: Enrich LeO prospects with contact data
+name: enrich-prospect-contacts
 description: Queue LeO's asynchronous contact-enrichment job, poll it to completion, and reconcile what you were actually charged - without double-reserving credits on a retry.
 api: openapi/leo-prospects-api-openapi.yml
 operations: [ProspectsController_search, ProspectsController_enrich, JobsController_getJob, CreditsController_getCreditBalance]

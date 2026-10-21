@@ -1,0 +1,113 @@
+generated: '2026-10-20'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 6
+  own: 6
+  other_domain: 0
+  platform: 0
+  roles:
+  - docs
+  - identity
+  - marketing
+  - other
+  - website
+hosts:
+- host: api.meetleo.com
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - docs-index
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - Documentation
+  - APIReference
+  serves:
+  - api
+  - docs
+  - cdn
+  vendor: cloudfront
+  registrable_domain: meetleo.com
+  role: docs
+  relation: own
+- host: insights-app.meetleo.com
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types:
+  - SignUp
+  - Login
+  serves: []
+  registrable_domain: meetleo.com
+  role: identity
+  relation: own
+- host: mcp.meetleo.com
+  found_by:
+  - apis[]
+  - probed
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types: []
+  serves:
+  - api
+  - identity
+  vendor: cognito
+  registrable_domain: meetleo.com
+  role: other
+  relation: own
+- host: meetleo.com
+  found_by:
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: meetleo.com
+  role: other
+  relation: own
+- host: resources.meetleo.com
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - well-known
+  types:
+  - Newsroom
+  - Blog
+  serves: []
+  registrable_domain: meetleo.com
+  role: marketing
+  relation: own
+- host: www.meetleo.com
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - Website
+  - Pricing
+  - Support
+  - FAQ
+  - TermsOfService
+  - PrivacyPolicy
+  - Compliance
+  serves:
+  - docs
+  - api
+  - hosting
+  vendor: vercel
+  registrable_domain: meetleo.com
+  role: website
+  relation: own

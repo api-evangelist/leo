@@ -1,7 +1,7 @@
 ---
 generated: '2026-08-14'
 method: generated
-name: Build a prospect list by insurance renewal window
+name: search-prospects-by-renewal-window
 description: Use LeO's x-date filters to find commercial-insurance prospects whose policies renew inside a target window, and page through the results without spending enrichment credits.
 api: openapi/leo-prospects-api-openapi.yml
 operations: [ProspectsController_search, ProspectsController_getById]

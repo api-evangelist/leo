@@ -1,0 +1,652 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/leo/main/json-schema/leo-search-prospects-dto-schema.json",
+  "title": "SearchProspectsDto",
+  "x-generated": "2026-10-20",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/leo-prospects-api-openapi.yml#/components/schemas/SearchProspectsDto",
+  "type": "object",
+  "properties": {
+    "filters": {
+      "description": "Filter group(s). Within a single object, conditions are **ANDed** together. Pass one object for a typical search — multiple objects are reserved for advanced segment combinations.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SearchProspectsFiltersDto"
+      }
+    },
+    "page": {
+      "type": "integer",
+      "description": "1-based page number",
+      "minimum": 1
+    },
+    "limit": {
+      "type": "integer",
+      "description": "Results per page",
+      "minimum": 1,
+      "maximum": 100
+    }
+  },
+  "$defs": {
+    "SearchProspectsFiltersDto": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "description": "Two-letter US state code(s). Any prospect in *one of* these states matches.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "city": {
+          "description": "City name(s).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "county": {
+          "description": "County name(s).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "zip": {
+          "description": "5-digit US ZIP code(s).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "naicsList": {
+          "description": "6-digit NAICS code(s). Common P&C prospect verticals: 484110 (general freight trucking), 236220 (commercial construction), 238210 (electrical contractors), 722511 (full-service restaurants).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ntee": {
+          "description": "IRS NTEE code(s) for nonprofit classification.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "vertical": {
+          "description": "Primary vertical(s). Examples: \"Trucking\", \"Construction\", \"Manufacturing\", \"Restaurants\".",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prospectName": {
+          "type": "string",
+          "description": "Fuzzy partial match on company name. Use this when you have a known target account."
+        },
+        "websiteUrl": {
+          "type": "string",
+          "description": "Website domain or URL. Bare domain (no scheme) is preferred and matches subdomains too."
+        },
+        "websiteDomain": {
+          "type": "string",
+          "description": "Exact website domain match (no scheme, no path)."
+        },
+        "ein": {
+          "type": "string",
+          "description": "Employer Identification Number (EIN)."
+        },
+        "minEmployeesNumber": {
+          "type": "integer",
+          "description": "Inclusive lower bound on employee count."
+        },
+        "maxEmployeesNumber": {
+          "type": "integer",
+          "description": "Inclusive upper bound on employee count. Must be ≥ minEmployeesNumber when both are set."
+        },
+        "minSalesVolume": {
+          "type": "integer",
+          "description": "Inclusive lower bound on annual sales volume (USD)."
+        },
+        "maxSalesVolume": {
+          "type": "integer",
+          "description": "Inclusive upper bound on annual sales volume (USD). Must be ≥ minSalesVolume when both are set."
+        },
+        "hasLinkedin": {
+          "type": "boolean",
+          "description": "Restrict to prospects with a LinkedIn profile."
+        },
+        "hasWebsite": {
+          "type": "boolean",
+          "description": "Restrict to prospects with a website on file."
+        },
+        "hasContactEmailEnriched": {
+          "type": "boolean",
+          "description": "Restrict to prospects that have had contact emails enriched."
+        },
+        "hasWc": {
+          "type": "boolean",
+          "description": "Restrict to prospects with workers-compensation policy data on file. Strong signal for P&C cross-sell."
+        },
+        "hasOsha": {
+          "type": "boolean",
+          "description": "Restrict to prospects with OSHA inspection/violation records."
+        },
+        "hasOshaViolations": {
+          "type": "boolean",
+          "description": "Restrict to prospects with recorded OSHA violations."
+        },
+        "wcCarrierNameList": {
+          "description": "WC carrier name(s) — exact matches within the WC carrier list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "wcBrokerNameList": {
+          "description": "WC broker name(s) — exact matches within the WC broker list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "wcRenewalMonth": {
+          "type": "integer",
+          "description": "Single WC renewal month (1–12). Unlike `wcRenewalMonths`, this triggers nearest-x-date sorting so results are ordered by proximity to a target renewal date.",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "wcRenewalMonths": {
+          "description": "Plain multi-month filter for WC renewal (1–12). Returns prospects whose WC policy renews in any of the listed months. Does not affect sort order — use `wcRenewalMonth` for nearest-date sorting.",
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "fromWcRenewalDate": {
+          "type": "string",
+          "description": "Earliest WC renewal date (ISO 8601).",
+          "format": "date"
+        },
+        "toWcRenewalDate": {
+          "type": "string",
+          "description": "Latest WC renewal date (ISO 8601).",
+          "format": "date"
+        },
+        "hasDot": {
+          "type": "boolean",
+          "description": "Restrict to prospects with FMCSA/DOT records (trucking, commercial auto). Pair with trucking NAICS for best results."
+        },
+        "hasDotmcmxff": {
+          "type": "boolean",
+          "description": "Restrict to DOT carriers with MX/MF (Mexico cross-border) authority. MCMXFF = Motor Carrier Mexico authority or Form & Fitness."
+        },
+        "hasDotViolations": {
+          "type": "boolean",
+          "description": "Restrict to DOT carriers with recorded violations."
+        },
+        "hasDotbipdExcess": {
+          "type": "boolean",
+          "description": "Restrict to DOT carriers with Bodily Injury & Property Damage (BIPD) excess liability coverage on file."
+        },
+        "hasDotbipdPrimary": {
+          "type": "boolean",
+          "description": "Restrict to DOT carriers with Bodily Injury & Property Damage (BIPD) primary liability coverage on file."
+        },
+        "hasDotCargo": {
+          "type": "boolean",
+          "description": "Restrict to DOT carriers with cargo insurance on file."
+        },
+        "hasDotSurety": {
+          "type": "boolean",
+          "description": "Restrict to DOT carriers with surety bond on file."
+        },
+        "hasDotCoverages": {
+          "type": "boolean",
+          "description": "Restrict to DOT carriers with any DOT coverage on file."
+        },
+        "hasDotTrust": {
+          "type": "boolean",
+          "description": "Restrict to DOT carriers with a DOT Trust filing."
+        },
+        "dotNumber": {
+          "type": "string",
+          "description": "FMCSA DOT number."
+        },
+        "minDotDrivers": {
+          "type": "integer",
+          "description": "Inclusive lower bound on number of DOT drivers."
+        },
+        "maxDotDrivers": {
+          "type": "integer",
+          "description": "Inclusive upper bound on number of DOT drivers."
+        },
+        "minDotUnits": {
+          "type": "integer",
+          "description": "Inclusive lower bound on number of DOT power units."
+        },
+        "maxDotUnits": {
+          "type": "integer",
+          "description": "Inclusive upper bound on number of DOT power units."
+        },
+        "dotCarrierNameList": {
+          "description": "DOT carrier name(s) — exact matches within the DOT carrier list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dotbipdMaxLimit": {
+          "type": "integer",
+          "description": "Maximum Bodily Injury & Property Damage (BIPD) liability limit on file (USD)."
+        },
+        "dotbipdExcessRenewalMonth": {
+          "type": "integer",
+          "description": "DOT BIPD Excess policy renewal month (1–12).",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "dotbipdPrimaryRenewalMonth": {
+          "type": "integer",
+          "description": "DOT BIPD Primary policy renewal month (1–12).",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "dotTrustRenewalMonth": {
+          "type": "integer",
+          "description": "DOT Trust policy renewal month (1–12).",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "dotCargoRenewalMonth": {
+          "type": "integer",
+          "description": "DOT Cargo policy renewal month (1–12).",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "dotSuretyRenewalMonth": {
+          "type": "integer",
+          "description": "DOT Surety policy renewal month (1–12).",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "predictedAutoXMonth": {
+          "type": "integer",
+          "description": "Predicted commercial auto policy renewal month (1–12).",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "predictedGeneralLiabilityXMonth": {
+          "type": "integer",
+          "description": "Predicted general liability policy renewal month (1–12).",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "has5500": {
+          "type": "boolean",
+          "description": "Restrict to prospects with any Form 5500 welfare/benefits filing."
+        },
+        "hasBenefitsPension": {
+          "type": "boolean",
+          "description": "Restrict to prospects with Form 5500 pension records (defined-benefit pension exposure)."
+        },
+        "hasBenefitsWelfare": {
+          "type": "boolean",
+          "description": "Restrict to prospects with Form 5500 welfare plan filings."
+        },
+        "has5500Contact": {
+          "type": "boolean",
+          "description": "Restrict to prospects with a Form 5500 signatory contact on file."
+        },
+        "benefitsCarrierNameList": {
+          "description": "Benefits carrier name(s) — exact matches within the 5500 carrier list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "benefitsBrokerNameList": {
+          "description": "Benefits broker name(s) — exact matches within the 5500 broker list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fromBenefitsRenewalDate": {
+          "type": "string",
+          "description": "Earliest benefits (pension/welfare) renewal date (ISO 8601).",
+          "format": "date"
+        },
+        "toBenefitsRenewalDate": {
+          "type": "string",
+          "description": "Latest benefits (pension/welfare) renewal date (ISO 8601).",
+          "format": "date"
+        },
+        "benefitsRenewalMonths": {
+          "description": "Benefits renewal month(s) (1–12) — matches pension or welfare renewal month.",
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "pensionRenewalMonth": {
+          "type": "integer",
+          "description": "Pension plan renewal month (1–12). Triggers nearest-x-date sorting.",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "welfareRenewalMonth": {
+          "type": "integer",
+          "description": "Welfare plan renewal month (1–12). Triggers nearest-x-date sorting.",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "minPensionParticipants": {
+          "type": "integer",
+          "description": "Inclusive lower bound on pension plan participant count."
+        },
+        "maxPensionParticipants": {
+          "type": "integer",
+          "description": "Inclusive upper bound on pension plan participant count."
+        },
+        "minWelfareParticipants": {
+          "type": "integer",
+          "description": "Inclusive lower bound on welfare plan participant count."
+        },
+        "maxWelfareParticipants": {
+          "type": "integer",
+          "description": "Inclusive upper bound on welfare plan participant count."
+        },
+        "minBenefitsTotalAssets": {
+          "type": "integer",
+          "description": "Inclusive lower bound on 5500 plan total assets (USD, end of year)."
+        },
+        "maxBenefitsTotalAssets": {
+          "type": "number",
+          "description": "Inclusive upper bound on 5500 plan total assets (USD, end of year)."
+        },
+        "benefitsServiceProviderList": {
+          "description": "Service provider name(s) listed on Schedule C of Form 5500.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "benefitsServiceProviderCode": {
+          "type": "string",
+          "description": "Single Form 5500 Schedule C service-provider relationship code. Use `benefitsServiceProviderCodes` for multi-code filtering."
+        },
+        "benefitsServiceProviderCodes": {
+          "description": "Form 5500 Schedule C service-provider relationship code(s). Matches prospects with any of the listed codes. Superset of `benefitsServiceProviderCode`.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "benefitsServiceProviderCompensationMin": {
+          "type": "number",
+          "description": "Minimum service provider compensation amount (USD, Schedule C)."
+        },
+        "benefitsServiceProviderCompensationMax": {
+          "type": "number",
+          "description": "Maximum service provider compensation amount (USD, Schedule C)."
+        },
+        "latestBenefitsPlanYear": {
+          "type": "string",
+          "description": "Latest welfare plan year begin date (ISO 8601). Filters on the most recent 5500 welfare filing date."
+        },
+        "latestPensionPlanYear": {
+          "type": "string",
+          "format": "date",
+          "description": "Latest pension plan year begin date (ISO 8601)."
+        },
+        "latestBenefitsSignatoryPolicyBegin": {
+          "type": "string",
+          "format": "date",
+          "description": "Latest welfare signatory first policy begin date (ISO 8601)."
+        },
+        "latestPensionSignatoryPolicyBegin": {
+          "type": "string",
+          "format": "date",
+          "description": "Latest pension signatory first policy begin date (ISO 8601)."
+        },
+        "latestBenefitsBrokeragePolicyBegin": {
+          "type": "string",
+          "format": "date",
+          "description": "Latest welfare broker first policy begin date (ISO 8601)."
+        },
+        "latestPensionBrokeragePolicyBegin": {
+          "type": "string",
+          "format": "date",
+          "description": "Latest pension broker first policy begin date (ISO 8601)."
+        },
+        "latestBenefitsCarrierPolicyBegin": {
+          "type": "string",
+          "format": "date",
+          "description": "Latest welfare carrier first policy begin date (ISO 8601)."
+        },
+        "latestPensionCarrierPolicyBegin": {
+          "type": "string",
+          "format": "date",
+          "description": "Latest pension carrier first policy begin date (ISO 8601)."
+        },
+        "hasOffline5500AiInsights": {
+          "type": "boolean",
+          "description": "Restrict to prospects with offline 5500 AI insights generated."
+        },
+        "hasIrs": {
+          "type": "boolean",
+          "description": "Restrict to prospects with IRS Form 990 records (nonprofits)."
+        },
+        "irs501Ind": {
+          "type": "boolean",
+          "description": "Restrict to IRS 501(c) tax-exempt organizations."
+        },
+        "fidelityBondInd": {
+          "type": "boolean",
+          "description": "Restrict to organizations with a fidelity bond indication on their 990."
+        },
+        "irsFormType": {
+          "type": "string",
+          "description": "IRS form type (e.g. \"990\", \"990-EZ\", \"990-PF\")."
+        },
+        "has990Contact": {
+          "type": "boolean",
+          "description": "Restrict to nonprofits with directors/officers listed on the 990."
+        },
+        "minIrsTotalRevenue": {
+          "type": "number",
+          "description": "Inclusive lower bound on IRS total revenue (USD)."
+        },
+        "maxIrsTotalRevenue": {
+          "type": "number",
+          "description": "Inclusive upper bound on IRS total revenue (USD)."
+        },
+        "minIrsTotalExpenses": {
+          "type": "number",
+          "description": "Inclusive lower bound on IRS total expenses (USD)."
+        },
+        "maxIrsTotalExpenses": {
+          "type": "number",
+          "description": "Inclusive upper bound on IRS total expenses (USD)."
+        },
+        "minIrsTotalNetIncome": {
+          "type": "number",
+          "description": "Inclusive lower bound on IRS net income (USD)."
+        },
+        "maxIrsTotalNetIncome": {
+          "type": "number",
+          "description": "Inclusive upper bound on IRS net income (USD)."
+        },
+        "minIrsTotalNetAssets": {
+          "type": "integer",
+          "description": "Inclusive lower bound on IRS total net assets (USD)."
+        },
+        "maxIrsTotalNetAssets": {
+          "type": "integer",
+          "description": "Inclusive upper bound on IRS total net assets (USD)."
+        },
+        "minIrsGrossReceipts": {
+          "type": "number",
+          "description": "Inclusive lower bound on IRS gross receipts (USD)."
+        },
+        "maxIrsGrossReceipts": {
+          "type": "number",
+          "description": "Inclusive upper bound on IRS gross receipts (USD)."
+        },
+        "benefitsRagFlagComplianceAmendmentNeeded": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Compliance Amendment Needed."
+        },
+        "benefitsRagFlagCorrectiveDistributions": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Corrective Distributions."
+        },
+        "benefitsRagFlagDecliningPlanAssets": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Declining Plan Assets."
+        },
+        "benefitsRagFlagDelinquentContributions": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Delinquent Contributions."
+        },
+        "benefitsRagFlagExcessiveServiceProviderFees": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Excessive Service Provider Fees."
+        },
+        "benefitsRagFlagFidelityBondTooLow": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Fidelity Bond Too Low."
+        },
+        "benefitsRagFlagFrozenPlan": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Frozen Plan."
+        },
+        "benefitsRagFlagHas5500Audit": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Has 5500 Audit."
+        },
+        "benefitsRagFlagHighAverageAccountBalance": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: High Average Account Balance."
+        },
+        "benefitsRagFlagHighBrokerCommissionRate": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: High Broker Commission Rate."
+        },
+        "benefitsRagFlagHighExpenseRatio": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: High Expense Ratio."
+        },
+        "benefitsRagFlagHighFees": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: High Fees."
+        },
+        "benefitsRagFlagHighParticipantTurnover": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: High Participant Turnover."
+        },
+        "benefitsRagFlagHighPremiumPerCapita": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: High Premium Per Capita."
+        },
+        "benefitsRagFlagHighRetireeAssets": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: High Retiree Assets."
+        },
+        "benefitsRagFlagHighTurnoverRatio": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: High Turnover Ratio."
+        },
+        "benefitsRagFlagIndirectCompensationHeavy": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Indirect Compensation Heavy."
+        },
+        "benefitsRagFlagLargeAssetDrop": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Large Asset Drop."
+        },
+        "benefitsRagFlagLateFiling": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Late Filing."
+        },
+        "benefitsRagFlagLowParticipationRate": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Low Participation Rate."
+        },
+        "benefitsRagFlagMissingAudit": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Missing Audit."
+        },
+        "benefitsRagFlagMultiplePlansSingleEmployer": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Multiple Plans Single Employer."
+        },
+        "benefitsRagFlagNegativeNetAssets": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Negative Net Assets."
+        },
+        "benefitsRagFlagNegativeNetIncome": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Negative Net Income."
+        },
+        "benefitsRagFlagNetParticipantOutflow": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Net Participant Outflow."
+        },
+        "benefitsRagFlagNewPlan": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: New Plan."
+        },
+        "benefitsRagFlagNoCurrentBroker": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: No Current Broker."
+        },
+        "benefitsRagFlagNoEmployerContributions": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: No Employer Contributions."
+        },
+        "benefitsRagFlagNoInsuranceOnWelfarePlan": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: No Insurance On Welfare Plan."
+        },
+        "benefitsRagFlagNoStopLoss": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: No Stop Loss."
+        },
+        "benefitsRagFlagPlanRecentlyTerminated": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Plan Recently Terminated."
+        },
+        "benefitsRagFlagPolicyExpiringSoon": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Policy Expiring Soon."
+        },
+        "benefitsRagFlagQualifiedAuditOpinion": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Qualified Audit Opinion."
+        },
+        "benefitsRagFlagRelatedPartyTransactions": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Related Party Transactions."
+        },
+        "benefitsRagFlagSingleCarrierDependency": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Single Carrier Dependency."
+        },
+        "benefitsRagFlagSmallPlanLargeAssets": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Small Plan Large Assets."
+        },
+        "benefitsRagFlagStaleValuation": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Stale Valuation."
+        },
+        "benefitsRagFlagUnderfundedPension": {
+          "type": "boolean",
+          "description": "Restrict to prospects flagged for: Underfunded Pension."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,93 @@
+generated: '2026-10-20'
+method: generated
+source: openapi/leo-account-api-openapi.yml, openapi/leo-credits-api-openapi.yml, openapi/leo-health-api-openapi.yml,
+  openapi/leo-jobs-api-openapi.yml, openapi/leo-prospects-api-openapi.yml
+description: Recommended x-agentic-access execution contracts, classified heuristically from
+  the OpenAPI. A governance starting point for exposing this API to AI agents — review and bind
+  audience per deployment. See research/curity/agentic-governance/.
+summary:
+  operations: 7
+  by_action_class:
+    connected: 6
+    acting: 1
+  by_consequence:
+    read: 6
+    safety-critical: 1
+  human_in_the_loop_required: 1
+operations:
+- path: /v1/account
+  method: get
+  operationId: AccountController_getAccount
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/credits/balance
+  method: get
+  operationId: CreditsController_getCreditBalance
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /health
+  method: get
+  operationId: AppController_health
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/jobs/{taskId}
+  method: get
+  operationId: JobsController_getJob
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/prospects/search
+  method: post
+  operationId: ProspectsController_search
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/prospects/{prospectId}
+  method: get
+  operationId: ProspectsController_getById
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/prospects/enrich
+  method: post
+  operationId: ProspectsController_enrich
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required

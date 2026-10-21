@@ -1,0 +1,1023 @@
+{
+  "@context": {
+    "@vocab": "https://meetleo.com/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "leo": "https://meetleo.com/schema#",
+    "PlanDto": "leo:PlanDto",
+    "name": {
+      "@id": "leo:name",
+      "@type": "xsd:string"
+    },
+    "hasApiAccess": {
+      "@id": "leo:hasApiAccess",
+      "@type": "xsd:boolean"
+    },
+    "hasMcpAccess": {
+      "@id": "leo:hasMcpAccess",
+      "@type": "xsd:boolean"
+    },
+    "AccountResponseDto": "leo:AccountResponseDto",
+    "userId": {
+      "@id": "leo:userId",
+      "@type": "xsd:string"
+    },
+    "email": {
+      "@id": "leo:email",
+      "@type": "xsd:string"
+    },
+    "tenantId": {
+      "@id": "leo:tenantId",
+      "@type": "xsd:string"
+    },
+    "plan": {
+      "@id": "leo:plan",
+      "@type": "@id"
+    },
+    "CreditBalanceResponseDto": "leo:CreditBalanceResponseDto",
+    "available": {
+      "@id": "leo:available",
+      "@type": "xsd:decimal"
+    },
+    "reserved": {
+      "@id": "leo:reserved",
+      "@type": "xsd:decimal"
+    },
+    "poolId": {
+      "@id": "leo:poolId",
+      "@type": "xsd:string"
+    },
+    "EnrichedProspectJobItemDto": "leo:EnrichedProspectJobItemDto",
+    "prospectId": {
+      "@id": "leo:prospectId",
+      "@type": "xsd:decimal"
+    },
+    "enrichmentStatus": {
+      "@id": "leo:enrichmentStatus",
+      "@type": "xsd:string"
+    },
+    "JobStatusDataDto": "leo:JobStatusDataDto",
+    "taskId": {
+      "@id": "leo:taskId",
+      "@type": "xsd:string"
+    },
+    "status": {
+      "@id": "leo:status",
+      "@type": "xsd:string"
+    },
+    "prospects": {
+      "@id": "leo:prospects",
+      "@container": "@list"
+    },
+    "JobPollMetadataDto": "leo:JobPollMetadataDto",
+    "requestId": {
+      "@id": "leo:requestId",
+      "@type": "xsd:string"
+    },
+    "creditsUsed": {
+      "@id": "leo:creditsUsed",
+      "@type": "xsd:decimal"
+    },
+    "creditsRemaining": {
+      "@id": "leo:creditsRemaining",
+      "@type": "xsd:decimal"
+    },
+    "JobErrorItemDto": "leo:JobErrorItemDto",
+    "code": {
+      "@id": "leo:code",
+      "@type": "xsd:string"
+    },
+    "message": {
+      "@id": "leo:message",
+      "@type": "xsd:string"
+    },
+    "JobPollEnvelopeDto": "leo:JobPollEnvelopeDto",
+    "version": {
+      "@id": "leo:version",
+      "@type": "xsd:string"
+    },
+    "processTime": {
+      "@id": "leo:processTime",
+      "@type": "xsd:decimal"
+    },
+    "data": {
+      "@id": "leo:data",
+      "@type": "@id"
+    },
+    "errors": {
+      "@id": "leo:errors",
+      "@container": "@list"
+    },
+    "metadata": {
+      "@id": "leo:metadata",
+      "@type": "@id"
+    },
+    "DotData": "leo:DotData",
+    "units": {
+      "@id": "leo:units",
+      "@type": "xsd:decimal"
+    },
+    "drivers": {
+      "@id": "leo:drivers",
+      "@type": "xsd:decimal"
+    },
+    "violations": {
+      "@id": "leo:violations",
+      "@type": "xsd:boolean"
+    },
+    "bipdPrimary": {
+      "@id": "leo:bipdPrimary"
+    },
+    "bipdExcess": {
+      "@id": "leo:bipdExcess"
+    },
+    "cargo": {
+      "@id": "leo:cargo"
+    },
+    "surety": {
+      "@id": "leo:surety"
+    },
+    "OshaData": "leo:OshaData",
+    "healthViolations": {
+      "@id": "leo:healthViolations",
+      "@type": "xsd:boolean"
+    },
+    "safetyViolations": {
+      "@id": "leo:safetyViolations",
+      "@type": "xsd:boolean"
+    },
+    "SearchProspectsResponseData": "leo:SearchProspectsResponseData",
+    "pagination": {
+      "@id": "leo:pagination",
+      "@type": "@id"
+    },
+    "ProspectInsurance": "leo:ProspectInsurance",
+    "wc": {
+      "@id": "leo:wc"
+    },
+    "pension": {
+      "@id": "leo:pension"
+    },
+    "benefits": {
+      "@id": "leo:benefits"
+    },
+    "fidelityBond": {
+      "@id": "leo:fidelityBond",
+      "@type": "xsd:boolean"
+    },
+    "osha": {
+      "@id": "leo:osha"
+    },
+    "dot": {
+      "@id": "leo:dot"
+    },
+    "EnrichProspectsDto": "leo:EnrichProspectsDto",
+    "filters": {
+      "@id": "leo:filters",
+      "@container": "@list"
+    },
+    "maxProspects": {
+      "@id": "leo:maxProspects",
+      "@type": "xsd:decimal"
+    },
+    "EnrichProspectsResponseData": "leo:EnrichProspectsResponseData",
+    "pollUrl": {
+      "@id": "leo:pollUrl",
+      "@type": "xsd:string"
+    },
+    "creditsReserved": {
+      "@id": "leo:creditsReserved",
+      "@type": "xsd:decimal"
+    },
+    "estimatedWaitSeconds": {
+      "@id": "leo:estimatedWaitSeconds",
+      "@type": "xsd:decimal"
+    },
+    "SearchProspectsFiltersDto": "leo:SearchProspectsFiltersDto",
+    "state": {
+      "@id": "leo:state",
+      "@container": "@list"
+    },
+    "city": {
+      "@id": "leo:city",
+      "@container": "@list"
+    },
+    "county": {
+      "@id": "leo:county",
+      "@container": "@list"
+    },
+    "zip": {
+      "@id": "leo:zip",
+      "@container": "@list"
+    },
+    "naicsList": {
+      "@id": "leo:naicsList",
+      "@container": "@list"
+    },
+    "ntee": {
+      "@id": "leo:ntee",
+      "@container": "@list"
+    },
+    "vertical": {
+      "@id": "leo:vertical",
+      "@container": "@list"
+    },
+    "prospectName": {
+      "@id": "leo:prospectName",
+      "@type": "xsd:string"
+    },
+    "websiteUrl": {
+      "@id": "leo:websiteUrl",
+      "@type": "xsd:string"
+    },
+    "websiteDomain": {
+      "@id": "leo:websiteDomain",
+      "@type": "xsd:string"
+    },
+    "ein": {
+      "@id": "leo:ein",
+      "@type": "xsd:string"
+    },
+    "minEmployeesNumber": {
+      "@id": "leo:minEmployeesNumber",
+      "@type": "xsd:integer"
+    },
+    "maxEmployeesNumber": {
+      "@id": "leo:maxEmployeesNumber",
+      "@type": "xsd:integer"
+    },
+    "minSalesVolume": {
+      "@id": "leo:minSalesVolume",
+      "@type": "xsd:integer"
+    },
+    "maxSalesVolume": {
+      "@id": "leo:maxSalesVolume",
+      "@type": "xsd:integer"
+    },
+    "hasLinkedin": {
+      "@id": "leo:hasLinkedin",
+      "@type": "xsd:boolean"
+    },
+    "hasWebsite": {
+      "@id": "leo:hasWebsite",
+      "@type": "xsd:boolean"
+    },
+    "hasContactEmailEnriched": {
+      "@id": "leo:hasContactEmailEnriched",
+      "@type": "xsd:boolean"
+    },
+    "hasWc": {
+      "@id": "leo:hasWc",
+      "@type": "xsd:boolean"
+    },
+    "hasOsha": {
+      "@id": "leo:hasOsha",
+      "@type": "xsd:boolean"
+    },
+    "hasOshaViolations": {
+      "@id": "leo:hasOshaViolations",
+      "@type": "xsd:boolean"
+    },
+    "wcCarrierNameList": {
+      "@id": "leo:wcCarrierNameList",
+      "@container": "@list"
+    },
+    "wcBrokerNameList": {
+      "@id": "leo:wcBrokerNameList",
+      "@container": "@list"
+    },
+    "wcRenewalMonth": {
+      "@id": "leo:wcRenewalMonth",
+      "@type": "xsd:integer"
+    },
+    "wcRenewalMonths": {
+      "@id": "leo:wcRenewalMonths",
+      "@container": "@list"
+    },
+    "fromWcRenewalDate": {
+      "@id": "leo:fromWcRenewalDate",
+      "@type": "xsd:date"
+    },
+    "toWcRenewalDate": {
+      "@id": "leo:toWcRenewalDate",
+      "@type": "xsd:date"
+    },
+    "hasDot": {
+      "@id": "leo:hasDot",
+      "@type": "xsd:boolean"
+    },
+    "hasDotmcmxff": {
+      "@id": "leo:hasDotmcmxff",
+      "@type": "xsd:boolean"
+    },
+    "hasDotViolations": {
+      "@id": "leo:hasDotViolations",
+      "@type": "xsd:boolean"
+    },
+    "hasDotbipdExcess": {
+      "@id": "leo:hasDotbipdExcess",
+      "@type": "xsd:boolean"
+    },
+    "hasDotbipdPrimary": {
+      "@id": "leo:hasDotbipdPrimary",
+      "@type": "xsd:boolean"
+    },
+    "hasDotCargo": {
+      "@id": "leo:hasDotCargo",
+      "@type": "xsd:boolean"
+    },
+    "hasDotSurety": {
+      "@id": "leo:hasDotSurety",
+      "@type": "xsd:boolean"
+    },
+    "hasDotCoverages": {
+      "@id": "leo:hasDotCoverages",
+      "@type": "xsd:boolean"
+    },
+    "hasDotTrust": {
+      "@id": "leo:hasDotTrust",
+      "@type": "xsd:boolean"
+    },
+    "dotNumber": {
+      "@id": "leo:dotNumber",
+      "@type": "xsd:string"
+    },
+    "minDotDrivers": {
+      "@id": "leo:minDotDrivers",
+      "@type": "xsd:integer"
+    },
+    "maxDotDrivers": {
+      "@id": "leo:maxDotDrivers",
+      "@type": "xsd:integer"
+    },
+    "minDotUnits": {
+      "@id": "leo:minDotUnits",
+      "@type": "xsd:integer"
+    },
+    "maxDotUnits": {
+      "@id": "leo:maxDotUnits",
+      "@type": "xsd:integer"
+    },
+    "dotCarrierNameList": {
+      "@id": "leo:dotCarrierNameList",
+      "@container": "@list"
+    },
+    "dotbipdMaxLimit": {
+      "@id": "leo:dotbipdMaxLimit",
+      "@type": "xsd:integer"
+    },
+    "dotbipdExcessRenewalMonth": {
+      "@id": "leo:dotbipdExcessRenewalMonth",
+      "@type": "xsd:integer"
+    },
+    "dotbipdPrimaryRenewalMonth": {
+      "@id": "leo:dotbipdPrimaryRenewalMonth",
+      "@type": "xsd:integer"
+    },
+    "dotTrustRenewalMonth": {
+      "@id": "leo:dotTrustRenewalMonth",
+      "@type": "xsd:integer"
+    },
+    "dotCargoRenewalMonth": {
+      "@id": "leo:dotCargoRenewalMonth",
+      "@type": "xsd:integer"
+    },
+    "dotSuretyRenewalMonth": {
+      "@id": "leo:dotSuretyRenewalMonth",
+      "@type": "xsd:integer"
+    },
+    "predictedAutoXMonth": {
+      "@id": "leo:predictedAutoXMonth",
+      "@type": "xsd:integer"
+    },
+    "predictedGeneralLiabilityXMonth": {
+      "@id": "leo:predictedGeneralLiabilityXMonth",
+      "@type": "xsd:integer"
+    },
+    "has5500": {
+      "@id": "leo:has5500",
+      "@type": "xsd:boolean"
+    },
+    "hasBenefitsPension": {
+      "@id": "leo:hasBenefitsPension",
+      "@type": "xsd:boolean"
+    },
+    "hasBenefitsWelfare": {
+      "@id": "leo:hasBenefitsWelfare",
+      "@type": "xsd:boolean"
+    },
+    "has5500Contact": {
+      "@id": "leo:has5500Contact",
+      "@type": "xsd:boolean"
+    },
+    "benefitsCarrierNameList": {
+      "@id": "leo:benefitsCarrierNameList",
+      "@container": "@list"
+    },
+    "benefitsBrokerNameList": {
+      "@id": "leo:benefitsBrokerNameList",
+      "@container": "@list"
+    },
+    "fromBenefitsRenewalDate": {
+      "@id": "leo:fromBenefitsRenewalDate",
+      "@type": "xsd:date"
+    },
+    "toBenefitsRenewalDate": {
+      "@id": "leo:toBenefitsRenewalDate",
+      "@type": "xsd:date"
+    },
+    "benefitsRenewalMonths": {
+      "@id": "leo:benefitsRenewalMonths",
+      "@container": "@list"
+    },
+    "pensionRenewalMonth": {
+      "@id": "leo:pensionRenewalMonth",
+      "@type": "xsd:integer"
+    },
+    "welfareRenewalMonth": {
+      "@id": "leo:welfareRenewalMonth",
+      "@type": "xsd:integer"
+    },
+    "minPensionParticipants": {
+      "@id": "leo:minPensionParticipants",
+      "@type": "xsd:integer"
+    },
+    "maxPensionParticipants": {
+      "@id": "leo:maxPensionParticipants",
+      "@type": "xsd:integer"
+    },
+    "minWelfareParticipants": {
+      "@id": "leo:minWelfareParticipants",
+      "@type": "xsd:integer"
+    },
+    "maxWelfareParticipants": {
+      "@id": "leo:maxWelfareParticipants",
+      "@type": "xsd:integer"
+    },
+    "minBenefitsTotalAssets": {
+      "@id": "leo:minBenefitsTotalAssets",
+      "@type": "xsd:integer"
+    },
+    "maxBenefitsTotalAssets": {
+      "@id": "leo:maxBenefitsTotalAssets",
+      "@type": "xsd:decimal"
+    },
+    "benefitsServiceProviderList": {
+      "@id": "leo:benefitsServiceProviderList",
+      "@container": "@list"
+    },
+    "benefitsServiceProviderCode": {
+      "@id": "leo:benefitsServiceProviderCode",
+      "@type": "xsd:string"
+    },
+    "benefitsServiceProviderCodes": {
+      "@id": "leo:benefitsServiceProviderCodes",
+      "@container": "@list"
+    },
+    "benefitsServiceProviderCompensationMin": {
+      "@id": "leo:benefitsServiceProviderCompensationMin",
+      "@type": "xsd:decimal"
+    },
+    "benefitsServiceProviderCompensationMax": {
+      "@id": "leo:benefitsServiceProviderCompensationMax",
+      "@type": "xsd:decimal"
+    },
+    "latestBenefitsPlanYear": {
+      "@id": "leo:latestBenefitsPlanYear",
+      "@type": "xsd:string"
+    },
+    "latestPensionPlanYear": {
+      "@id": "leo:latestPensionPlanYear",
+      "@type": "xsd:date"
+    },
+    "latestBenefitsSignatoryPolicyBegin": {
+      "@id": "leo:latestBenefitsSignatoryPolicyBegin",
+      "@type": "xsd:date"
+    },
+    "latestPensionSignatoryPolicyBegin": {
+      "@id": "leo:latestPensionSignatoryPolicyBegin",
+      "@type": "xsd:date"
+    },
+    "latestBenefitsBrokeragePolicyBegin": {
+      "@id": "leo:latestBenefitsBrokeragePolicyBegin",
+      "@type": "xsd:date"
+    },
+    "latestPensionBrokeragePolicyBegin": {
+      "@id": "leo:latestPensionBrokeragePolicyBegin",
+      "@type": "xsd:date"
+    },
+    "latestBenefitsCarrierPolicyBegin": {
+      "@id": "leo:latestBenefitsCarrierPolicyBegin",
+      "@type": "xsd:date"
+    },
+    "latestPensionCarrierPolicyBegin": {
+      "@id": "leo:latestPensionCarrierPolicyBegin",
+      "@type": "xsd:date"
+    },
+    "hasOffline5500AiInsights": {
+      "@id": "leo:hasOffline5500AiInsights",
+      "@type": "xsd:boolean"
+    },
+    "hasIrs": {
+      "@id": "leo:hasIrs",
+      "@type": "xsd:boolean"
+    },
+    "irs501Ind": {
+      "@id": "leo:irs501Ind",
+      "@type": "xsd:boolean"
+    },
+    "fidelityBondInd": {
+      "@id": "leo:fidelityBondInd",
+      "@type": "xsd:boolean"
+    },
+    "irsFormType": {
+      "@id": "leo:irsFormType",
+      "@type": "xsd:string"
+    },
+    "has990Contact": {
+      "@id": "leo:has990Contact",
+      "@type": "xsd:boolean"
+    },
+    "minIrsTotalRevenue": {
+      "@id": "leo:minIrsTotalRevenue",
+      "@type": "xsd:decimal"
+    },
+    "maxIrsTotalRevenue": {
+      "@id": "leo:maxIrsTotalRevenue",
+      "@type": "xsd:decimal"
+    },
+    "minIrsTotalExpenses": {
+      "@id": "leo:minIrsTotalExpenses",
+      "@type": "xsd:decimal"
+    },
+    "maxIrsTotalExpenses": {
+      "@id": "leo:maxIrsTotalExpenses",
+      "@type": "xsd:decimal"
+    },
+    "minIrsTotalNetIncome": {
+      "@id": "leo:minIrsTotalNetIncome",
+      "@type": "xsd:decimal"
+    },
+    "maxIrsTotalNetIncome": {
+      "@id": "leo:maxIrsTotalNetIncome",
+      "@type": "xsd:decimal"
+    },
+    "minIrsTotalNetAssets": {
+      "@id": "leo:minIrsTotalNetAssets",
+      "@type": "xsd:integer"
+    },
+    "maxIrsTotalNetAssets": {
+      "@id": "leo:maxIrsTotalNetAssets",
+      "@type": "xsd:integer"
+    },
+    "minIrsGrossReceipts": {
+      "@id": "leo:minIrsGrossReceipts",
+      "@type": "xsd:decimal"
+    },
+    "maxIrsGrossReceipts": {
+      "@id": "leo:maxIrsGrossReceipts",
+      "@type": "xsd:decimal"
+    },
+    "benefitsRagFlagComplianceAmendmentNeeded": {
+      "@id": "leo:benefitsRagFlagComplianceAmendmentNeeded",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagCorrectiveDistributions": {
+      "@id": "leo:benefitsRagFlagCorrectiveDistributions",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagDecliningPlanAssets": {
+      "@id": "leo:benefitsRagFlagDecliningPlanAssets",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagDelinquentContributions": {
+      "@id": "leo:benefitsRagFlagDelinquentContributions",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagExcessiveServiceProviderFees": {
+      "@id": "leo:benefitsRagFlagExcessiveServiceProviderFees",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagFidelityBondTooLow": {
+      "@id": "leo:benefitsRagFlagFidelityBondTooLow",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagFrozenPlan": {
+      "@id": "leo:benefitsRagFlagFrozenPlan",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagHas5500Audit": {
+      "@id": "leo:benefitsRagFlagHas5500Audit",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagHighAverageAccountBalance": {
+      "@id": "leo:benefitsRagFlagHighAverageAccountBalance",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagHighBrokerCommissionRate": {
+      "@id": "leo:benefitsRagFlagHighBrokerCommissionRate",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagHighExpenseRatio": {
+      "@id": "leo:benefitsRagFlagHighExpenseRatio",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagHighFees": {
+      "@id": "leo:benefitsRagFlagHighFees",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagHighParticipantTurnover": {
+      "@id": "leo:benefitsRagFlagHighParticipantTurnover",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagHighPremiumPerCapita": {
+      "@id": "leo:benefitsRagFlagHighPremiumPerCapita",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagHighRetireeAssets": {
+      "@id": "leo:benefitsRagFlagHighRetireeAssets",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagHighTurnoverRatio": {
+      "@id": "leo:benefitsRagFlagHighTurnoverRatio",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagIndirectCompensationHeavy": {
+      "@id": "leo:benefitsRagFlagIndirectCompensationHeavy",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagLargeAssetDrop": {
+      "@id": "leo:benefitsRagFlagLargeAssetDrop",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagLateFiling": {
+      "@id": "leo:benefitsRagFlagLateFiling",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagLowParticipationRate": {
+      "@id": "leo:benefitsRagFlagLowParticipationRate",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagMissingAudit": {
+      "@id": "leo:benefitsRagFlagMissingAudit",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagMultiplePlansSingleEmployer": {
+      "@id": "leo:benefitsRagFlagMultiplePlansSingleEmployer",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagNegativeNetAssets": {
+      "@id": "leo:benefitsRagFlagNegativeNetAssets",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagNegativeNetIncome": {
+      "@id": "leo:benefitsRagFlagNegativeNetIncome",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagNetParticipantOutflow": {
+      "@id": "leo:benefitsRagFlagNetParticipantOutflow",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagNewPlan": {
+      "@id": "leo:benefitsRagFlagNewPlan",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagNoCurrentBroker": {
+      "@id": "leo:benefitsRagFlagNoCurrentBroker",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagNoEmployerContributions": {
+      "@id": "leo:benefitsRagFlagNoEmployerContributions",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagNoInsuranceOnWelfarePlan": {
+      "@id": "leo:benefitsRagFlagNoInsuranceOnWelfarePlan",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagNoStopLoss": {
+      "@id": "leo:benefitsRagFlagNoStopLoss",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagPlanRecentlyTerminated": {
+      "@id": "leo:benefitsRagFlagPlanRecentlyTerminated",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagPolicyExpiringSoon": {
+      "@id": "leo:benefitsRagFlagPolicyExpiringSoon",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagQualifiedAuditOpinion": {
+      "@id": "leo:benefitsRagFlagQualifiedAuditOpinion",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagRelatedPartyTransactions": {
+      "@id": "leo:benefitsRagFlagRelatedPartyTransactions",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagSingleCarrierDependency": {
+      "@id": "leo:benefitsRagFlagSingleCarrierDependency",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagSmallPlanLargeAssets": {
+      "@id": "leo:benefitsRagFlagSmallPlanLargeAssets",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagStaleValuation": {
+      "@id": "leo:benefitsRagFlagStaleValuation",
+      "@type": "xsd:boolean"
+    },
+    "benefitsRagFlagUnderfundedPension": {
+      "@id": "leo:benefitsRagFlagUnderfundedPension",
+      "@type": "xsd:boolean"
+    },
+    "InsuranceLineData": "leo:InsuranceLineData",
+    "renewalDate": {
+      "@id": "leo:renewalDate",
+      "@type": "xsd:string"
+    },
+    "carrier": {
+      "@id": "leo:carrier",
+      "@type": "xsd:string"
+    },
+    "broker": {
+      "@id": "leo:broker",
+      "@type": "xsd:string"
+    },
+    "participants": {
+      "@id": "leo:participants",
+      "@type": "xsd:decimal"
+    },
+    "XDatePredictions": "leo:XDatePredictions",
+    "generalLiability": {
+      "@id": "leo:generalLiability",
+      "@type": "xsd:string"
+    },
+    "commercialAuto": {
+      "@id": "leo:commercialAuto",
+      "@type": "xsd:string"
+    },
+    "DotInsuranceLine": "leo:DotInsuranceLine",
+    "ProspectIrs990": "leo:ProspectIrs990",
+    "reportType": {
+      "@id": "leo:reportType",
+      "@type": "xsd:string"
+    },
+    "reportYear": {
+      "@id": "leo:reportYear",
+      "@type": "xsd:integer"
+    },
+    "totalRevenue": {
+      "@id": "leo:totalRevenue",
+      "@type": "xsd:decimal"
+    },
+    "totalExpenses": {
+      "@id": "leo:totalExpenses",
+      "@type": "xsd:decimal"
+    },
+    "totalNetAssets": {
+      "@id": "leo:totalNetAssets",
+      "@type": "xsd:decimal"
+    },
+    "history": {
+      "@id": "leo:history",
+      "@container": "@list"
+    },
+    "SearchProspectsDto": "leo:SearchProspectsDto",
+    "page": {
+      "@id": "leo:page",
+      "@type": "xsd:integer"
+    },
+    "limit": {
+      "@id": "leo:limit",
+      "@type": "xsd:integer"
+    },
+    "BenefitsRedFlags": "leo:BenefitsRedFlags",
+    "benefitsRagFlagDescriptionComplianceAmendmentNeeded": {
+      "@id": "leo:benefitsRagFlagDescriptionComplianceAmendmentNeeded",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionCorrectiveDistributions": {
+      "@id": "leo:benefitsRagFlagDescriptionCorrectiveDistributions",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionDecliningPlanAssets": {
+      "@id": "leo:benefitsRagFlagDescriptionDecliningPlanAssets",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionDelinquentContributions": {
+      "@id": "leo:benefitsRagFlagDescriptionDelinquentContributions",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionExcessiveServiceProviderFees": {
+      "@id": "leo:benefitsRagFlagDescriptionExcessiveServiceProviderFees",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionFidelityBondTooLow": {
+      "@id": "leo:benefitsRagFlagDescriptionFidelityBondTooLow",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionFrozenPlan": {
+      "@id": "leo:benefitsRagFlagDescriptionFrozenPlan",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionHas5500Audit": {
+      "@id": "leo:benefitsRagFlagDescriptionHas5500Audit",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionHighAverageAccountBalance": {
+      "@id": "leo:benefitsRagFlagDescriptionHighAverageAccountBalance",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionHighBrokerCommissionRate": {
+      "@id": "leo:benefitsRagFlagDescriptionHighBrokerCommissionRate",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionHighExpenseRatio": {
+      "@id": "leo:benefitsRagFlagDescriptionHighExpenseRatio",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionHighFees": {
+      "@id": "leo:benefitsRagFlagDescriptionHighFees",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionHighParticipantTurnover": {
+      "@id": "leo:benefitsRagFlagDescriptionHighParticipantTurnover",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionHighPremiumPerCapita": {
+      "@id": "leo:benefitsRagFlagDescriptionHighPremiumPerCapita",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionHighRetireeAssets": {
+      "@id": "leo:benefitsRagFlagDescriptionHighRetireeAssets",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionHighTurnoverRatio": {
+      "@id": "leo:benefitsRagFlagDescriptionHighTurnoverRatio",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionIndirectCompensationHeavy": {
+      "@id": "leo:benefitsRagFlagDescriptionIndirectCompensationHeavy",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionLargeAssetDrop": {
+      "@id": "leo:benefitsRagFlagDescriptionLargeAssetDrop",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionLateFiling": {
+      "@id": "leo:benefitsRagFlagDescriptionLateFiling",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionLowParticipationRate": {
+      "@id": "leo:benefitsRagFlagDescriptionLowParticipationRate",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionMissingAudit": {
+      "@id": "leo:benefitsRagFlagDescriptionMissingAudit",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionMultiplePlansSingleEmployer": {
+      "@id": "leo:benefitsRagFlagDescriptionMultiplePlansSingleEmployer",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionNegativeNetAssets": {
+      "@id": "leo:benefitsRagFlagDescriptionNegativeNetAssets",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionNegativeNetIncome": {
+      "@id": "leo:benefitsRagFlagDescriptionNegativeNetIncome",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionNetParticipantOutflow": {
+      "@id": "leo:benefitsRagFlagDescriptionNetParticipantOutflow",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionNewPlan": {
+      "@id": "leo:benefitsRagFlagDescriptionNewPlan",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionNoCurrentBroker": {
+      "@id": "leo:benefitsRagFlagDescriptionNoCurrentBroker",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionNoEmployerContributions": {
+      "@id": "leo:benefitsRagFlagDescriptionNoEmployerContributions",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionNoInsuranceOnWelfarePlan": {
+      "@id": "leo:benefitsRagFlagDescriptionNoInsuranceOnWelfarePlan",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionNoStopLoss": {
+      "@id": "leo:benefitsRagFlagDescriptionNoStopLoss",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionPlanRecentlyTerminated": {
+      "@id": "leo:benefitsRagFlagDescriptionPlanRecentlyTerminated",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionPolicyExpiringSoon": {
+      "@id": "leo:benefitsRagFlagDescriptionPolicyExpiringSoon",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionQualifiedAuditOpinion": {
+      "@id": "leo:benefitsRagFlagDescriptionQualifiedAuditOpinion",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionRelatedPartyTransactions": {
+      "@id": "leo:benefitsRagFlagDescriptionRelatedPartyTransactions",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionSingleCarrierDependency": {
+      "@id": "leo:benefitsRagFlagDescriptionSingleCarrierDependency",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionSmallPlanLargeAssets": {
+      "@id": "leo:benefitsRagFlagDescriptionSmallPlanLargeAssets",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionStaleValuation": {
+      "@id": "leo:benefitsRagFlagDescriptionStaleValuation",
+      "@type": "xsd:string"
+    },
+    "benefitsRagFlagDescriptionUnderfundedPension": {
+      "@id": "leo:benefitsRagFlagDescriptionUnderfundedPension",
+      "@type": "xsd:string"
+    },
+    "PaginationResponse": "leo:PaginationResponse",
+    "total": {
+      "@id": "leo:total",
+      "@type": "xsd:integer"
+    },
+    "ProspectIrs990HistoryEntry": "leo:ProspectIrs990HistoryEntry",
+    "year": {
+      "@id": "leo:year",
+      "@type": "xsd:integer"
+    },
+    "ProspectResponse": "leo:ProspectResponse",
+    "standardCompanyName": {
+      "@id": "leo:standardCompanyName",
+      "@type": "xsd:string"
+    },
+    "zipCode": {
+      "@id": "leo:zipCode",
+      "@type": "xsd:string"
+    },
+    "address": {
+      "@id": "leo:address",
+      "@type": "xsd:string"
+    },
+    "primaryVertical": {
+      "@id": "leo:primaryVertical",
+      "@type": "xsd:string"
+    },
+    "naicsCode": {
+      "@id": "leo:naicsCode",
+      "@type": "xsd:string"
+    },
+    "salesVolumeRange": {
+      "@id": "leo:salesVolumeRange",
+      "@type": "xsd:string"
+    },
+    "hqPhone": {
+      "@id": "leo:hqPhone",
+      "@type": "xsd:string"
+    },
+    "employeeRange": {
+      "@id": "leo:employeeRange",
+      "@type": "xsd:string"
+    },
+    "linkedinUrl": {
+      "@id": "leo:linkedinUrl",
+      "@type": "xsd:string"
+    },
+    "insurance": {
+      "@id": "leo:insurance",
+      "@type": "@id"
+    },
+    "irs990": {
+      "@id": "leo:irs990"
+    },
+    "xDatePredictions": {
+      "@id": "leo:xDatePredictions"
+    },
+    "benefitsRedFlags": {
+      "@id": "leo:benefitsRedFlags"
+    },
+    "contacts": {
+      "@id": "leo:contacts"
+    }
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "LeO API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects LeO's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-20) from openapi/leo-account-api-openapi.yml, openapi/leo-credits-api-openapi.yml, openapi/leo-health-api-openapi.yml.",
+  "dcterms:created": "2026-10-20",
+  "dcterms:source": [
+    "openapi/leo-account-api-openapi.yml",
+    "openapi/leo-credits-api-openapi.yml",
+    "openapi/leo-health-api-openapi.yml",
+    "openapi/leo-jobs-api-openapi.yml",
+    "openapi/leo-prospects-api-openapi.yml"
+  ]
+}

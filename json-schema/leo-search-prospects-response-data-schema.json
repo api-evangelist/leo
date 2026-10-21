@@ -1,0 +1,1093 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/leo/main/json-schema/leo-search-prospects-response-data-schema.json",
+  "title": "SearchProspectsResponseData",
+  "x-generated": "2026-10-20",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/leo-prospects-api-openapi.yml#/components/schemas/SearchProspectsResponseData",
+  "type": "object",
+  "properties": {
+    "prospects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ProspectResponse"
+      }
+    },
+    "pagination": {
+      "$ref": "#/$defs/PaginationResponse"
+    }
+  },
+  "required": [
+    "prospects",
+    "pagination"
+  ],
+  "$defs": {
+    "BenefitsRedFlags": {
+      "type": "object",
+      "properties": {
+        "benefitsRagFlagComplianceAmendmentNeeded": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Compliance Amendment Needed — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionComplianceAmendmentNeeded": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Compliance Amendment Needed — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagCorrectiveDistributions": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Corrective Distributions — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionCorrectiveDistributions": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Corrective Distributions — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagDecliningPlanAssets": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Declining Plan Assets — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionDecliningPlanAssets": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Declining Plan Assets — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagDelinquentContributions": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Delinquent Contributions — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionDelinquentContributions": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Delinquent Contributions — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagExcessiveServiceProviderFees": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Excessive Service Provider Fees — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionExcessiveServiceProviderFees": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Excessive Service Provider Fees — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagFidelityBondTooLow": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Fidelity Bond Too Low — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionFidelityBondTooLow": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Fidelity Bond Too Low — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagFrozenPlan": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Frozen Plan — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionFrozenPlan": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Frozen Plan — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagHas5500Audit": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Has 5500 Audit — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionHas5500Audit": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Has 5500 Audit — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagHighAverageAccountBalance": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "High Average Account Balance — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionHighAverageAccountBalance": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "High Average Account Balance — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagHighBrokerCommissionRate": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "High Broker Commission Rate — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionHighBrokerCommissionRate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "High Broker Commission Rate — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagHighExpenseRatio": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "High Expense Ratio — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionHighExpenseRatio": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "High Expense Ratio — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagHighFees": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "High Fees — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionHighFees": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "High Fees — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagHighParticipantTurnover": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "High Participant Turnover — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionHighParticipantTurnover": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "High Participant Turnover — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagHighPremiumPerCapita": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "High Premium Per Capita — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionHighPremiumPerCapita": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "High Premium Per Capita — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagHighRetireeAssets": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "High Retiree Assets — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionHighRetireeAssets": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "High Retiree Assets — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagHighTurnoverRatio": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "High Turnover Ratio — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionHighTurnoverRatio": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "High Turnover Ratio — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagIndirectCompensationHeavy": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Indirect Compensation Heavy — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionIndirectCompensationHeavy": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Indirect Compensation Heavy — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagLargeAssetDrop": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Large Asset Drop — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionLargeAssetDrop": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Large Asset Drop — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagLateFiling": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Late Filing — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionLateFiling": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Late Filing — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagLowParticipationRate": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Low Participation Rate — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionLowParticipationRate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Low Participation Rate — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagMissingAudit": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Missing Audit — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionMissingAudit": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Missing Audit — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagMultiplePlansSingleEmployer": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Multiple Plans Single Employer — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionMultiplePlansSingleEmployer": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Multiple Plans Single Employer — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagNegativeNetAssets": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Negative Net Assets — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionNegativeNetAssets": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Negative Net Assets — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagNegativeNetIncome": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Negative Net Income — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionNegativeNetIncome": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Negative Net Income — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagNetParticipantOutflow": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Net Participant Outflow — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionNetParticipantOutflow": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Net Participant Outflow — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagNewPlan": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "New Plan — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionNewPlan": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "New Plan — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagNoCurrentBroker": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "No Current Broker — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionNoCurrentBroker": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "No Current Broker — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagNoEmployerContributions": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "No Employer Contributions — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionNoEmployerContributions": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "No Employer Contributions — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagNoInsuranceOnWelfarePlan": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "No Insurance On Welfare Plan — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionNoInsuranceOnWelfarePlan": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "No Insurance On Welfare Plan — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagNoStopLoss": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "No Stop Loss — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionNoStopLoss": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "No Stop Loss — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagPlanRecentlyTerminated": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Plan Recently Terminated — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionPlanRecentlyTerminated": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Plan Recently Terminated — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagPolicyExpiringSoon": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Policy Expiring Soon — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionPolicyExpiringSoon": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Policy Expiring Soon — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagQualifiedAuditOpinion": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Qualified Audit Opinion — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionQualifiedAuditOpinion": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Qualified Audit Opinion — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagRelatedPartyTransactions": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Related Party Transactions — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionRelatedPartyTransactions": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Related Party Transactions — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagSingleCarrierDependency": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Single Carrier Dependency — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionSingleCarrierDependency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Single Carrier Dependency — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagSmallPlanLargeAssets": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Small Plan Large Assets — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionSmallPlanLargeAssets": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Small Plan Large Assets — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagStaleValuation": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Stale Valuation — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionStaleValuation": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Stale Valuation — human-readable explanation when flagged; null otherwise."
+        },
+        "benefitsRagFlagUnderfundedPension": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Underfunded Pension — true = flagged, false = not flagged, null = insufficient data."
+        },
+        "benefitsRagFlagDescriptionUnderfundedPension": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Underfunded Pension — human-readable explanation when flagged; null otherwise."
+        }
+      },
+      "required": [
+        "benefitsRagFlagComplianceAmendmentNeeded",
+        "benefitsRagFlagDescriptionComplianceAmendmentNeeded",
+        "benefitsRagFlagCorrectiveDistributions",
+        "benefitsRagFlagDescriptionCorrectiveDistributions",
+        "benefitsRagFlagDecliningPlanAssets",
+        "benefitsRagFlagDescriptionDecliningPlanAssets",
+        "benefitsRagFlagDelinquentContributions",
+        "benefitsRagFlagDescriptionDelinquentContributions",
+        "benefitsRagFlagExcessiveServiceProviderFees",
+        "benefitsRagFlagDescriptionExcessiveServiceProviderFees",
+        "benefitsRagFlagFidelityBondTooLow",
+        "benefitsRagFlagDescriptionFidelityBondTooLow",
+        "benefitsRagFlagFrozenPlan",
+        "benefitsRagFlagDescriptionFrozenPlan",
+        "benefitsRagFlagHas5500Audit",
+        "benefitsRagFlagDescriptionHas5500Audit",
+        "benefitsRagFlagHighAverageAccountBalance",
+        "benefitsRagFlagDescriptionHighAverageAccountBalance",
+        "benefitsRagFlagHighBrokerCommissionRate",
+        "benefitsRagFlagDescriptionHighBrokerCommissionRate",
+        "benefitsRagFlagHighExpenseRatio",
+        "benefitsRagFlagDescriptionHighExpenseRatio",
+        "benefitsRagFlagHighFees",
+        "benefitsRagFlagDescriptionHighFees",
+        "benefitsRagFlagHighParticipantTurnover",
+        "benefitsRagFlagDescriptionHighParticipantTurnover",
+        "benefitsRagFlagHighPremiumPerCapita",
+        "benefitsRagFlagDescriptionHighPremiumPerCapita",
+        "benefitsRagFlagHighRetireeAssets",
+        "benefitsRagFlagDescriptionHighRetireeAssets",
+        "benefitsRagFlagHighTurnoverRatio",
+        "benefitsRagFlagDescriptionHighTurnoverRatio",
+        "benefitsRagFlagIndirectCompensationHeavy",
+        "benefitsRagFlagDescriptionIndirectCompensationHeavy",
+        "benefitsRagFlagLargeAssetDrop",
+        "benefitsRagFlagDescriptionLargeAssetDrop",
+        "benefitsRagFlagLateFiling",
+        "benefitsRagFlagDescriptionLateFiling",
+        "benefitsRagFlagLowParticipationRate",
+        "benefitsRagFlagDescriptionLowParticipationRate",
+        "benefitsRagFlagMissingAudit",
+        "benefitsRagFlagDescriptionMissingAudit",
+        "benefitsRagFlagMultiplePlansSingleEmployer",
+        "benefitsRagFlagDescriptionMultiplePlansSingleEmployer",
+        "benefitsRagFlagNegativeNetAssets",
+        "benefitsRagFlagDescriptionNegativeNetAssets",
+        "benefitsRagFlagNegativeNetIncome",
+        "benefitsRagFlagDescriptionNegativeNetIncome",
+        "benefitsRagFlagNetParticipantOutflow",
+        "benefitsRagFlagDescriptionNetParticipantOutflow",
+        "benefitsRagFlagNewPlan",
+        "benefitsRagFlagDescriptionNewPlan",
+        "benefitsRagFlagNoCurrentBroker",
+        "benefitsRagFlagDescriptionNoCurrentBroker",
+        "benefitsRagFlagNoEmployerContributions",
+        "benefitsRagFlagDescriptionNoEmployerContributions",
+        "benefitsRagFlagNoInsuranceOnWelfarePlan",
+        "benefitsRagFlagDescriptionNoInsuranceOnWelfarePlan",
+        "benefitsRagFlagNoStopLoss",
+        "benefitsRagFlagDescriptionNoStopLoss",
+        "benefitsRagFlagPlanRecentlyTerminated",
+        "benefitsRagFlagDescriptionPlanRecentlyTerminated",
+        "benefitsRagFlagPolicyExpiringSoon",
+        "benefitsRagFlagDescriptionPolicyExpiringSoon",
+        "benefitsRagFlagQualifiedAuditOpinion",
+        "benefitsRagFlagDescriptionQualifiedAuditOpinion",
+        "benefitsRagFlagRelatedPartyTransactions",
+        "benefitsRagFlagDescriptionRelatedPartyTransactions",
+        "benefitsRagFlagSingleCarrierDependency",
+        "benefitsRagFlagDescriptionSingleCarrierDependency",
+        "benefitsRagFlagSmallPlanLargeAssets",
+        "benefitsRagFlagDescriptionSmallPlanLargeAssets",
+        "benefitsRagFlagStaleValuation",
+        "benefitsRagFlagDescriptionStaleValuation",
+        "benefitsRagFlagUnderfundedPension",
+        "benefitsRagFlagDescriptionUnderfundedPension"
+      ]
+    },
+    "DotData": {
+      "type": "object",
+      "properties": {
+        "units": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of power units (trucks/tractors) registered with FMCSA."
+        },
+        "drivers": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of CDL drivers registered with FMCSA."
+        },
+        "violations": {
+          "type": "boolean"
+        },
+        "bipdPrimary": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/DotInsuranceLine"
+            }
+          ]
+        },
+        "bipdExcess": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/DotInsuranceLine"
+            }
+          ]
+        },
+        "cargo": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/DotInsuranceLine"
+            }
+          ]
+        },
+        "surety": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/DotInsuranceLine"
+            }
+          ]
+        }
+      },
+      "required": [
+        "units",
+        "drivers",
+        "violations",
+        "bipdPrimary",
+        "bipdExcess",
+        "cargo",
+        "surety"
+      ]
+    },
+    "DotInsuranceLine": {
+      "type": "object",
+      "properties": {
+        "renewalDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "DOT coverage renewal date (ISO YYYY-MM-DD)."
+        },
+        "carrier": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "DOT coverage carrier name."
+        }
+      },
+      "required": [
+        "renewalDate",
+        "carrier"
+      ]
+    },
+    "InsuranceLineData": {
+      "type": "object",
+      "properties": {
+        "renewalDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Policy renewal date (ISO YYYY-MM-DD). Present for WC, pension, and welfare/benefits lines."
+        },
+        "carrier": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Insurance carrier name for this line."
+        },
+        "broker": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Broker name. Present for WC, pension, and welfare/benefits lines."
+        },
+        "participants": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of covered participants. Only present for pension and welfare/benefits lines."
+        }
+      },
+      "required": [
+        "renewalDate",
+        "carrier"
+      ]
+    },
+    "OshaData": {
+      "type": "object",
+      "properties": {
+        "healthViolations": {
+          "type": "boolean"
+        },
+        "safetyViolations": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "healthViolations",
+        "safetyViolations"
+      ]
+    },
+    "PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "description": "1-based page number returned."
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Page size used for this response."
+        },
+        "total": {
+          "type": "integer",
+          "description": "Total prospects matching the filters across all pages."
+        }
+      },
+      "required": [
+        "page",
+        "limit",
+        "total"
+      ]
+    },
+    "ProspectInsurance": {
+      "type": "object",
+      "properties": {
+        "wc": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/InsuranceLineData"
+            }
+          ]
+        },
+        "pension": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/InsuranceLineData"
+            }
+          ]
+        },
+        "benefits": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/InsuranceLineData"
+            }
+          ]
+        },
+        "fidelityBond": {
+          "type": "boolean"
+        },
+        "osha": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/OshaData"
+            }
+          ]
+        },
+        "dot": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/DotData"
+            }
+          ]
+        }
+      },
+      "required": [
+        "wc",
+        "pension",
+        "benefits",
+        "fidelityBond",
+        "osha",
+        "dot"
+      ]
+    },
+    "ProspectIrs990": {
+      "type": "object",
+      "properties": {
+        "reportType": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "IRS form variant filed (e.g. \"990\", \"990-EZ\", \"990-PF\")."
+        },
+        "reportYear": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "totalRevenue": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Total revenue in USD."
+        },
+        "totalExpenses": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Total expenses in USD."
+        },
+        "totalNetAssets": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Total net assets at fiscal year end, in USD."
+        },
+        "history": {
+          "description": "Up to 11 years of historical IRS total expenses, descending by year. Only present when the requesting user has the csvHasIrsHistoricalData entitlement.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProspectIrs990HistoryEntry"
+          }
+        }
+      },
+      "required": [
+        "reportType",
+        "reportYear",
+        "totalRevenue",
+        "totalExpenses",
+        "totalNetAssets"
+      ]
+    },
+    "ProspectIrs990HistoryEntry": {
+      "type": "object",
+      "properties": {
+        "year": {
+          "type": "integer"
+        },
+        "totalExpenses": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Total expenses for the year, in USD."
+        }
+      },
+      "required": [
+        "year",
+        "totalExpenses"
+      ]
+    },
+    "ProspectResponse": {
+      "type": "object",
+      "properties": {
+        "prospectId": {
+          "type": "integer"
+        },
+        "standardCompanyName": {
+          "type": "string"
+        },
+        "state": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "city": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "zipCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "address": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "primaryVertical": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "naicsCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "naicsList": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ntee": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "NTEE classification code. Only present when the requesting user has the nteeFilter entitlement."
+        },
+        "salesVolumeRange": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hqPhone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ein": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "employeeRange": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "websiteUrl": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "linkedinUrl": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "insurance": {
+          "$ref": "#/$defs/ProspectInsurance"
+        },
+        "irs990": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/ProspectIrs990"
+            }
+          ]
+        },
+        "xDatePredictions": {
+          "description": "Modeled renewal-date predictions. Only present when the requesting user has the xDatePredictions entitlement.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/XDatePredictions"
+            }
+          ]
+        },
+        "benefitsRedFlags": {
+          "description": "Benefits Red Flags (38 risk indicators from Form 5500). Only present when the requesting user has the isBenefitsRedFlagFilter entitlement. Each flag is true (flagged), false (not flagged), or null (insufficient data). Paired benefitsRagFlagDescription* fields carry the explanation when a flag is triggered.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/BenefitsRedFlags"
+            }
+          ]
+        },
+        "contacts": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Always null in search response — use /v1/prospects/enrich for contacts"
+        }
+      },
+      "required": [
+        "prospectId",
+        "standardCompanyName",
+        "state",
+        "city",
+        "zipCode",
+        "address",
+        "primaryVertical",
+        "naicsCode",
+        "naicsList",
+        "salesVolumeRange",
+        "hqPhone",
+        "ein",
+        "employeeRange",
+        "websiteUrl",
+        "linkedinUrl",
+        "insurance",
+        "irs990",
+        "contacts"
+      ]
+    },
+    "XDatePredictions": {
+      "type": "object",
+      "properties": {
+        "generalLiability": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Predicted General Liability renewal date (ISO YYYY-MM-DD)."
+        },
+        "commercialAuto": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Predicted Commercial Auto renewal date (ISO YYYY-MM-DD)."
+        }
+      },
+      "required": [
+        "generalLiability",
+        "commercialAuto"
+      ]
+    }
+  }
+}
