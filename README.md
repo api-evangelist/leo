@@ -64,64 +64,157 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-LeO is an AI-powered sales and prospecting platform for commercial insurance professionals — property & casualty (P&C) brokers, employee benefits advisors, and nonprofit insurance specialists. It pairs a commercial-lines prospect database with 150+ filters (NAICS, revenue, workers' compensation, DOT, OSHA compliance history, IRS 990 nonprofit data) and a renewal-date (X-date) database with AI-predicted renewal months, then generates AI-personalized outreach and pre-meeting intelligence on incumbent carriers, brokers and coverage gaps. Prospects push to CRM or export to CSV.
+LeO is an AI-powered sales and prospecting platform for commercial insurance professionals, serving property & casualty (P&C) brokers, employee benefits advisors, and nonprofit insurance specialists. The platform pairs a commercial-lines prospect database of 25M+ US businesses and 200+ filters -- NAICS codes, revenue thresholds, workers' compensation, DOT/FMCSA records, OSHA compliance history, Form 5500 benefits and pension filings, and IRS 990 nonprofit data -- with a renewal-date (X-date) database carrying key contacts and AI-predicted renewal months. LeO generates AI-personalized email outreach, produces pre-meeting intelligence on incumbent carriers, brokers, coverage and risk gaps, and pushes qualified prospects to CRM or CSV export. Founded by CEO Liri Halperin Segal, LeO is a Techstars portfolio company and has been certified HIPAA compliant by an external auditing firm. Alongside the subscription web application it ships two programmatic surfaces: a REST "Leo Public API" at api.meetleo.com with a published OpenAPI 3.0.0 definition covering account, credits, prospect search and asynchronous contact enrichment, and a first-party, OAuth-protected MCP Connector at mcp.meetleo.com marketed for Claude, ChatGPT, Gemini and Copilot. Both are entitlement-gated to existing customers and metered in credits.
 
-Founded by CEO Liri Halperin Segal. Techstars portfolio company. Certified HIPAA compliant by an external auditing firm.
+**Areas:** Company · Insurance · Commercial Insurance · Property and Casualty · Employee Benefits · Insurtech · Artificial Intelligence · Sales · Lead Generation · Prospecting · Data Enrichment · Sales Intelligence
 
-- Website: https://www.meetleo.com/
-- Application: https://insights-app.meetleo.com/
-- Pricing: https://www.meetleo.com/pricing
+## LeO on APIs.io
 
-## API surface
+Everything profiled for LeO is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/leo/](https://apis.io/providers/leo/)** — or go straight to one of the APIs or properties below.
 
-**Correction (2026-08-14).** An earlier round of this profile stated that "LeO publishes no public developer API." That was wrong. It was concluded from probing only the Wix-managed marketing host `www.meetleo.com`, which returns HTTP 400 for every `/.well-known/` path and 404 for `/api`, `/docs` and `/developers`. Probing the **API host root** instead found a live, first-party contract.
+### APIs (4)
 
-LeO ships two programmatic surfaces, both first-party and both entitlement-gated to existing customers:
+- [LeO Public API](https://apis.io/apis/leo/leo-public-api/) — REST API for account entitlements, credit balance, commercial-insurance prospect search across 134 filter properties, single-prospect retrieval, and…
+- [LeO MCP Connector](https://apis.io/apis/leo/leo-mcp-connector/) — First-party, hosted, remote MCP server exposing LeO's insurance intelligence -- 25M+ US businesses across 200+ filters, x-dates, Form 5500 financials,…
+- [LeO Site MCP (Wix-provided)](https://apis.io/apis/leo/leo-site-mcp-wix-provided/) — Platform-provided Wix Site MCP server fronting LeO's marketing site, advertised in LeO's llms.txt. Nine tools covering business details, site search and…
+- [LeO Health API](https://apis.io/apis/leo/leo-health-api/) — The Health API from LeO — 1 operation(s) for health.
 
-| Surface | Where | Auth | Evidence |
-|---|---|---|---|
-| **Leo Public API** (REST) | `https://api.meetleo.com` | Bearer JWT | OpenAPI 3.0.0 at [`/openapi.json`](https://api.meetleo.com/openapi.json) (HTTP 200), Swagger UI at [`/docs`](https://api.meetleo.com/docs), health check at `/health` |
-| **LeO MCP Connector** | `https://mcp.meetleo.com/mcp` | OAuth 2.1 (auth code + PKCE S256, AWS Cognito) | Marketed at [meetleo.com/mcp](https://www.meetleo.com/mcp); JSON-RPC probe returns a protocol-correct 401 with `WWW-Authenticate` naming RFC 9728 metadata; `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server` both 200 |
+### Published properties
 
-The REST contract carries 7 operations across 4 tags and 24 component schemas: account entitlements, credit balance, prospect search across a **134-property** filter schema, single-prospect retrieval, and asynchronous contact enrichment with job polling. `POST /v1/prospects/search` is free; `GET /v1/prospects/{prospectId}` costs 1 credit; `POST /v1/prospects/enrich` reserves credits and charges only rows that come back `enriched`.
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-The MCP Connector publishes three resource scopes — `prospects:read`, `prospects:enrich`, `account:read` — which map one-to-one onto the REST tag groups, so the connector reads as a thin agent facade over the same API.
+#### MCP servers (2)
 
-### What LeO does not publish
+Model Context Protocol servers that expose the API to agents.
 
-- **No status page, changelog, SLA, versioning policy or deprecation policy.** `status.meetleo.com` does not resolve; `meetleo.statuspage.io` has no tenant. The only availability signal is `GET https://api.meetleo.com/health`.
-- **No idempotency mechanism** on `POST /v1/prospects/enrich`, which reserves credits — a blind retry after a timeout can reserve twice.
-- **No published rate limits.** `429` is declared on four operations as "HTTP API stage throttling or upstream limits" with no numeric limit and no `RateLimit-*` / `Retry-After` headers.
-- **No SDKs, CLI, sandbox, webhooks or AsyncAPI.** No first-party package exists on npm, PyPI or GitHub.
-- **No `security.txt`, trust center, vulnerability disclosure programme or A2A agent card** on any host.
-- **No RFC 9457 problem+json** — errors use a custom `errors[]` envelope, and gateway-level failures use a different shape again.
-- **No API pricing.** The pricing page renders tier prices client-side from a Wix service that 403s anonymously, and neither it nor the MCP page states what a credit costs or which tier carries `hasApiAccess` / `hasMcpAccess`.
-- **No link from any LeO web property to `api.meetleo.com`.** LeO markets the agent surface from its primary navigation and leaves the REST surface undiscoverable. `llms.txt` documents only the Wix Site MCP and routes agents away from the real API.
+- [LeO 3.0 Site Visitor Assistant](https://apis.io/servers/leo/leo-3-0-site-visitor-assistant/)
+- [LeO MCP Connector](https://apis.io/servers/leo/leo-mcp-connector/)
 
-## Artifacts
+#### Agentic access (1)
 
-| Path | Type | Method |
-|---|---|---|
-| `apis.yml` | APIs.json 0.20 profile | — |
-| `openapi/_original/leo-openapi.json` | OpenAPI 3.0.0, verbatim | searched |
-| `openapi/leo-{prospects,jobs,account,credits,system}-api-openapi.yml` | OpenAPI, split one-per-tag | searched |
-| `overlays/leo-servers-overlay.yaml` | Overlay 1.0.0 (adds the `servers[]` the spec omits) | derived |
-| `mcp/leo-mcp.yml` | MCPServer — first-party LeO MCP Connector | probed |
-| `mcp/leo-tool-crosswalk.yml` | ToolCrosswalk | derived |
-| `mcp/leo-site-mcp.yml` | MCPServer — Wix Site MCP (platform-provided, not first-party) | probed |
-| `scopes/leo-scopes.yml` | OAuthScopes | probed |
-| `authentication/leo-authentication.yml` | Authentication | probed |
-| `conventions/leo-conventions.yml` | Conventions | derived |
-| `errors/leo-problem-types.yml` | ErrorCatalog | derived |
-| `data-model/leo-data-model.yml` | DataModel | derived |
-| `lifecycle/leo-lifecycle.yml` | Lifecycle | probed |
-| `rate-limits/leo-rate-limits.yml` | RateLimits (limit_count: 0) | probed |
-| `plans/leo-plans-pricing.yml` | Plans | searched |
-| `packages/leo-packages.yml` | negative record (no SDKs exist) | searched |
-| `skills/` | AgentSkill ×3 + index | generated |
-| `conformance/leo-conformance.yml` | Conformance / Compliance | searched |
-| `well-known/` | WellKnown — 3 documents on `mcp.meetleo.com` | probed |
-| `security/leo-domain-security.yml` | DomainSecurity | probed |
-| `llms/leo-llms.txt` | LLMsTxt, verbatim | searched |
+Which operations an agent can call, which act, and which need a human in the loop.
 
-Not applicable — no vulnerability disclosure programme, trust center, `security.txt`, SDK/package, CLI, sandbox, changelog, event/webhook surface, or A2A agent card was found. (The `github.com/meetleo` account belongs to an unrelated company, MeetLeonard, and is deliberately **not** linked.)
+- [Leo Agentic Access](https://apis.io/agentic-access/leo/leo-agentic-access/)
+
+#### JSON Schema (5)
+
+The data models the API reads and writes.
+
+- [EnrichProspectsDto](https://apis.io/schemas/leo/leo-enrich-prospects-dto/)
+- [EnrichProspectsResponseData](https://apis.io/schemas/leo/leo-enrich-prospects-response-data/)
+- [ProspectResponse](https://apis.io/schemas/leo/leo-prospect-response/)
+- [SearchProspectsDto](https://apis.io/schemas/leo/leo-search-prospects-dto/)
+- [SearchProspectsResponseData](https://apis.io/schemas/leo/leo-search-prospects-response-data/)
+
+#### JSON-LD (1)
+
+Linked-data contexts for the provider's vocabulary.
+
+- [Leo Context](https://apis.io/jsonld/leo/leo-context/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Leo Servers Overlay](https://apis.io/overlays/leo/leo-servers-overlay/)
+
+#### Governance rules (1)
+
+Spectral rulesets for the provider's contracts.
+
+- [LeO API Rules](https://apis.io/rules/leo/leo-rules/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Leo Authentication](https://apis.io/security/leo/leo-authentication/)
+- [Leo Domain Security](https://apis.io/security/leo/leo-domain-security/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Leo Scopes](https://apis.io/scopes/leo/leo-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Leo Plans Pricing](https://apis.io/plans/leo/leo-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Leo Rate Limits](https://apis.io/rate-limits/leo/leo-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.meetleo.com/)
+- [Documentation](https://api.meetleo.com/docs)
+- [API reference](https://api.meetleo.com/docs)
+- [Pricing](https://www.meetleo.com/pricing)
+- [Sign up](https://insights-app.meetleo.com/signup/register)
+- [Support](https://www.meetleo.com/contact)
+- [Blog](https://resources.meetleo.com/blog)
+- [Compliance](https://www.meetleo.com/ai-transparency)
+- [Terms of service](https://www.meetleo.com/terms-and-conditions)
+- [Privacy policy](https://www.meetleo.com/privacy)
+
+## API Evangelist rating
+
+**Kin Score 51.8** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 75.8 |
+| Contract quality | 53.4 |
+| Contract governance | 35.6 |
+| Operational transparency | 7.9 |
+| Developer ergonomics | 37.5 |
+| Access clarity | 77.6 |
+
+**Agent readiness 32.6** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | platform (partial credit) |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 38.5** — Insurance
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/leo/](https://apis.io/providers/leo/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for LeO: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/leo/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
